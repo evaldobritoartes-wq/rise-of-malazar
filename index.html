@@ -34,6 +34,55 @@
       font-size: 0.75rem;
       color: #70a1ff;
     }
+
+    /* Tela de Criação de Personagem */
+    #creation-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #050608;
+      border: 1px solid #1f2a38;
+      border-radius: 6px;
+      padding: 16px;
+      flex: 1;
+      justify-content: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      color: #eccc68;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    input, select {
+      background: #141824;
+      border: 1px solid #2f3640;
+      color: #ffffff;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .class-info {
+      font-size: 0.75rem;
+      color: #a4b0be;
+      background: #10141d;
+      padding: 8px;
+      border-radius: 4px;
+      border-left: 3px solid #70a1ff;
+      margin-top: 4px;
+    }
+
+    /* Layout do Jogo Principial */
+    #game-screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+    }
     #enemy-hud {
       display: none;
       background: #1e1215;
@@ -108,6 +157,7 @@
       background: #2f3542;
       transform: scale(0.98);
     }
+    .btn-start { background: #2ed573; color: #050608; border-color: #2ed573; font-size: 1rem; padding: 14px; }
     .btn-explore { border-color: #ff4757; color: #ff6b81; }
     .btn-status { border-color: #1e90ff; color: #70a1ff; }
     .btn-bag { border-color: #ffa502; color: #eccc68; }
@@ -119,41 +169,66 @@
 
   <header>
     <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
-    <div class="subtitle" id="floor-display">Andar 1 da Masmorra</div>
+    <div class="subtitle" id="floor-display">Criação de Personagem</div>
   </header>
 
-  <div id="enemy-hud">
-    <div class="enemy-title" id="enemy-name">Inimigo</div>
-    <div style="font-size: 0.75rem; color: #ff6b81; margin-top: 2px;" id="enemy-hp-text">HP: 0/0</div>
-    <div class="hp-bar-bg">
-      <div class="hp-bar-fill" id="enemy-hp-fill"></div>
+  <!-- TELA DE CRIAÇÃO -->
+  <div id="creation-screen">
+    <div class="form-group">
+      <label for="hero-name">Nome do Herói:</label>
+      <input type="text" id="hero-name" placeholder="Ex: Dimitrian" value="Dimitrian" maxlength="15">
+    </div>
+
+    <div class="form-group">
+      <label for="hero-class">Classe do Herói:</label>
+      <select id="hero-class" onchange="updateClassPreview()">
+        <option value="Guerreiro">🗡️ Guerreiro (Alta Vida / Ataque Forte)</option>
+        <option value="Mago" selected>🪄 Mago (Alta Mana / Dano Mágico)</option>
+        <option value="Ladino">🗡️ Ladino (Ataque Rápido / Fuga Fácil)</option>
+        <option value="Clérigo">✝️ Clérigo (Equilibrado / Cura Eficiente)</option>
+      </select>
+    </div>
+
+    <div class="class-info" id="class-preview">
+      HP: 120 | MP: 80 | Habilidade: Bola de Fogo
+    </div>
+
+    <button class="btn-start" onclick="startAdventure()">🚀 Iniciar Aventura</button>
+  </div>
+
+  <!-- TELA DO JOGO -->
+  <div id="game-screen">
+    <div id="enemy-hud">
+      <div class="enemy-title" id="enemy-name">Inimigo</div>
+      <div style="font-size: 0.75rem; color: #ff6b81; margin-top: 2px;" id="enemy-hp-text">HP: 0/0</div>
+      <div class="hp-bar-bg">
+        <div class="hp-bar-fill" id="enemy-hp-fill"></div>
+      </div>
+    </div>
+
+    <div id="log"></div>
+
+    <div class="controls" id="action-buttons">
+      <!-- Botões via JS -->
     </div>
   </div>
 
-  <div id="log"></div>
-
-  <div class="controls" id="action-buttons">
-    <!-- Botões renderizados via JavaScript -->
-  </div>
-
   <script>
-    // --- ESTADO DO JOGO ---
-    const hero = {
-      name: 'Dimitrian',
-      class: 'Mago',
-      hp: 120,
-      maxHp: 120,
-      mana: 80,
-      maxMana: 80,
-      gold: 150,
-      potions: 2,
-      isAlive: true
+    // Configurações das Classes
+    const classData = {
+      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], desc: 'HP: 160 | MP: 30 | Habilidade: Golpe Devastador' },
+      'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], desc: 'HP: 100 | MP: 100 | Habilidade: Bola de Fogo' },
+      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], desc: 'HP: 120 | MP: 50 | Habilidade: Ataque Sombrio' },
+      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], desc: 'HP: 140 | MP: 70 | Habilidade: Luz Sagrada' }
     };
 
+    let hero = {};
     let currentFloor = 1;
     let inCombat = false;
     let currentEnemy = null;
 
+    const creationScreen = document.getElementById('creation-screen');
+    const gameScreen = document.getElementById('game-screen');
     const logDiv = document.getElementById('log');
     const enemyHud = document.getElementById('enemy-hud');
     const enemyNameEl = document.getElementById('enemy-name');
@@ -161,6 +236,42 @@
     const enemyHpFillEl = document.getElementById('enemy-hp-fill');
     const floorDisplayEl = document.getElementById('floor-display');
     const buttonsContainer = document.getElementById('action-buttons');
+
+    function updateClassPreview() {
+      const selectedClass = document.getElementById('hero-class').value;
+      document.getElementById('class-preview').innerText = classData[selectedClass].desc;
+    }
+
+    function startAdventure() {
+      const nameInput = document.getElementById('hero-name').value.trim();
+      const selectedClass = document.getElementById('hero-class').value;
+      const stats = classData[selectedClass];
+
+      hero = {
+        name: nameInput || 'Herói',
+        class: selectedClass,
+        hp: stats.hp,
+        maxHp: stats.hp,
+        mana: stats.mana,
+        maxMana: stats.mana,
+        gold: 150,
+        potions: 2,
+        spellName: stats.spellName,
+        spellCost: stats.spellCost,
+        spellDmg: stats.spellDmg,
+        isAlive: true
+      };
+
+      creationScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
+      floorDisplayEl.innerText = `Andar 1 da Masmorra`;
+
+      log(`[Sistema]: Bem-vindo ao Rise of Malazar!`, 'sys');
+      log(`[Herói]: ${hero.name}, o ${hero.class}, iniciou a sua jornada!`, 'action');
+      log(`[Masmorra]: Toque em "Explorar" para adentrar o Andar ${currentFloor}.`, 'sys');
+
+      updateControls();
+    }
 
     function log(msg, type = 'sys') {
       const entry = document.createElement('div');
@@ -179,7 +290,7 @@
       if (inCombat) {
         buttonsContainer.innerHTML = `
           <button class="btn-explore" onclick="attackPhysical()">🗡️ Atacar</button>
-          <button class="btn-status" onclick="attackMagic()">🪄 Magia (15 MP)</button>
+          <button class="btn-status" onclick="attackMagic()">🪄 ${hero.spellName} (${hero.spellCost} MP)</button>
           <button class="btn-bag" onclick="usePotion()">🧪 Poção (${hero.potions})</button>
           <button class="btn-flee" onclick="flee()">🏃 Fugir</button>
         `;
@@ -240,7 +351,7 @@
 
       const dmg = Math.floor(Math.random() * 8) + 10;
       currentEnemy.hp -= dmg;
-      log(`[Ataque]: ${hero.name} ataca com o Cajado causando ${dmg} de dano!`, 'combat');
+      log(`[Ataque]: ${hero.name} ataca causando ${dmg} de dano!`, 'combat');
 
       checkCombatState();
     }
@@ -248,15 +359,16 @@
     function attackMagic() {
       if (!inCombat) return;
 
-      if (hero.mana < 15) {
-        log(`[Mana]: Mana insuficiente! Você precisa de 15 MP.`, 'danger');
+      if (hero.mana < hero.spellCost) {
+        log(`[Mana]: Mana insuficiente! Você precisa de ${hero.spellCost} MP.`, 'danger');
         return;
       }
 
-      hero.mana -= 15;
-      const dmg = Math.floor(Math.random() * 15) + 30;
+      hero.mana -= hero.spellCost;
+      const [minDmg, maxDmg] = hero.spellDmg;
+      const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg;
       currentEnemy.hp -= dmg;
-      log(`[Magia]: ${hero.name} lança Bola de Fogo causando ${dmg} de dano mágico!`, 'combat');
+      log(`[Habilidade]: ${hero.name} usa ${hero.spellName} causando ${dmg} de dano!`, 'combat');
 
       checkCombatState();
     }
@@ -270,7 +382,6 @@
         inCombat = false;
         currentEnemy = null;
         
-        // Aumenta o andar a cada vitória
         currentFloor++;
         floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
         
@@ -302,8 +413,8 @@
     function flee() {
       if (!inCombat) return;
 
-      const chance = Math.random();
-      if (chance > 0.4) {
+      const chance = hero.class === 'Ladino' ? 0.7 : 0.4;
+      if (Math.random() < chance) {
         log(`[Fuga]: Você conseguiu escapar com sucesso!`, 'sys');
         inCombat = false;
         currentEnemy = null;
@@ -368,11 +479,6 @@
       hero.mana = hero.maxMana;
       log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
     }
-
-    // Inicialização
-    log(`[Sistema]: Bem-vindo ao Rise of Malazar!`, 'sys');
-    log(`[Masmorra]: Toque em "Explorar" para adentrar o Andar ${currentFloor}.`, 'sys');
-    updateControls();
   </script>
 </body>
 </html>
