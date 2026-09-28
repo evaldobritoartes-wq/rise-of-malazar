@@ -1,72 +1,228 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rise of Malazar</title>
-    <!-- Configuração PWA para instalar no celular -->
-    <meta name="theme-color" content="#0d1117">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-        body { background-color: #0d1117; color: #c9d1d9; display: flex; flex-direction: column; height: 100vh; padding: 10px; }
-        #header { text-align: center; padding: 10px; border-bottom: 2px solid #238636; color: #2ea043; }
-        #game-log { flex: 1; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; overflow-y: auto; margin: 10px 0; font-size: 14px; line-height: 1.4; }
-        .log-entry { margin-bottom: 6px; }
-        .hero-action { color: #58a6ff; }
-        .enemy-action { color: #f85149; }
-        .system-msg { color: #e3b341; }
-        #controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        button { background: #21262d; color: #c9d1d9; border: 1px solid #8b949e; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
-        button:active { background: #30363d; transform: scale(0.98); }
-        .btn-attack { border-color: #f85149; color: #ff7b72; }
-        .btn-skill { border-color: #a371f7; color: #d2a8ff; }
-        .btn-bag { border-color: #e3b341; color: #f2cc60; }
-        .btn-rest { border-color: #2ea043; color: #56d364; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rise of Malazar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0b0d12;
+      color: #33ff33;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 10px;
+    }
+    header {
+      text-align: center;
+      padding: 8px 0;
+      border-bottom: 2px solid #1f293d;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 1.3rem;
+      color: #2ed573;
+      letter-spacing: 2px;
+    }
+    .subtitle {
+      font-size: 0.75rem;
+      color: #70a1ff;
+    }
+    #log {
+      flex: 1;
+      background-color: #050608;
+      border: 1px solid #1f2a38;
+      border-radius: 6px;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .entry {
+      word-break: break-word;
+    }
+    .sys { color: #a4b0be; }
+    .action { color: #ffa502; }
+    .combat { color: #ff4757; }
+    .heal { color: #2ed573; }
+    .status { color: #1e90ff; }
+    .danger { color: #ff6b81; font-weight: bold; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      background: #141824;
+      border: 1px solid #2f3640;
+      color: #eccc68;
+      padding: 12px 6px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button:active {
+      background: #2f3542;
+      transform: scale(0.98);
+    }
+    .btn-explore { border-color: #ff4757; color: #ff6b81; }
+    .btn-status { border-color: #1e90ff; color: #70a1ff; }
+    .btn-bag { border-color: #ffa502; color: #eccc68; }
+    .btn-rest { border-color: #2ed573; color: #2ed573; }
+  </style>
 </head>
 <body>
 
-    <div id="header">
-        <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
-        <p>Beta Playtest v0.1</p>
-    </div>
+  <header>
+    <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
+    <div class="subtitle">Core Playtest v0.2</div>
+  </header>
 
-    <div id="game-log">
-        <div class="log-entry system-msg">[Sistema]: Bem-vindo a Rise of Malazar! A pátria precisa dos seus heróis.</div>
-        <div class="log-entry">[Ermos]: O grupo descansa na Taverna. O que deseja fazer?</div>
-    </div>
+  <div id="log"></div>
 
-    <div id="controls">
-        <button class="btn-attack" onclick="action('explorar')">🗡️ Explorar Masmorra</button>
-        <button class="btn-skill" onclick="action('status')">📊 Status do Grupo</button>
-        <button class="btn-bag" onclick="action('mochila')">🎒 Mochila</button>
-        <button class="btn-rest" onclick="action('taverna')">🍺 Descansar (Taverna)</button>
-    </div>
+  <div class="controls">
+    <button class="btn-explore" onclick="explore()">⚔️ Explorar</button>
+    <button class="btn-status" onclick="showStatus()">📊 Status</button>
+    <button class="btn-bag" onclick="usePotion()">🧪 Usar Poção</button>
+    <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
+  </div>
 
-    <script>
-        function log(msg, type = '') {
-            const logDiv = document.getElementById('game-log');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            entry.innerText = msg;
-            logDiv.appendChild(entry);
-            logDiv.scrollTop = logDiv.scrollHeight;
+  <script>
+    // --- ESTADO INICIAL DO JOGO ---
+    const hero = {
+      name: 'Dimitrian',
+      class: 'Mago',
+      hp: 120,
+      maxHp: 120,
+      mana: 80,
+      maxMana: 80,
+      gold: 150,
+      potions: 2,
+      isAlive: true
+    };
+
+    const logDiv = document.getElementById('log');
+
+    function log(msg, type = 'sys') {
+      const entry = document.createElement('div');
+      entry.className = `entry ${type}`;
+      entry.innerText = msg;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function explore() {
+      if (!hero.isAlive) return showGameOver();
+
+      log(`[Masmorra]: Você avança pelos corredores sombrios...`, 'action');
+
+      const enemies = [
+        { name: 'Esqueleto', hp: 30, atk: 12, gold: 20 },
+        { name: 'Goblin', hp: 25, atk: 10, gold: 15 },
+        { name: 'Orc Guerreiro', hp: 55, atk: 22, gold: 45 },
+        { name: 'Cultista de Malazar', hp: 40, atk: 18, gold: 35 }
+      ];
+
+      const enemy = enemies[Math.floor(Math.random() * enemies.length)];
+      log(`[Inimigo]: Um ${enemy.name} surge para o combate!`, 'danger');
+
+      // Ataque do Herói
+      if (hero.mana >= 15) {
+        hero.mana -= 15;
+        const dmg = Math.floor(Math.random() * 15) + 30; // 30 a 44 de dano
+        enemy.hp -= dmg;
+        log(`[Combate]: ${hero.name} lança Bola de Fogo! Causa ${dmg} de dano no ${enemy.name}.`, 'combat');
+      } else {
+        const dmg = Math.floor(Math.random() * 8) + 10; // 10 a 17 de dano
+        enemy.hp -= dmg;
+        log(`[Combate]: Sem mana! ${hero.name} ataca com o Cajado causando ${dmg} de dano.`, 'combat');
+      }
+
+      // Resultado do Inimigo
+      if (enemy.hp <= 0) {
+        log(`[Vitória]: O ${enemy.name} foi derrotado! Você encontrou ${enemy.gold}g.`, 'heal');
+        hero.gold += enemy.gold;
+      } else {
+        // Contra-ataque do Inimigo
+        const enemyAtk = Math.floor(Math.random() * 6) + (enemy.atk - 3);
+        hero.hp -= enemyAtk;
+        log(`[Dano]: O ${enemy.name} sobreviveu e atacou! ${hero.name} recebeu ${enemyAtk} de dano.`, 'danger');
+
+        if (hero.hp <= 0) {
+          hero.hp = 0;
+          hero.isAlive = false;
+          log(`[DERROTA]: ${hero.name} sucumbiu em combate... O Malazar triunfou!`, 'danger');
         }
+      }
+    }
 
-        function action(act) {
-            if (act === 'explorar') {
-                log('[Masmorra]: Você entrou no Andar 1. Um Esqueleto surgiu da Vanguarda!', 'enemy-action');
-                log('[Combate]: Dimitrian usou Bola de Fogo causando 35 de dano!', 'hero-action');
-            } else if (act === 'status') {
-                log('[Grupo]: Dimitrian (Mago) - HP: 120/120 | Mana: 80/80', 'system-msg');
-            } else if (act === 'mochila') {
-                log('[Mochila]: 2x Porção de Cura, 1x Antídoto. Ouro: 150g', 'system-msg');
-            } else if (act === 'taverna') {
-                log('[Taverna]: O grupo descansou e recuperou todo o HP e Mana por 30g.', 'system-msg');
-            }
-        }
-    </script>
+    function showStatus() {
+      if (!hero.isAlive) return showGameOver();
+      log(`[Status]: ${hero.name} (${hero.class}) | HP: ${hero.hp}/${hero.maxHp} | Mana: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g | Poções: ${hero.potions}`, 'status');
+    }
+
+    function usePotion() {
+      if (!hero.isAlive) return showGameOver();
+
+      if (hero.potions <= 0) {
+        log(`[Mochila]: Você não tem poções de cura restantes!`, 'danger');
+        return;
+      }
+
+      if (hero.hp >= hero.maxHp) {
+        log(`[Mochila]: Sua vida já está no máximo!`, 'status');
+        return;
+      }
+
+      hero.potions--;
+      const healAmount = 50;
+      hero.hp = Math.min(hero.maxHp, hero.hp + healAmount);
+      log(`[Mochila]: Você bebeu uma Poção de Cura. +${healAmount} HP recuperado! (HP: ${hero.hp}/${hero.maxHp})`, 'heal');
+    }
+
+    function rest() {
+      if (!hero.isAlive) return showGameOver();
+
+      if (hero.gold < 30) {
+        log(`[Taverna]: O taverneiro recusa seu descanso. Você precisa de 30g! (Ouro atual: ${hero.gold}g)`, 'danger');
+        return;
+      }
+
+      if (hero.hp === hero.maxHp && hero.mana === hero.maxMana) {
+        log(`[Taverna]: Você já está totalmente descansado. Não precisa gastar ouro agora.`, 'status');
+        return;
+      }
+
+      hero.gold -= 30;
+      hero.hp = hero.maxHp;
+      hero.mana = hero.maxMana;
+      log(`[Taverna]: Você pagou 30g, descansou no quarto e recuperou TODO o HP e Mana!`, 'heal');
+    }
+
+    function showGameOver() {
+      log(`[Game Over]: Seu herói morreu. Atualize a página do navegador para reiniciar a jornada.`, 'danger');
+    }
+
+    // Mensagem Inicial
+    log(`[Sistema]: Bem-vindo ao Rise of Malazar!`, 'sys');
+    log(`[Ermos]: O grupo está na Taverna. Toque em "Explorar" para enfrentar perigos!`, 'sys');
+  </script>
 </body>
 </html>
