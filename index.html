@@ -18,6 +18,8 @@
       flex-direction: column;
       height: 100vh;
       padding: 10px;
+      overflow: hidden;
+      position: relative;
     }
     header {
       text-align: center;
@@ -59,6 +61,7 @@
       padding: 16px;
       flex: 1;
       justify-content: center;
+      overflow-y: auto;
     }
     .form-group {
       display: flex;
@@ -144,6 +147,7 @@
       flex-direction: column;
       flex: 1;
       height: 100%;
+      overflow: hidden;
     }
     #enemy-hud {
       display: none;
@@ -183,6 +187,7 @@
     .event { color: #eccc68; font-weight: bold; }
     .levelup { color: #e1b12c; font-weight: bold; font-size: 0.95rem; }
     .victory { color: #70a1ff; font-weight: bold; font-size: 1rem; }
+    .achievement-log { color: #eccc68; font-weight: bold; border-left: 3px solid #e1b12c; padding-left: 6px; }
 
     .controls {
       display: grid;
@@ -217,9 +222,57 @@
     .btn-rest { border-color: #2ed573; color: #2ed573; }
     .btn-flee { border-color: #a4b0be; color: #a4b0be; }
     .btn-ngplus { background: #e1b12c; color: #050608; border-color: #e1b12c; font-size: 1rem; grid-column: span 2; padding: 12px; }
+
+    /* Pop-up de Conquistas */
+    #achievement-popup {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10141d;
+      border: 2px solid #e1b12c;
+      box-shadow: 0 0 15px rgba(225, 177, 44, 0.4);
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      transition: top 0.5s ease-in-out;
+    }
+    #achievement-popup.show {
+      top: 15px;
+    }
+    .ach-icon { font-size: 1.8rem; }
+    .ach-text { display: flex; flex-direction: column; }
+    .ach-title { font-weight: bold; color: #e1b12c; font-size: 0.85rem; }
+    .ach-desc { color: #ffffff; font-size: 0.75rem; }
+
+    /* Texto Flutuante de Dano/Cura */
+    .floating-text {
+      position: absolute;
+      font-weight: bold;
+      font-size: 1.2rem;
+      pointer-events: none;
+      animation: floatUp 1s ease-out forwards;
+      z-index: 100;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      50% { opacity: 1; transform: translateY(-25px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-50px) scale(0.8); }
+    }
   </style>
 </head>
 <body id="game-body">
+
+  <div id="achievement-popup">
+    <div class="ach-icon" id="ach-pop-icon">🏆</div>
+    <div class="ach-text">
+      <span class="ach-title" id="ach-pop-title">CONQUISTA DESBLOQUEADA!</span>
+      <span class="ach-desc" id="ach-pop-desc">Descrição da conquista</span>
+    </div>
+  </div>
 
   <header>
     <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
@@ -345,6 +398,16 @@
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
         osc.start(now);
         osc.stop(now + 0.5);
+      } else if (type === 'achievement') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        osc.frequency.setValueAtTime(1046.50, now + 0.3);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
       } else if (type === 'defeat') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(180, now);
@@ -361,6 +424,75 @@
       body.classList.remove('shake');
       void body.offsetWidth;
       body.classList.add('shake');
+    }
+
+    function spawnFloatingText(text, color = '#ff4757') {
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.innerText = text;
+      el.style.color = color;
+      
+      const randomX = Math.floor(Math.random() * 80) + 10;
+      el.style.left = `${randomX}%`;
+      el.style.top = `40%`;
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+
+    /* SISTEMA DE CONQUISTAS */
+    const achievements = {
+      'first_kill': { icon: '🗡️', name: 'Primeiro Sangue', desc: 'Derrotou o seu primeiro inimigo.' },
+      'boss_hunter': { icon: '👑', name: 'Caçador de Chefes', desc: 'Derrotou o seu primeiro Guardião.' },
+      'rich': { icon: '💰', name: 'Magnata das Ruínas', desc: 'Acumulou 500 moedas de ouro.' },
+      'max_gear': { icon: '🛡️', name: 'Forjado na Glória', desc: 'Melhorou arma e armadura para Nível 3+.' },
+      'slayer_of_malazar': { icon: '🏆', name: 'Destruidor do Mal', desc: 'Derrotou Malazar e salvou o reino!' },
+      'ng_plus_warrior': { icon: '🔥', name: 'Lenda Imortal', desc: 'Iniciou um ciclo New Game+.' }
+    };
+
+    let unlockedAchievements = [];
+
+    function checkAchievements() {
+      if (hero.kills >= 1 && !unlockedAchievements.includes('first_kill')) {
+        unlockAchievement('first_kill');
+      }
+      if (hero.bossKills >= 1 && !unlockedAchievements.includes('boss_hunter')) {
+        unlockAchievement('boss_hunter');
+      }
+      if (hero.gold >= 500 && !unlockedAchievements.includes('rich')) {
+        unlockAchievement('rich');
+      }
+      if (hero.weaponLvl >= 3 && hero.armorLvl >= 3 && !unlockedAchievements.includes('max_gear')) {
+        unlockAchievement('max_gear');
+      }
+      if (gameWon && !unlockedAchievements.includes('slayer_of_malazar')) {
+        unlockAchievement('slayer_of_malazar');
+      }
+      if (ngCycle > 1 && !unlockedAchievements.includes('ng_plus_warrior')) {
+        unlockAchievement('ng_plus_warrior');
+      }
+    }
+
+    function unlockAchievement(id) {
+      if (unlockedAchievements.includes(id)) return;
+
+      unlockedAchievements.push(id);
+      localStorage.setItem('rom_achievements', JSON.stringify(unlockedAchievements));
+
+      const ach = achievements[id];
+      playSound('achievement');
+
+      const pop = document.getElementById('achievement-popup');
+      document.getElementById('ach-pop-icon').innerText = ach.icon;
+      document.getElementById('ach-pop-title').innerText = `CONQUISTA: ${ach.name}`;
+      document.getElementById('ach-pop-desc').innerText = ach.desc;
+
+      pop.classList.add('show');
+      log(`[🏆 CONQUISTA]: ${ach.icon} ${ach.name} - ${ach.desc}`, 'achievement-log');
+
+      setTimeout(() => {
+        pop.classList.remove('show');
+      }, 4000);
     }
 
     const classData = {
@@ -389,6 +521,9 @@
 
     window.onload = () => {
       updateClassPreview();
+      const savedAch = localStorage.getItem('rom_achievements');
+      if (savedAch) unlockedAchievements = JSON.parse(savedAch);
+
       const savedData = localStorage.getItem('rom_save');
       if (savedData) {
         const data = JSON.parse(savedData);
@@ -429,6 +564,7 @@
       }
       const data = { hero: hero, floor: currentFloor, ngCycle: ngCycle };
       localStorage.setItem('rom_save', JSON.stringify(data));
+      checkAchievements();
       updateHeroHud();
     }
 
@@ -441,6 +577,9 @@
       hero = data.hero;
       currentFloor = data.floor;
       ngCycle = data.ngCycle || 1;
+
+      if (hero.kills === undefined) hero.kills = 0;
+      if (hero.bossKills === undefined) hero.bossKills = 0;
 
       if (!hero.inventory) {
         hero.inventory = { hpPotion: hero.potions || 2, manaElixir: 1, fireScroll: 1 };
@@ -486,6 +625,8 @@
         spellDmg: stats.spellDmg,
         skill2Name: stats.skill2Name,
         skill2Cost: stats.skill2Cost,
+        kills: 0,
+        bossKills: 0,
         isAlive: true
       };
 
@@ -545,6 +686,7 @@
 
         playSound('levelup');
         triggerShake();
+        spawnFloatingText('LEVEL UP!', '#e1b12c');
         log(`[LEVEL UP! 🎉]: ${hero.name} subiu para o Nível ${hero.level}! (+${hpGain} HP, +${mpGain} MP!)`, 'levelup');
 
         if (hero.level === 3) {
@@ -585,7 +727,7 @@
       } else {
         buttonsContainer.innerHTML = `
           <button class="btn-explore" onclick="explore()">⚔️ Explorar</button>
-          <button class="btn-status" onclick="showStatus()">📊 Status</button>
+          <button class="btn-status" onclick="showStatus()">📊 Status / 🏆</button>
           <button class="btn-bag" onclick="shopMenu()">🛍️ Loja / Equipamento</button>
           <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
         `;
@@ -612,7 +754,6 @@
       log(`[Masmorra]: Você explora as profundezas do Andar ${currentFloor}...`, 'action');
 
       if (currentFloor === 10) {
-        // BOSS FINAL: MALAZAR
         const ngMult = 1 + (ngCycle - 1) * 0.8;
         currentEnemy = {
           name: 'MALAZAR, O SENHOR DAS SOMBRAS',
@@ -695,11 +836,13 @@
         const goldFound = Math.floor(Math.random() * 30) + 20 * currentFloor;
         hero.gold += goldFound;
         playSound('heal');
+        spawnFloatingText(`+${goldFound}g`, '#e1b12c');
         log(`[🧰 Evento]: Encontrou um Baú Antigo nas ruínas! Ganhou +${goldFound}g.`, 'event');
       } else if (roll < 0.50) {
         hero.hp = Math.min(hero.maxHp, hero.hp + 40);
         hero.mana = Math.min(hero.maxMana, hero.mana + 30);
         playSound('heal');
+        spawnFloatingText('+40 HP', '#2ed573');
         log(`[⛲ Evento]: Encontrou uma Fonte Mágica. +40 HP e +30 MP recuperados!`, 'heal');
       } else if (roll < 0.75) {
         const xpBonus = 15 * currentFloor;
@@ -711,6 +854,7 @@
         hero.hp = Math.max(1, hero.hp - trapDmg);
         playSound('attack');
         triggerShake();
+        spawnFloatingText(`-${trapDmg} HP`, '#ff4757');
         log(`[⚠️ Evento]: Ativou uma armadilha de espinhos! Perdeu ${trapDmg} de HP.`, 'danger');
       }
 
@@ -725,6 +869,7 @@
       const weaponBonus = (hero.weaponLvl - 1) * 5;
       const dmg = Math.floor(Math.random() * 8) + 10 + weaponBonus;
       currentEnemy.hp -= dmg;
+      spawnFloatingText(`-${dmg}`, '#ff4757');
       log(`[Ataque]: ${hero.name} ataca causando ${dmg} de dano físico!`, 'combat');
 
       checkCombatState();
@@ -744,6 +889,7 @@
       const weaponBonus = (hero.weaponLvl - 1) * 6;
       const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg + weaponBonus;
       currentEnemy.hp -= dmg;
+      spawnFloatingText(`-${dmg}`, '#1e90ff');
       log(`[Habilidade]: ${hero.name} usa ${hero.spellName} causando ${dmg} de dano!`, 'combat');
 
       checkCombatState();
@@ -763,18 +909,22 @@
       if (hero.class === 'Guerreiro') {
         const healAmt = 35;
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        spawnFloatingText(`+${healAmt} HP`, '#2ed573');
         log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name}! Recuperou +${healAmt} HP.`, 'heal');
       } else if (hero.class === 'Mago') {
         const dmg = Math.floor(Math.random() * 30) + 55 + (hero.weaponLvl * 8);
         currentEnemy.hp -= dmg;
+        spawnFloatingText(`-${dmg}`, '#ffa502');
         log(`[Habilidade]: ${hero.name} invocou ${hero.skill2Name} causando ${dmg} de dano devastador!`, 'combat');
       } else if (hero.class === 'Ladino') {
         const dmg = Math.floor(Math.random() * 20) + 40 + (hero.weaponLvl * 6);
         currentEnemy.hp -= dmg;
+        spawnFloatingText(`-${dmg}`, '#2ed573');
         log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} envenenando o alvo por ${dmg} de dano!`, 'combat');
       } else if (hero.class === 'Clérigo') {
         const healAmt = 60;
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        spawnFloatingText(`+${healAmt} HP`, '#2ed573');
         log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} recuperando +${healAmt} HP!`, 'heal');
       }
 
@@ -785,6 +935,12 @@
       if (currentEnemy.hp <= 0) {
         currentEnemy.hp = 0;
         updateEnemyHud();
+
+        hero.kills++;
+
+        if (currentEnemy.isBoss) {
+          hero.bossKills++;
+        }
 
         if (currentEnemy.isFinalBoss) {
           triggerVictoryEnding();
@@ -843,6 +999,7 @@
       hero.hp -= enemyDmg;
       playSound('attack');
       triggerShake();
+      spawnFloatingText(`-${enemyDmg}`, '#ff4757');
       log(`[Dano]: O ${currentEnemy.name} atacou e causou ${enemyDmg} de dano em ${hero.name}!`, 'danger');
 
       if (hero.hp <= 0) {
@@ -884,6 +1041,14 @@
       log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g`, 'status');
       log(`[🎒 Inventário]: 🧪 HP (${hero.inventory.hpPotion}) | 🧪 MP (${hero.inventory.manaElixir}) | 📜 Pergaminho (${hero.inventory.fireScroll})`, 'status');
       log(`[Equipamento]: Arma Nível ${hero.weaponLvl} | Armadura Nível ${hero.armorLvl}`, 'status');
+
+      log(`--- 🏆 CONQUISTAS (${unlockedAchievements.length}/${Object.keys(achievements).length}) ---`, 'event');
+      for (const [id, ach] of Object.entries(achievements)) {
+        const isUnlocked = unlockedAchievements.includes(id);
+        const icon = isUnlocked ? ach.icon : '🔒';
+        const title = isUnlocked ? ach.name : '???';
+        log(`${icon} ${title}: ${ach.desc}`, isUnlocked ? 'achievement-log' : 'sys');
+      }
     }
 
     function openBagMenu() {
@@ -905,6 +1070,7 @@
       const heal = 50;
       hero.hp = Math.min(hero.maxHp, hero.hp + heal);
       playSound('heal');
+      spawnFloatingText(`+${heal} HP`, '#2ed573');
       log(`[Mochila]: Usou Poção de HP! Recuperou +${heal} HP.`, 'heal');
 
       saveGame();
@@ -921,6 +1087,7 @@
       const manaRec = 45;
       hero.mana = Math.min(hero.maxMana, hero.mana + manaRec);
       playSound('heal');
+      spawnFloatingText(`+${manaRec} MP`, '#1e90ff');
       log(`[Mochila]: Usou Elixir de Mana! Recuperou +${manaRec} MP.`, 'heal');
 
       saveGame();
@@ -941,6 +1108,7 @@
       playSound('magic');
       const dmg = 65;
       currentEnemy.hp -= dmg;
+      spawnFloatingText(`-${dmg}`, '#ffa502');
       log(`[Mochila]: Usou Pergaminho de Fogo! Causou ${dmg} de dano explosivo no inimigo!`, 'combat');
 
       checkCombatState();
@@ -1046,6 +1214,7 @@
       hero.hp = hero.maxHp;
       hero.mana = hero.maxMana;
       playSound('heal');
+      spawnFloatingText('RESTED!', '#2ed573');
       log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
       saveGame();
     }
