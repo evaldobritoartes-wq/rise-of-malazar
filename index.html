@@ -141,6 +141,21 @@
     .bar-fill-mp { background: #1e90ff; height: 100%; width: 100%; transition: width 0.3s; }
     .bar-fill-xp { background: #e1b12c; height: 100%; width: 0%; transition: width 0.3s; }
 
+    /* Buffs Display */
+    .buffs-container {
+      display: flex;
+      gap: 6px;
+      font-size: 0.65rem;
+      color: #eccc68;
+      margin-top: 2px;
+    }
+    .buff-tag {
+      background: #1f2a38;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #70a1ff;
+    }
+
     /* Layout Principal */
     #game-screen {
       display: none;
@@ -331,6 +346,7 @@
         <div class="bar-bg"><div class="bar-fill-xp" id="bar-xp"></div></div>
         <span id="txt-xp" style="color: #a4b0be; font-size: 0.65rem;">0/50</span>
       </div>
+      <div class="buffs-container" id="buffs-container"></div>
     </div>
 
     <div id="enemy-hud">
@@ -495,11 +511,14 @@
       }, 4000);
     }
 
+    const weaponNames = ['Espada de Madeira', 'Lâmina de Aço', 'Machado do Vento', 'Cetro Elemental', 'Lâmina do Caos'];
+    const armorNames = ['Manto de Pano', 'Armadura de Couro', 'Cota de Malha', 'Placas de Aço', 'Armadura Divina'];
+
     const classData = {
-      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], skill2Name: 'Grito de Guerra', skill2Cost: 15, desc: 'HP: 160 | MP: 30 | Nv.3: Grito de Guerra' },
+      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], skill2Name: 'Grito de Guerra', skill2Cost: 15, desc: 'HP: 160 | MP: 30 | Nv.3: Grito de Guerra (+Escudo)' },
       'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], skill2Name: 'Meteoro Arcano', skill2Cost: 40, desc: 'HP: 100 | MP: 100 | Nv.3: Meteoro Arcano' },
-      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], skill2Name: 'Adaga Venenosa', skill2Cost: 20, desc: 'HP: 120 | MP: 50 | Nv.3: Adaga Venenosa' },
-      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], skill2Name: 'Oração Celestial', skill2Cost: 30, desc: 'HP: 140 | MP: 70 | Nv.3: Oração Celestial' }
+      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], skill2Name: 'Adaga Venenosa', skill2Cost: 20, desc: 'HP: 120 | MP: 50 | Nv.3: Adaga Venenosa (+Veneno)' },
+      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], skill2Name: 'Oração Celestial', skill2Cost: 30, desc: 'HP: 140 | MP: 70 | Nv.3: Oração (+Regeneração)' }
     };
 
     let hero = {};
@@ -518,6 +537,7 @@
     const enemyHpFillEl = document.getElementById('enemy-hp-fill');
     const floorDisplayEl = document.getElementById('floor-display');
     const buttonsContainer = document.getElementById('action-buttons');
+    const buffsContainer = document.getElementById('buffs-container');
 
     window.onload = () => {
       updateClassPreview();
@@ -555,6 +575,17 @@
       document.getElementById('txt-hp').innerText = `${hero.hp}/${hero.maxHp}`;
       document.getElementById('txt-mp').innerText = `${hero.mana}/${hero.maxMana}`;
       document.getElementById('txt-xp').innerText = `${hero.xp}/${hero.maxXp}`;
+
+      /* Renderizar Buffs */
+      buffsContainer.innerHTML = '';
+      if (hero.buffs) {
+        if (hero.buffs.regen > 0) {
+          buffsContainer.innerHTML += `<span class="buff-tag">💖 Regen (${hero.buffs.regen}t)</span>`;
+        }
+        if (hero.buffs.shield > 0) {
+          buffsContainer.innerHTML += `<span class="buff-tag">🛡️ Escudo (${hero.buffs.shield}t)</span>`;
+        }
+      }
     }
 
     function saveGame() {
@@ -580,6 +611,7 @@
 
       if (hero.kills === undefined) hero.kills = 0;
       if (hero.bossKills === undefined) hero.bossKills = 0;
+      if (!hero.buffs) hero.buffs = { regen: 0, shield: 0 };
 
       if (!hero.inventory) {
         hero.inventory = { hpPotion: hero.potions || 2, manaElixir: 1, fireScroll: 1 };
@@ -625,6 +657,7 @@
         spellDmg: stats.spellDmg,
         skill2Name: stats.skill2Name,
         skill2Cost: stats.skill2Cost,
+        buffs: { regen: 0, shield: 0 },
         kills: 0,
         bossKills: 0,
         isAlive: true
@@ -652,6 +685,7 @@
       gameWon = false;
       hero.hp = hero.maxHp;
       hero.mana = hero.maxMana;
+      hero.buffs = { regen: 0, shield: 0 };
 
       floorDisplayEl.innerText = `Andar 1 da Masmorra (NG+${ngCycle - 1})`;
       log(`[NEW GAME+]: Você iniciou o Ciclo ${ngCycle}! Os inimigos estão muito mais poderosos!`, 'levelup');
@@ -739,7 +773,8 @@
       if (inCombat && currentEnemy) {
         enemyHud.style.display = 'block';
         const isBoss = currentEnemy.isBoss ? '👑 CHEFE: ' : '';
-        enemyNameEl.innerText = `${isBoss}${currentEnemy.name}`;
+        const poisonTag = currentEnemy.poison ? ` 🧪 (${currentEnemy.poison}t)` : '';
+        enemyNameEl.innerText = `${isBoss}${currentEnemy.name}${poisonTag}`;
         enemyHpTextEl.innerText = `HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`;
         const pct = Math.max(0, (currentEnemy.hp / currentEnemy.maxHp) * 100);
         enemyHpFillEl.style.width = `${pct}%`;
@@ -762,6 +797,7 @@
           atk: Math.round(45 * ngMult),
           gold: 1000,
           xp: 500,
+          poison: 0,
           isBoss: true,
           isFinalBoss: true
         };
@@ -795,6 +831,7 @@
           atk: Math.round(bossTemplate.baseAtk * floorMult * ngMult),
           gold: Math.round(bossTemplate.baseGold * floorMult),
           xp: Math.round(bossTemplate.xp * floorMult),
+          poison: 0,
           isBoss: true
         };
 
@@ -818,6 +855,7 @@
           atk: Math.round(template.baseAtk * atkMultiplier),
           gold: Math.round(template.baseGold * hpMultiplier),
           xp: Math.round(template.xp * hpMultiplier),
+          poison: 0,
           isBoss: false
         };
 
@@ -909,8 +947,9 @@
       if (hero.class === 'Guerreiro') {
         const healAmt = 35;
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        hero.buffs.shield = 3;
         spawnFloatingText(`+${healAmt} HP`, '#2ed573');
-        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name}! Recuperou +${healAmt} HP.`, 'heal');
+        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name}! Recuperou +${healAmt} HP e ativou Escudo (3 turnos)!`, 'heal');
       } else if (hero.class === 'Mago') {
         const dmg = Math.floor(Math.random() * 30) + 55 + (hero.weaponLvl * 8);
         currentEnemy.hp -= dmg;
@@ -919,13 +958,15 @@
       } else if (hero.class === 'Ladino') {
         const dmg = Math.floor(Math.random() * 20) + 40 + (hero.weaponLvl * 6);
         currentEnemy.hp -= dmg;
+        currentEnemy.poison = 3;
         spawnFloatingText(`-${dmg}`, '#2ed573');
         log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} envenenando o alvo por ${dmg} de dano!`, 'combat');
       } else if (hero.class === 'Clérigo') {
         const healAmt = 60;
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        hero.buffs.regen = 3;
         spawnFloatingText(`+${healAmt} HP`, '#2ed573');
-        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} recuperando +${healAmt} HP!`, 'heal');
+        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} recuperando +${healAmt} HP e ativando Regeneração!`, 'heal');
       }
 
       checkCombatState();
@@ -991,8 +1032,41 @@
       updateControls();
     }
 
+    function processTurnEffects() {
+      /* Processar regeneração do Herói */
+      if (hero.buffs && hero.buffs.regen > 0) {
+        const regenVal = 15;
+        hero.hp = Math.min(hero.maxHp, hero.hp + regenVal);
+        hero.buffs.regen--;
+        spawnFloatingText(`+${regenVal} HP`, '#2ed573');
+        log(`[✨ Regeneração]: Recuperou +${regenVal} HP!`, 'heal');
+      }
+
+      /* Processar veneno no Inimigo */
+      if (currentEnemy && currentEnemy.poison > 0) {
+        const poisonDmg = 12;
+        currentEnemy.hp = Math.max(0, currentEnemy.hp - poisonDmg);
+        currentEnemy.poison--;
+        spawnFloatingText(`-${poisonDmg}`, '#2ed573');
+        log(`[🧪 Veneno]: O ${currentEnemy.name} sofreu ${poisonDmg} de dano de veneno!`, 'combat');
+      }
+    }
+
     function enemyTurn() {
-      const armorReduction = (hero.armorLvl - 1) * 3;
+      processTurnEffects();
+
+      if (currentEnemy && currentEnemy.hp <= 0) {
+        checkCombatState();
+        return;
+      }
+
+      let armorReduction = (hero.armorLvl - 1) * 3;
+      if (hero.buffs && hero.buffs.shield > 0) {
+        armorReduction += 10;
+        hero.buffs.shield--;
+        log(`[🛡️ Escudo]: O Escudo reduziu o dano sofrido!`, 'sys');
+      }
+
       const rawDmg = Math.floor(Math.random() * 6) + (currentEnemy.atk - 2);
       const enemyDmg = Math.max(2, rawDmg - armorReduction);
 
@@ -1037,10 +1111,13 @@
     }
 
     function showStatus() {
+      const weaponName = weaponNames[Math.min(hero.weaponLvl - 1, weaponNames.length - 1)];
+      const armorName = armorNames[Math.min(hero.armorLvl - 1, armorNames.length - 1)];
+
       log(`[Status]: ${hero.name} (${hero.class}) - Nível ${hero.level} | XP: ${hero.xp}/${hero.maxXp}`, 'status');
       log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g`, 'status');
       log(`[🎒 Inventário]: 🧪 HP (${hero.inventory.hpPotion}) | 🧪 MP (${hero.inventory.manaElixir}) | 📜 Pergaminho (${hero.inventory.fireScroll})`, 'status');
-      log(`[Equipamento]: Arma Nível ${hero.weaponLvl} | Armadura Nível ${hero.armorLvl}`, 'status');
+      log(`[Equipamento]: 🗡️ ${weaponName} (+Nv.${hero.weaponLvl}) | 🛡️ ${armorName} (+Nv.${hero.armorLvl})`, 'status');
 
       log(`--- 🏆 CONQUISTAS (${unlockedAchievements.length}/${Object.keys(achievements).length}) ---`, 'event');
       for (const [id, ach] of Object.entries(achievements)) {
@@ -1052,7 +1129,7 @@
     }
 
     function openBagMenu() {
-      log(`[🎒 Mochila]: Escolha um item para utilizar no combate:`, 'sys');
+      log(`[🎒 Mochila]: Escolha um item para utilizar:`, 'sys');
       buttonsContainer.innerHTML = `
         <button class="btn-bag" onclick="useHpPotion()">🧪 Poção HP (${hero.inventory.hpPotion})</button>
         <button class="btn-status" onclick="useManaElixir()">🧪 Elixir MP (${hero.inventory.manaElixir})</button>
@@ -1117,14 +1194,17 @@
     function shopMenu() {
       const weaponCost = hero.weaponLvl * 50;
       const armorCost = hero.armorLvl * 50;
-      log(`[Loja]: O que deseja comprar/melhorar?`, 'sys');
+      const weaponName = weaponNames[Math.min(hero.weaponLvl, weaponNames.length - 1)];
+      const armorName = armorNames[Math.min(hero.armorLvl, armorNames.length - 1)];
+
+      log(`[Loja]: O que deseja comprar ou forjar?`, 'sys');
 
       buttonsContainer.innerHTML = `
         <button class="btn-bag" onclick="buyHpPotion()">🧪 Poção HP (25g)</button>
         <button class="btn-status" onclick="buyManaElixir()">🧪 Elixir MP (30g)</button>
         <button class="btn-explore" onclick="buyScroll()">📜 Pergaminho (45g)</button>
-        <button class="btn-explore" onclick="upgradeWeapon()">🗡️ +Arma (${weaponCost}g)</button>
-        <button class="btn-status" onclick="upgradeArmor()">🛡️ +Armadura (${armorCost}g)</button>
+        <button class="btn-explore" onclick="upgradeWeapon()">🗡️ ${weaponName} (${weaponCost}g)</button>
+        <button class="btn-status" onclick="upgradeArmor()">🛡️ ${armorName} (${armorCost}g)</button>
         <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
       `;
     }
@@ -1177,8 +1257,9 @@
 
       hero.gold -= cost;
       hero.weaponLvl++;
+      const name = weaponNames[Math.min(hero.weaponLvl - 1, weaponNames.length - 1)];
       playSound('heal');
-      log(`[Loja]: Arma melhorada para o Nível ${hero.weaponLvl}! Dano aumentado.`, 'heal');
+      log(`[Loja]: Forjou: ${name} (Nível ${hero.weaponLvl})! Dano aumentado.`, 'heal');
       saveGame();
       shopMenu();
     }
@@ -1194,8 +1275,9 @@
       hero.armorLvl++;
       hero.maxHp += 20;
       hero.hp += 20;
+      const name = armorNames[Math.min(hero.armorLvl - 1, armorNames.length - 1)];
       playSound('heal');
-      log(`[Loja]: Armadura melhorada para o Nível ${hero.armorLvl}! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
+      log(`[Loja]: Forjou: ${name} (Nível ${hero.armorLvl})! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
       saveGame();
       shopMenu();
     }
