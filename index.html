@@ -259,7 +259,7 @@
     <div id="hero-hud">
       <div class="hud-header">
         <span id="hud-name-class">Herói (Nv. 1)</span>
-        <span id="hud-gold-potions">💰 150g | 🧪 2</span>
+        <span id="hud-gold-potions">💰 150g</span>
       </div>
       <div class="bar-container">
         <span style="color: #2ed573; width: 24px;">HP</span>
@@ -401,7 +401,7 @@
     function updateHeroHud() {
       if (!hero || !hero.name) return;
       document.getElementById('hud-name-class').innerText = `${hero.name} (${hero.class} Nv.${hero.level})`;
-      document.getElementById('hud-gold-potions').innerText = `💰 ${hero.gold}g | 🧪 ${hero.potions}`;
+      document.getElementById('hud-gold-potions').innerText = `💰 ${hero.gold}g`;
 
       const hpPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
       const mpPct = Math.max(0, (hero.mana / hero.maxMana) * 100);
@@ -437,6 +437,10 @@
       if (!hero.xp) hero.xp = 0;
       if (!hero.maxXp) hero.maxXp = 50;
 
+      if (!hero.inventory) {
+        hero.inventory = { hpPotion: hero.potions || 2, manaElixir: 1, fireScroll: 1 };
+      }
+
       const stats = classData[hero.class];
       hero.skill2Name = stats.skill2Name;
       hero.skill2Cost = stats.skill2Cost;
@@ -471,7 +475,7 @@
         mana: stats.mana,
         maxMana: stats.mana,
         gold: 150,
-        potions: 2,
+        inventory: { hpPotion: 2, manaElixir: 1, fireScroll: 1 },
         weaponLvl: 1,
         armorLvl: 1,
         spellName: stats.spellName,
@@ -549,13 +553,13 @@
           <button class="btn-explore" onclick="attackPhysical()">🗡️ Atacar</button>
           <button class="btn-status" onclick="attackMagic()">🪄 ${hero.spellName} (${hero.spellCost} MP)</button>
           ${skill2Btn}
-          <button class="btn-bag" onclick="usePotion()">🧪 Poção (${hero.potions})</button>
+          <button class="btn-bag" onclick="openBagMenu()">🎒 Mochila</button>
         `;
       } else {
         buttonsContainer.innerHTML = `
           <button class="btn-explore" onclick="explore()">⚔️ Explorar</button>
           <button class="btn-status" onclick="showStatus()">📊 Status</button>
-          <button class="btn-bag" onclick="shopMenu()">🛍️ Loja / Equipamentos</button>
+          <button class="btn-bag" onclick="shopMenu()">🛍️ Loja / Equipamento</button>
           <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
         `;
       }
@@ -638,16 +642,21 @@
     function triggerRandomEvent() {
       const roll = Math.random();
 
-      if (roll < 0.35) {
+      if (roll < 0.25) {
         const goldFound = Math.floor(Math.random() * 30) + 20 * currentFloor;
         hero.gold += goldFound;
         playSound('heal');
         log(`[🧰 Evento]: Encontrou um Baú Antigo nas ruínas! Ganhou +${goldFound}g.`, 'event');
-      } else if (roll < 0.65) {
+      } else if (roll < 0.50) {
         hero.hp = Math.min(hero.maxHp, hero.hp + 40);
         hero.mana = Math.min(hero.maxMana, hero.mana + 30);
         playSound('heal');
         log(`[⛲ Evento]: Encontrou uma Fonte Mágica. +40 HP e +30 MP recuperados!`, 'heal');
+      } else if (roll < 0.75) {
+        const xpBonus = 15 * currentFloor;
+        playSound('magic');
+        log(`[📜 Evento]: Encontrou Runas Antigas gravadas nas paredes da masmorra!`, 'event');
+        gainXp(xpBonus);
       } else {
         const trapDmg = Math.floor(Math.random() * 10) + 5;
         hero.hp = Math.max(1, hero.hp - trapDmg);
@@ -800,22 +809,123 @@
 
     function showStatus() {
       log(`[Status]: ${hero.name} (${hero.class}) - Nível ${hero.level} | XP: ${hero.xp}/${hero.maxXp}`, 'status');
-      log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g | Poções: ${hero.potions}`, 'status');
+      log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g`, 'status');
+      log(`[🎒 Inventário]: 🧪 HP (${hero.inventory.hpPotion}) | 🧪 MP (${hero.inventory.manaElixir}) | 📜 Pergaminho (${hero.inventory.fireScroll})`, 'status');
       log(`[Equipamento]: Arma Nível ${hero.weaponLvl} | Armadura Nível ${hero.armorLvl}`, 'status');
+    }
+
+    function openBagMenu() {
+      log(`[🎒 Mochila]: Escolha um item para utilizar no combate:`, 'sys');
+      buttonsContainer.innerHTML = `
+        <button class="btn-bag" onclick="useHpPotion()">🧪 Poção HP (${hero.inventory.hpPotion})</button>
+        <button class="btn-status" onclick="useManaElixir()">🧪 Elixir MP (${hero.inventory.manaElixir})</button>
+        <button class="btn-explore" onclick="useFireScroll()">📜 Pergaminho (${hero.inventory.fireScroll})</button>
+        <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
+      `;
+    }
+
+    function useHpPotion() {
+      if (hero.inventory.hpPotion <= 0) {
+        log(`[Mochila]: Sem Poções de HP no inventário!`, 'danger');
+        return;
+      }
+      hero.inventory.hpPotion--;
+      const heal = 50;
+      hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+      playSound('heal');
+      log(`[Mochila]: Usou Poção de HP! Recuperou +${heal} HP.`, 'heal');
+
+      saveGame();
+      if (inCombat) enemyTurn();
+      else updateControls();
+    }
+
+    function useManaElixir() {
+      if (hero.inventory.manaElixir <= 0) {
+        log(`[Mochila]: Sem Elixires de Mana no inventário!`, 'danger');
+        return;
+      }
+      hero.inventory.manaElixir--;
+      const manaRec = 45;
+      hero.mana = Math.min(hero.maxMana, hero.mana + manaRec);
+      playSound('heal');
+      log(`[Mochila]: Usou Elixir de Mana! Recuperou +${manaRec} MP.`, 'heal');
+
+      saveGame();
+      if (inCombat) enemyTurn();
+      else updateControls();
+    }
+
+    function useFireScroll() {
+      if (hero.inventory.fireScroll <= 0) {
+        log(`[Mochila]: Sem Pergaminhos de Fogo!`, 'danger');
+        return;
+      }
+      if (!inCombat) {
+        log(`[Mochila]: O Pergaminho de Fogo só pode ser usado em combate!`, 'status');
+        return;
+      }
+      hero.inventory.fireScroll--;
+      playSound('magic');
+      const dmg = 65;
+      currentEnemy.hp -= dmg;
+      log(`[Mochila]: Usou Pergaminho de Fogo! Causou ${dmg} de dano explosivo no inimigo!`, 'combat');
+
+      checkCombatState();
     }
 
     function shopMenu() {
       const weaponCost = hero.weaponLvl * 50;
       const armorCost = hero.armorLvl * 50;
       log(`[Loja]: O que deseja comprar/melhorar?`, 'sys');
-      log(`1. Poção de Cura (25g) | 2. Melhorar Arma Nv.${hero.weaponLvl+1} (${weaponCost}g) | 3. Melhorar Armadura Nv.${hero.armorLvl+1} (${armorCost}g)`, 'sys');
 
       buttonsContainer.innerHTML = `
-        <button class="btn-bag" onclick="buyPotion()">🧪 Poção (25g)</button>
+        <button class="btn-bag" onclick="buyHpPotion()">🧪 Poção HP (25g)</button>
+        <button class="btn-status" onclick="buyManaElixir()">🧪 Elixir MP (30g)</button>
+        <button class="btn-explore" onclick="buyScroll()">📜 Pergaminho (45g)</button>
         <button class="btn-explore" onclick="upgradeWeapon()">🗡️ +Arma (${weaponCost}g)</button>
         <button class="btn-status" onclick="upgradeArmor()">🛡️ +Armadura (${armorCost}g)</button>
         <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
       `;
+    }
+
+    function buyHpPotion() {
+      if (hero.gold < 25) {
+        log(`[Loja]: Ouro insuficiente para Poção de HP (25g).`, 'danger');
+        return;
+      }
+      hero.gold -= 25;
+      hero.inventory.hpPotion++;
+      playSound('heal');
+      log(`[Loja]: Comprou 1x Poção de HP!`, 'heal');
+      saveGame();
+      shopMenu();
+    }
+
+    function buyManaElixir() {
+      if (hero.gold < 30) {
+        log(`[Loja]: Ouro insuficiente para Elixir de Mana (30g).`, 'danger');
+        return;
+      }
+      hero.gold -= 30;
+      hero.inventory.manaElixir++;
+      playSound('heal');
+      log(`[Loja]: Comprou 1x Elixir de Mana!`, 'heal');
+      saveGame();
+      shopMenu();
+    }
+
+    function buyScroll() {
+      if (hero.gold < 45) {
+        log(`[Loja]: Ouro insuficiente para Pergaminho de Fogo (45g).`, 'danger');
+        return;
+      }
+      hero.gold -= 45;
+      hero.inventory.fireScroll++;
+      playSound('heal');
+      log(`[Loja]: Comprou 1x Pergaminho de Fogo!`, 'heal');
+      saveGame();
+      shopMenu();
     }
 
     function upgradeWeapon() {
@@ -846,44 +956,6 @@
       hero.hp += 20;
       playSound('heal');
       log(`[Loja]: Armadura melhorada para o Nível ${hero.armorLvl}! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function usePotion() {
-      if (hero.potions <= 0) {
-        log(`[Mochila]: Sem poções no inventário!`, 'danger');
-        return;
-      }
-      if (hero.hp >= hero.maxHp) {
-        log(`[Mochila]: Sua vida já está cheia.`, 'status');
-        return;
-      }
-
-      hero.potions--;
-      const heal = 50;
-      hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-      playSound('heal');
-      log(`[Cura]: +${heal} HP recuperado! (HP: ${hero.hp}/${hero.maxHp})`, 'heal');
-
-      saveGame();
-      if (inCombat) {
-        enemyTurn();
-      } else {
-        updateControls();
-      }
-    }
-
-    function buyPotion() {
-      if (hero.gold < 25) {
-        log(`[Loja]: Ouro insuficiente para comprar uma poção (Custa 25g).`, 'danger');
-        return;
-      }
-
-      hero.gold -= 25;
-      hero.potions++;
-      playSound('heal');
-      log(`[Loja]: Você comprou 1x Poção de Cura por 25g. Total de poções: ${hero.potions}`, 'heal');
       saveGame();
       shopMenu();
     }
