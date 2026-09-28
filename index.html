@@ -1458,6 +1458,67 @@ function atualizarInterfaceInventario() {
         renderizarInventarioVisual(heroi);
     }
 }
+    // --- CORREÇÃO AUTOMÁTICA DA RENDERIZAÇÃO DO INVENTÁRIO (RISE OF MALAZAR) ---
+function renderizarInventarioVisual(heroi) {
+    let containerInventario = document.getElementById('inventario-container');
+    
+    // Se o contentor não existir no HTML, cria-o dinamicamente logo abaixo do HUD do herói
+    if (!containerInventario) {
+        containerInventario = document.createElement('div');
+        containerInventario.id = 'inventario-container';
+        containerInventario.style.margin = '10px 0';
+        containerInventario.style.padding = '10px';
+        containerInventario.style.background = '#10141d';
+        containerInventario.style.border = '1px solid #e1b12c';
+        containerInventario.style.borderRadius = '6px';
+        
+        const heroHud = document.getElementById('hero-hud');
+        if (heroHud && heroHud.parentNode) {
+            heroHud.parentNode.insertBefore(containerInventario, heroHud.nextSibling);
+        } else {
+            const gameScreen = document.getElementById('game-screen') || document.body;
+            gameScreen.prepend(containerInventario);
+        }
+    }
+
+    containerInventario.innerHTML = '<h3 style="color: #e1b12c; font-size: 0.95rem; margin-bottom: 8px;">📦 Inventário e Equipamentos</h3>';
+
+    if (!heroi.inventario || heroi.inventario.length === 0) {
+        containerInventario.innerHTML += '<p style="font-size: 0.85rem; color: #aaa;">O inventário está vazio.</p>';
+        return;
+    }
+
+    heroi.inventario.forEach((item, index) => {
+        const divItem = document.createElement('div');
+        divItem.style.display = 'flex';
+        divItem.style.justifyContent = 'space-between';
+        divItem.style.alignItems = 'center';
+        divItem.style.margin = '6px 0';
+        divItem.style.padding = '6px';
+        divItem.style.background = '#1a212e';
+        divItem.style.borderRadius = '4px';
+        divItem.style.border = '1px solid #2f3542';
+        
+        const statusVinculo = item.boundToPlayer ? '🔒 (Vinculado)' : '✨ (Negociável)';
+        const infoClasse = item.classePermitida ? `[Classe: ${item.classePermitida}]` : '';
+
+        divItem.innerHTML = `
+            <span style="font-size: 0.8rem; color: #fff;"><strong>${item.nome}</strong> (${item.tipo}) - Atq: ${item.ataque} ${infoClasse} ${statusVinculo}</span>
+            <div>
+                <button onclick="tentarEquiparItem(${index}, heroi)" style="margin-right: 4px; padding: 3px 6px; background: #2ed573; border: none; border-radius: 3px; color: #fff; font-size: 0.75rem; cursor: pointer;">Equipar</button>
+                <button onclick="descartarItemObsoleto(${index}, heroi)" style="padding: 3px 6px; background: #a93226; border: none; border-radius: 3px; color: #fff; font-size: 0.75rem; cursor: pointer;">Reciclar</button>
+            </div>
+        `;
+        
+        containerInventario.appendChild(divItem);
+    });
+}
+
+function atualizarInterfaceInventario() {
+    if (typeof heroi !== 'undefined' && heroi) {
+        renderizarInventarioVisual(heroi);
+    }
+}
   </script>
 </body>
 </html>
