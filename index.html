@@ -146,6 +146,7 @@
     .heal { color: #2ed573; }
     .status { color: #1e90ff; }
     .danger { color: #ff6b81; font-weight: bold; }
+    .event { color: #eccc68; font-weight: bold; }
 
     .controls {
       display: grid;
@@ -257,7 +258,6 @@
     const floorDisplayEl = document.getElementById('floor-display');
     const buttonsContainer = document.getElementById('action-buttons');
 
-    // Verificar se existe jogo guardado
     window.onload = () => {
       updateClassPreview();
       const savedData = localStorage.getItem('rom_save');
@@ -278,10 +278,7 @@
         localStorage.removeItem('rom_save');
         return;
       }
-      const data = {
-        hero: hero,
-        floor: currentFloor
-      };
+      const data = { hero: hero, floor: currentFloor };
       localStorage.setItem('rom_save', JSON.stringify(data));
     }
 
@@ -373,7 +370,8 @@
     function updateEnemyHud() {
       if (inCombat && currentEnemy) {
         enemyHud.style.display = 'block';
-        enemyNameEl.innerText = `${currentEnemy.name} (Nível ${currentFloor})`;
+        const isBoss = currentEnemy.isBoss ? '👑 CHEFE: ' : '';
+        enemyNameEl.innerText = `${isBoss}${currentEnemy.name} (Nível ${currentFloor})`;
         enemyHpTextEl.innerText = `HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`;
         const pct = Math.max(0, (currentEnemy.hp / currentEnemy.maxHp) * 100);
         enemyHpFillEl.style.width = `${pct}%`;
@@ -387,28 +385,83 @@
 
       log(`[Masmorra]: Você explora as profundezas do Andar ${currentFloor}...`, 'action');
 
-      const enemyTypes = [
-        { name: 'Esqueleto', baseHp: 30, baseAtk: 10, baseGold: 20 },
-        { name: 'Goblin', baseHp: 25, baseAtk: 8, baseGold: 15 },
-        { name: 'Orc Guerreiro', baseHp: 50, baseAtk: 18, baseGold: 40 },
-        { name: 'Cultista de Malazar', baseHp: 40, baseAtk: 15, baseGold: 35 }
-      ];
+      // 20% de Hipótese de Evento Aleatório (se não for andar de Chefe)
+      if (currentFloor % 5 !== 0 && Math.random() < 0.25) {
+        triggerRandomEvent();
+        return;
+      }
 
-      const template = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-      const hpMultiplier = 1 + (currentFloor - 1) * 0.25;
-      const atkMultiplier = 1 + (currentFloor - 1) * 0.2;
+      // Sistema de Chefes a cada 5 Andares
+      if (currentFloor % 5 === 0) {
+        const bosses = [
+          { name: 'Lorde Esqueleto', baseHp: 120, baseAtk: 25, baseGold: 150 },
+          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200 },
+          { name: 'General de Malazar', baseHp: 200, baseAtk: 38, baseGold: 300 }
+        ];
+        const bossTemplate = bosses[Math.floor(Math.random() * bosses.length)];
+        const mult = 1 + (currentFloor / 5 - 1) * 0.5;
 
-      currentEnemy = {
-        name: template.name,
-        hp: Math.round(template.baseHp * hpMultiplier),
-        maxHp: Math.round(template.baseHp * hpMultiplier),
-        atk: Math.round(template.baseAtk * atkMultiplier),
-        gold: Math.round(template.baseGold * hpMultiplier)
-      };
+        currentEnemy = {
+          name: bossTemplate.name,
+          hp: Math.round(bossTemplate.baseHp * mult),
+          maxHp: Math.round(bossTemplate.baseHp * mult),
+          atk: Math.round(bossTemplate.baseAtk * mult),
+          gold: Math.round(bossTemplate.baseGold * mult),
+          isBoss: true
+        };
+
+        log(`[⚠️ CHEFE ⚠️]: O guardião ${currentEnemy.name} surgiu para proteger o Andar ${currentFloor}!`, 'danger');
+      } else {
+        // Inimigos Normais
+        const enemyTypes = [
+          { name: 'Esqueleto', baseHp: 30, baseAtk: 10, baseGold: 20 },
+          { name: 'Goblin', baseHp: 25, baseAtk: 8, baseGold: 15 },
+          { name: 'Orc Guerreiro', baseHp: 50, baseAtk: 18, baseGold: 40 },
+          { name: 'Cultista de Malazar', baseHp: 40, baseAtk: 15, baseGold: 35 }
+        ];
+
+        const template = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+        const hpMultiplier = 1 + (currentFloor - 1) * 0.25;
+        const atkMultiplier = 1 + (currentFloor - 1) * 0.2;
+
+        currentEnemy = {
+          name: template.name,
+          hp: Math.round(template.baseHp * hpMultiplier),
+          maxHp: Math.round(template.baseHp * hpMultiplier),
+          atk: Math.round(template.baseAtk * atkMultiplier),
+          gold: Math.round(template.baseGold * hpMultiplier),
+          isBoss: false
+        };
+
+        log(`[Combate]: Um ${currentEnemy.name} bloqueia o seu caminho!`, 'danger');
+      }
 
       inCombat = true;
-      log(`[Combate]: Um ${currentEnemy.name} bloqueia o seu caminho!`, 'danger');
       updateEnemyHud();
+      updateControls();
+    }
+
+    function triggerRandomEvent() {
+      const roll = Math.random();
+
+      if (roll < 0.35) {
+        // Baú de Tesouro
+        const goldFound = Math.floor(Math.random() * 30) + 20 * currentFloor;
+        hero.gold += goldFound;
+        log(`[🧰 Evento]: Encontrou um Baú Antigo nas ruínas! Ganhou +${goldFound}g.`, 'event');
+      } else if (roll < 0.65) {
+        // Fonte Mágica
+        hero.hp = Math.min(hero.maxHp, hero.hp + 40);
+        hero.mana = Math.min(hero.maxMana, hero.mana + 30);
+        log(`[⛲ Evento]: Encontrou uma Fonte Mágica. +40 HP e +30 MP recuperados!`, 'heal');
+      } else {
+        // Armadilha
+        const trapDmg = Math.floor(Math.random() * 10) + 5;
+        hero.hp = Math.max(1, hero.hp - trapDmg);
+        log(`[⚠️ Evento]: Ativou uma armadilha de espinhos! Perdeu ${trapDmg} de HP.`, 'danger');
+      }
+
+      saveGame();
       updateControls();
     }
 
@@ -445,7 +498,13 @@
       if (currentEnemy.hp <= 0) {
         currentEnemy.hp = 0;
         updateEnemyHud();
-        log(`[Vitória]: O ${currentEnemy.name} foi derrotado! Você ganhou ${currentEnemy.gold}g.`, 'heal');
+
+        if (currentEnemy.isBoss) {
+          log(`[👑 VITÓRIA LENDÁRIA]: O Chefe ${currentEnemy.name} foi destruído! Recompensa: ${currentEnemy.gold}g!`, 'heal');
+        } else {
+          log(`[Vitória]: O ${currentEnemy.name} foi derrotado! Você ganhou ${currentEnemy.gold}g.`, 'heal');
+        }
+
         hero.gold += currentEnemy.gold;
         inCombat = false;
         currentEnemy = null;
@@ -485,6 +544,11 @@
 
     function flee() {
       if (!inCombat) return;
+
+      if (currentEnemy.isBoss) {
+        log(`[Fuga]: Não é possível fugir da batalha contra um Chefe!`, 'danger');
+        return;
+      }
 
       const chance = hero.class === 'Ladino' ? 0.7 : 0.4;
       if (Math.random() < chance) {
