@@ -1413,6 +1413,51 @@ function tentarEquiparItem(indexInventario, heroi) {
     }
     return true;
 }
+    // --- BOTÃO VISUAL DE DESCARTE NO INVENTÁRIO (RISE OF MALAZAR) ---
+
+// Função auxiliar para atualizar a exibição do inventário com o botão de reciclagem
+function renderizarInventarioVisual(heroi) {
+    // Procura o contentor do inventario no HTML
+    const containerInventario = document.getElementById('inventario-container') || document.getElementById('inventario');
+    
+    if (!containerInventario) {
+        console.warn("Contentor do inventário não encontrado na DOM.");
+        return;
+    }
+
+    containerInventario.innerHTML = ''; // Limpa a lista atual
+
+    if (!heroi.inventario || heroi.inventario.length === 0) {
+        containerInventario.innerHTML = '<p>O inventário está vazio.</p>';
+        return;
+    }
+
+    heroi.inventario.forEach((item, index) => {
+        const divItem = document.createElement('div');
+        divItem.className = 'item-inventario-card';
+        
+        // Define texto de vínculo ou restrição se houver
+        const statusVinculo = item.boundToPlayer ? '🔒 (Vinculado)' : '✨ (Negociável)';
+        const infoClasse = item.classePermitida ? `[Classe: ${item.classePermitida}]` : '';
+
+        divItem.innerHTML = `
+            <span><strong>${item.nome}</strong> (${item.tipo}) - Atq: ${item.ataque} ${infoClasse} ${statusVinculo}</span>
+            <div>
+                <button onclick="tentarEquiparItem(${index}, heroi)">Equipar</button>
+                <button onclick="descartarItemObsoleto(${index}, heroi)" style="background-color: #a93226; color: white;">Reciclar</button>
+            </div>
+        `;
+        
+        containerInventario.appendChild(divItem);
+    });
+}
+
+// Atualiza a interface do inventário utilizando a variável heroi do jogo
+function atualizarInterfaceInventario() {
+    if (typeof heroi !== 'undefined' && heroi) {
+        renderizarInventarioVisual(heroi);
+    }
+}
   </script>
 </body>
 </html>
