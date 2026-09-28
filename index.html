@@ -1325,6 +1325,42 @@
       log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
       saveGame();
     }
+    // --- SISTEMA DE CLASSE, VÍNCULO E TROCAS (RISE OF MALAZAR) ---
+
+function criarItemMasmorra(nomeItem, tipoItem, classeObrigatoria, ataqueBase) {
+    return {
+        id: "item_" + Date.now(),
+        nome: nomeItem,
+        tipo: tipoItem,
+        classePermitida: classeObrigatoria,
+        ataque: ataqueBase,
+        isTraded: false,
+        boundToPlayer: false
+    };
+}
+
+function receberItemDeTroca(item, heroi) {
+    if (item.isTraded || item.boundToPlayer) {
+        alert("Este item já foi negociado anteriormente e está vinculado a um jogador. Não pode ser trocado novamente!");
+        return false;
+    }
+    item.isTraded = true;
+    item.boundToPlayer = true;
+    heroi.inventario.push(item);
+    alert(`Recebeste e vinculaste o item: ${item.nome}! Ele agora não pode mais ser trocado.`);
+    return true;
+}
+
+function descartarItemObsoleto(indexInventario, heroi) {
+    const item = heroi.inventario[indexInventario];
+    const ouroRecebido = Math.max(5, Math.floor(item.ataque / 2));
+    heroi.ouro += ouroRecebido;
+    heroi.inventario.splice(indexInventario, 1);
+    alert(`Item destruído com sucesso. Recebeste ${ouroRecebido} de ouro.`);
+    if (typeof atualizarInterfaceInventario === 'function') {
+        atualizarInterfaceInventario();
+    }
+}
   </script>
 </body>
 </html>
