@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rise of Malazar</title>
+    <!-- Configuração PWA para instalar no celular -->
+    <meta name="theme-color" content="#0d1117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        body { background-color: #0d1117; color: #c9d1d9; display: flex; flex-direction: column; height: 100vh; padding: 10px; }
+        #header { text-align: center; padding: 10px; border-bottom: 2px solid #238636; color: #2ea043; }
+        #game-log { flex: 1; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; overflow-y: auto; margin: 10px 0; font-size: 14px; line-height: 1.4; }
+        .log-entry { margin-bottom: 6px; }
+        .hero-action { color: #58a6ff; }
+        .enemy-action { color: #f85149; }
+        .system-msg { color: #e3b341; }
+        #controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        button { background: #21262d; color: #c9d1d9; border: 1px solid #8b949e; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        button:active { background: #30363d; transform: scale(0.98); }
+        .btn-attack { border-color: #f85149; color: #ff7b72; }
+        .btn-skill { border-color: #a371f7; color: #d2a8ff; }
+        .btn-bag { border-color: #e3b341; color: #f2cc60; }
+        .btn-rest { border-color: #2ea043; color: #56d364; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
+        <p>Beta Playtest v0.1</p>
+    </div>
+
+    <div id="game-log">
+        <div class="log-entry system-msg">[Sistema]: Bem-vindo a Rise of Malazar! A pátria precisa dos seus heróis.</div>
+        <div class="log-entry">[Ermos]: O grupo descansa na Taverna. O que deseja fazer?</div>
+    </div>
+
+    <div id="controls">
+        <button class="btn-attack" onclick="action('explorar')">🗡️ Explorar Masmorra</button>
+        <button class="btn-skill" onclick="action('status')">📊 Status do Grupo</button>
+        <button class="btn-bag" onclick="action('mochila')">🎒 Mochila</button>
+        <button class="btn-rest" onclick="action('taverna')">🍺 Descansar (Taverna)</button>
+    </div>
+
+    <script>
+        function log(msg, type = '') {
+            const logDiv = document.getElementById('game-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerText = msg;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function action(act) {
+            if (act === 'explorar') {
+                log('[Masmorra]: Você entrou no Andar 1. Um Esqueleto surgiu da Vanguarda!', 'enemy-action');
+                log('[Combate]: Dimitrian usou Bola de Fogo causando 35 de dano!', 'hero-action');
+            } else if (act === 'status') {
+                log('[Grupo]: Dimitrian (Mago) - HP: 120/120 | Mana: 80/80', 'system-msg');
+            } else if (act === 'mochila') {
+                log('[Mochila]: 2x Porção de Cura, 1x Antídoto. Ouro: 150g', 'system-msg');
+            } else if (act === 'taverna') {
+                log('[Taverna]: O grupo descansou e recuperou todo o HP e Mana por 30g.', 'system-msg');
+            }
+        }
+    </script>
+</body>
+</html>
