@@ -182,6 +182,7 @@
     .danger { color: #ff6b81; font-weight: bold; }
     .event { color: #eccc68; font-weight: bold; }
     .levelup { color: #e1b12c; font-weight: bold; font-size: 0.95rem; }
+    .victory { color: #70a1ff; font-weight: bold; font-size: 1rem; }
 
     .controls {
       display: grid;
@@ -215,6 +216,7 @@
     .btn-bag { border-color: #ffa502; color: #eccc68; }
     .btn-rest { border-color: #2ed573; color: #2ed573; }
     .btn-flee { border-color: #a4b0be; color: #a4b0be; }
+    .btn-ngplus { background: #e1b12c; color: #050608; border-color: #e1b12c; font-size: 1rem; grid-column: span 2; padding: 12px; }
   </style>
 </head>
 <body id="game-body">
@@ -370,7 +372,9 @@
 
     let hero = {};
     let currentFloor = 1;
+    let ngCycle = 1;
     let inCombat = false;
+    let gameWon = false;
     let currentEnemy = null;
 
     const creationScreen = document.getElementById('creation-screen');
@@ -389,7 +393,8 @@
       if (savedData) {
         const data = JSON.parse(savedData);
         document.getElementById('save-prompt').style.display = 'block';
-        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class} Nv.${data.hero.level || 1}) - Andar ${data.floor}`;
+        const cycleText = data.ngCycle > 1 ? ` [NG+${data.ngCycle - 1}]` : '';
+        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class} Nv.${data.hero.level})${cycleText} - Andar ${data.floor}`;
       }
     };
 
@@ -400,7 +405,8 @@
 
     function updateHeroHud() {
       if (!hero || !hero.name) return;
-      document.getElementById('hud-name-class').innerText = `${hero.name} (${hero.class} Nv.${hero.level})`;
+      const cycleText = ngCycle > 1 ? ` (NG+${ngCycle - 1})` : '';
+      document.getElementById('hud-name-class').innerText = `${hero.name} (${hero.class} Nv.${hero.level})${cycleText}`;
       document.getElementById('hud-gold-potions').innerText = `💰 ${hero.gold}g`;
 
       const hpPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
@@ -421,7 +427,7 @@
         localStorage.removeItem('rom_save');
         return;
       }
-      const data = { hero: hero, floor: currentFloor };
+      const data = { hero: hero, floor: currentFloor, ngCycle: ngCycle };
       localStorage.setItem('rom_save', JSON.stringify(data));
       updateHeroHud();
     }
@@ -433,9 +439,8 @@
 
       const data = JSON.parse(savedData);
       hero = data.hero;
-      if (!hero.level) hero.level = 1;
-      if (!hero.xp) hero.xp = 0;
-      if (!hero.maxXp) hero.maxXp = 50;
+      currentFloor = data.floor;
+      ngCycle = data.ngCycle || 1;
 
       if (!hero.inventory) {
         hero.inventory = { hpPotion: hero.potions || 2, manaElixir: 1, fireScroll: 1 };
@@ -445,11 +450,9 @@
       hero.skill2Name = stats.skill2Name;
       hero.skill2Cost = stats.skill2Cost;
 
-      currentFloor = data.floor;
-
       creationScreen.style.display = 'none';
       gameScreen.style.display = 'flex';
-      floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
+      floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra (Ciclo ${ngCycle})`;
 
       log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
       log(`[Herói]: ${hero.name} (${hero.class} Nv.${hero.level}) regressou no Andar ${currentFloor}.`, 'action');
@@ -487,6 +490,9 @@
       };
 
       currentFloor = 1;
+      ngCycle = 1;
+      gameWon = false;
+
       creationScreen.style.display = 'none';
       gameScreen.style.display = 'flex';
       floorDisplayEl.innerText = `Andar 1 da Masmorra`;
@@ -494,6 +500,20 @@
       log(`[Sistema]: Bem-vindo ao Rise of Malazar!`, 'sys');
       log(`[Herói]: ${hero.name}, o ${hero.class}, iniciou a sua jornada!`, 'action');
       log(`[Masmorra]: Toque em "Explorar" para adentrar o Andar ${currentFloor}.`, 'sys');
+
+      saveGame();
+      updateControls();
+    }
+
+    function startNgPlus() {
+      ngCycle++;
+      currentFloor = 1;
+      gameWon = false;
+      hero.hp = hero.maxHp;
+      hero.mana = hero.maxMana;
+
+      floorDisplayEl.innerText = `Andar 1 da Masmorra (NG+${ngCycle - 1})`;
+      log(`[NEW GAME+]: Você iniciou o Ciclo ${ngCycle}! Os inimigos estão muito mais poderosos!`, 'levelup');
 
       saveGame();
       updateControls();
@@ -541,6 +561,13 @@
         return;
       }
 
+      if (gameWon) {
+        buttonsContainer.innerHTML = `
+          <button class="btn-ngplus" onclick="startNgPlus()">🔥 Iniciar New Game+ (Ciclo ${ngCycle + 1})</button>
+        `;
+        return;
+      }
+
       if (inCombat) {
         let skill2Btn = '';
         if (hero.level >= 3) {
@@ -570,7 +597,7 @@
       if (inCombat && currentEnemy) {
         enemyHud.style.display = 'block';
         const isBoss = currentEnemy.isBoss ? '👑 CHEFE: ' : '';
-        enemyNameEl.innerText = `${isBoss}${currentEnemy.name} (Nível ${currentFloor})`;
+        enemyNameEl.innerText = `${isBoss}${currentEnemy.name}`;
         enemyHpTextEl.innerText = `HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`;
         const pct = Math.max(0, (currentEnemy.hp / currentEnemy.maxHp) * 100);
         enemyHpFillEl.style.width = `${pct}%`;
@@ -584,27 +611,49 @@
 
       log(`[Masmorra]: Você explora as profundezas do Andar ${currentFloor}...`, 'action');
 
+      if (currentFloor === 10) {
+        // BOSS FINAL: MALAZAR
+        const ngMult = 1 + (ngCycle - 1) * 0.8;
+        currentEnemy = {
+          name: 'MALAZAR, O SENHOR DAS SOMBRAS',
+          hp: Math.round(350 * ngMult),
+          maxHp: Math.round(350 * ngMult),
+          atk: Math.round(45 * ngMult),
+          gold: 1000,
+          xp: 500,
+          isBoss: true,
+          isFinalBoss: true
+        };
+
+        log(`[🔥 CHEFE FINAL 🔥]: Malazar ergue-se do trono sombrio! "Você ousou desafiar-me, ${hero.name}? Prepare-se para a ruína!"`, 'danger');
+        inCombat = true;
+        updateEnemyHud();
+        updateControls();
+        return;
+      }
+
       if (currentFloor % 5 !== 0 && Math.random() < 0.25) {
         triggerRandomEvent();
         return;
       }
 
+      const ngMult = 1 + (ngCycle - 1) * 0.5;
+
       if (currentFloor % 5 === 0) {
         const bosses = [
           { name: 'Lorde Esqueleto', baseHp: 120, baseAtk: 25, baseGold: 150, xp: 100 },
-          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200, xp: 130 },
-          { name: 'General de Malazar', baseHp: 200, baseAtk: 38, baseGold: 300, xp: 180 }
+          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200, xp: 130 }
         ];
         const bossTemplate = bosses[Math.floor(Math.random() * bosses.length)];
-        const mult = 1 + (currentFloor / 5 - 1) * 0.5;
+        const floorMult = 1 + (currentFloor / 5 - 1) * 0.5;
 
         currentEnemy = {
           name: bossTemplate.name,
-          hp: Math.round(bossTemplate.baseHp * mult),
-          maxHp: Math.round(bossTemplate.baseHp * mult),
-          atk: Math.round(bossTemplate.baseAtk * mult),
-          gold: Math.round(bossTemplate.baseGold * mult),
-          xp: Math.round(bossTemplate.xp * mult),
+          hp: Math.round(bossTemplate.baseHp * floorMult * ngMult),
+          maxHp: Math.round(bossTemplate.baseHp * floorMult * ngMult),
+          atk: Math.round(bossTemplate.baseAtk * floorMult * ngMult),
+          gold: Math.round(bossTemplate.baseGold * floorMult),
+          xp: Math.round(bossTemplate.xp * floorMult),
           isBoss: true
         };
 
@@ -618,8 +667,8 @@
         ];
 
         const template = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-        const hpMultiplier = 1 + (currentFloor - 1) * 0.25;
-        const atkMultiplier = 1 + (currentFloor - 1) * 0.2;
+        const hpMultiplier = (1 + (currentFloor - 1) * 0.25) * ngMult;
+        const atkMultiplier = (1 + (currentFloor - 1) * 0.2) * ngMult;
 
         currentEnemy = {
           name: template.name,
@@ -737,6 +786,11 @@
         currentEnemy.hp = 0;
         updateEnemyHud();
 
+        if (currentEnemy.isFinalBoss) {
+          triggerVictoryEnding();
+          return;
+        }
+
         if (currentEnemy.isBoss) {
           log(`[👑 VITÓRIA LENDÁRIA]: O Chefe ${currentEnemy.name} foi destruído! Recompensa: ${currentEnemy.gold}g!`, 'heal');
         } else {
@@ -761,6 +815,24 @@
 
       updateEnemyHud();
       enemyTurn();
+    }
+
+    function triggerVictoryEnding() {
+      inCombat = false;
+      gameWon = true;
+      playSound('levelup');
+
+      log(`[🏆 VITÓRIA ABSOLUTA 🏆]: MALAZAR FOI DERROTADO!`, 'victory');
+
+      if (hero.hp > hero.maxHp * 0.5) {
+        log(`[📜 FINAL GLORIOSO]: ${hero.name} triunfou com facilidade e libertou todo o reino da maldição eterna de Malazar!`, 'victory');
+      } else {
+        log(`[📜 FINAL SOBREVIVENTE]: À beira da morte, ${hero.name} desferiu o golpe final, selando Malazar nas profundezas!`, 'event');
+      }
+
+      saveGame();
+      updateEnemyHud();
+      updateControls();
     }
 
     function enemyTurn() {
