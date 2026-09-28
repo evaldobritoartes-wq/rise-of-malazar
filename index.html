@@ -35,6 +35,19 @@
       color: #70a1ff;
     }
 
+    /* Animação de tremor ao receber impacto */
+    .shake {
+      animation: shake 0.2s;
+    }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      20% { transform: translate(-3px, 0px) rotate(-1deg); }
+      40% { transform: translate(3px, 2px) rotate(1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      80% { transform: translate(3px, 1px) rotate(-1deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
     /* Tela de Criação e Carregamento */
     #creation-screen {
       display: flex;
@@ -147,6 +160,7 @@
     .status { color: #1e90ff; }
     .danger { color: #ff6b81; font-weight: bold; }
     .event { color: #eccc68; font-weight: bold; }
+    .levelup { color: #e1b12c; font-weight: bold; font-size: 0.95rem; }
 
     .controls {
       display: grid;
@@ -182,7 +196,7 @@
     .btn-flee { border-color: #a4b0be; color: #a4b0be; }
   </style>
 </head>
-<body>
+<body id="game-body">
 
   <header>
     <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
@@ -236,6 +250,75 @@
   </div>
 
   <script>
+    // Sistema de Áudio Sintetizado (Web Audio API)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'attack') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'magic') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(700, now + 0.25);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'heal') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(500, now + 0.3);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'levelup') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(261.63, now); // C4
+        osc.frequency.setValueAtTime(329.63, now + 0.1); // E4
+        osc.frequency.setValueAtTime(392.00, now + 0.2); // G4
+        osc.frequency.setValueAtTime(523.25, now + 0.3); // C5
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'defeat') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+    }
+
+    function triggerShake() {
+      const body = document.getElementById('game-body');
+      body.classList.remove('shake');
+      void body.offsetWidth; // Reflow
+      body.classList.add('shake');
+    }
+
     const classData = {
       'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], desc: 'HP: 160 | MP: 30 | Habilidade: Golpe Devastador' },
       'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], desc: 'HP: 100 | MP: 100 | Habilidade: Bola de Fogo' },
@@ -264,7 +347,7 @@
       if (savedData) {
         const data = JSON.parse(savedData);
         document.getElementById('save-prompt').style.display = 'block';
-        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class}) - Andar ${data.floor}`;
+        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class} Nv.${data.hero.level || 1}) - Andar ${data.floor}`;
       }
     };
 
@@ -283,11 +366,16 @@
     }
 
     function loadSavedGame() {
+      initAudio();
       const savedData = localStorage.getItem('rom_save');
       if (!savedData) return;
 
       const data = JSON.parse(savedData);
       hero = data.hero;
+      if (!hero.level) hero.level = 1;
+      if (!hero.xp) hero.xp = 0;
+      if (!hero.maxXp) hero.maxXp = 50;
+
       currentFloor = data.floor;
 
       creationScreen.style.display = 'none';
@@ -295,12 +383,13 @@
       floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
 
       log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
-      log(`[Herói]: ${hero.name} (${hero.class}) regressou à aventura no Andar ${currentFloor}.`, 'action');
+      log(`[Herói]: ${hero.name} (${hero.class} Nv.${hero.level}) regressou no Andar ${currentFloor}.`, 'action');
 
       updateControls();
     }
 
     function startNewGame() {
+      initAudio();
       const nameInput = document.getElementById('hero-name').value.trim();
       const selectedClass = document.getElementById('hero-class').value;
       const stats = classData[selectedClass];
@@ -308,6 +397,9 @@
       hero = {
         name: nameInput || 'Herói',
         class: selectedClass,
+        level: 1,
+        xp: 0,
+        maxXp: 50,
         hp: stats.hp,
         maxHp: stats.hp,
         mana: stats.mana,
@@ -341,6 +433,28 @@
       entry.innerText = msg;
       logDiv.appendChild(entry);
       logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function gainXp(amount) {
+      hero.xp += amount;
+      log(`[XP]: Ganhou +${amount} de XP! (${hero.xp}/${hero.maxXp})`, 'sys');
+
+      if (hero.xp >= hero.maxXp) {
+        hero.level++;
+        hero.xp -= hero.maxXp;
+        hero.maxXp = Math.round(hero.maxXp * 1.5);
+
+        const hpGain = 20;
+        const mpGain = 10;
+        hero.maxHp += hpGain;
+        hero.hp = hero.maxHp;
+        hero.maxMana += mpGain;
+        hero.mana = hero.maxMana;
+
+        playSound('levelup');
+        triggerShake();
+        log(`[LEVEL UP! 🎉]: ${hero.name} subiu para o Nível ${hero.level}! (+${hpGain} Max HP, +${mpGain} Max MP, Vida/Mana restauradas!)`, 'levelup');
+      }
     }
 
     function updateControls() {
@@ -385,18 +499,16 @@
 
       log(`[Masmorra]: Você explora as profundezas do Andar ${currentFloor}...`, 'action');
 
-      // 20% de Hipótese de Evento Aleatório (se não for andar de Chefe)
       if (currentFloor % 5 !== 0 && Math.random() < 0.25) {
         triggerRandomEvent();
         return;
       }
 
-      // Sistema de Chefes a cada 5 Andares
       if (currentFloor % 5 === 0) {
         const bosses = [
-          { name: 'Lorde Esqueleto', baseHp: 120, baseAtk: 25, baseGold: 150 },
-          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200 },
-          { name: 'General de Malazar', baseHp: 200, baseAtk: 38, baseGold: 300 }
+          { name: 'Lorde Esqueleto', baseHp: 120, baseAtk: 25, baseGold: 150, xp: 100 },
+          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200, xp: 130 },
+          { name: 'General de Malazar', baseHp: 200, baseAtk: 38, baseGold: 300, xp: 180 }
         ];
         const bossTemplate = bosses[Math.floor(Math.random() * bosses.length)];
         const mult = 1 + (currentFloor / 5 - 1) * 0.5;
@@ -407,17 +519,17 @@
           maxHp: Math.round(bossTemplate.baseHp * mult),
           atk: Math.round(bossTemplate.baseAtk * mult),
           gold: Math.round(bossTemplate.baseGold * mult),
+          xp: Math.round(bossTemplate.xp * mult),
           isBoss: true
         };
 
         log(`[⚠️ CHEFE ⚠️]: O guardião ${currentEnemy.name} surgiu para proteger o Andar ${currentFloor}!`, 'danger');
       } else {
-        // Inimigos Normais
         const enemyTypes = [
-          { name: 'Esqueleto', baseHp: 30, baseAtk: 10, baseGold: 20 },
-          { name: 'Goblin', baseHp: 25, baseAtk: 8, baseGold: 15 },
-          { name: 'Orc Guerreiro', baseHp: 50, baseAtk: 18, baseGold: 40 },
-          { name: 'Cultista de Malazar', baseHp: 40, baseAtk: 15, baseGold: 35 }
+          { name: 'Esqueleto', baseHp: 30, baseAtk: 10, baseGold: 20, xp: 20 },
+          { name: 'Goblin', baseHp: 25, baseAtk: 8, baseGold: 15, xp: 15 },
+          { name: 'Orc Guerreiro', baseHp: 50, baseAtk: 18, baseGold: 40, xp: 35 },
+          { name: 'Cultista de Malazar', baseHp: 40, baseAtk: 15, baseGold: 35, xp: 30 }
         ];
 
         const template = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
@@ -430,6 +542,7 @@
           maxHp: Math.round(template.baseHp * hpMultiplier),
           atk: Math.round(template.baseAtk * atkMultiplier),
           gold: Math.round(template.baseGold * hpMultiplier),
+          xp: Math.round(template.xp * hpMultiplier),
           isBoss: false
         };
 
@@ -445,19 +558,20 @@
       const roll = Math.random();
 
       if (roll < 0.35) {
-        // Baú de Tesouro
         const goldFound = Math.floor(Math.random() * 30) + 20 * currentFloor;
         hero.gold += goldFound;
+        playSound('heal');
         log(`[🧰 Evento]: Encontrou um Baú Antigo nas ruínas! Ganhou +${goldFound}g.`, 'event');
       } else if (roll < 0.65) {
-        // Fonte Mágica
         hero.hp = Math.min(hero.maxHp, hero.hp + 40);
         hero.mana = Math.min(hero.maxMana, hero.mana + 30);
+        playSound('heal');
         log(`[⛲ Evento]: Encontrou uma Fonte Mágica. +40 HP e +30 MP recuperados!`, 'heal');
       } else {
-        // Armadilha
         const trapDmg = Math.floor(Math.random() * 10) + 5;
         hero.hp = Math.max(1, hero.hp - trapDmg);
+        playSound('attack');
+        triggerShake();
         log(`[⚠️ Evento]: Ativou uma armadilha de espinhos! Perdeu ${trapDmg} de HP.`, 'danger');
       }
 
@@ -468,6 +582,7 @@
     function attackPhysical() {
       if (!inCombat) return;
 
+      playSound('attack');
       const weaponBonus = (hero.weaponLvl - 1) * 5;
       const dmg = Math.floor(Math.random() * 8) + 10 + weaponBonus;
       currentEnemy.hp -= dmg;
@@ -484,6 +599,7 @@
         return;
       }
 
+      playSound('magic');
       hero.mana -= hero.spellCost;
       const [minDmg, maxDmg] = hero.spellDmg;
       const weaponBonus = (hero.weaponLvl - 1) * 6;
@@ -506,12 +622,15 @@
         }
 
         hero.gold += currentEnemy.gold;
+        const xpEarned = currentEnemy.xp;
+
         inCombat = false;
         currentEnemy = null;
         
         currentFloor++;
         floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
         
+        gainXp(xpEarned);
         saveGame();
         updateEnemyHud();
         updateControls();
@@ -528,12 +647,15 @@
       const enemyDmg = Math.max(2, rawDmg - armorReduction);
 
       hero.hp -= enemyDmg;
+      playSound('attack');
+      triggerShake();
       log(`[Dano]: O ${currentEnemy.name} atacou e causou ${enemyDmg} de dano em ${hero.name}!`, 'danger');
 
       if (hero.hp <= 0) {
         hero.hp = 0;
         hero.isAlive = false;
         inCombat = false;
+        playSound('defeat');
         log(`[DERROTA]: ${hero.name} caiu no Andar ${currentFloor}... O Malazar triunfou!`, 'danger');
         updateEnemyHud();
       }
@@ -564,7 +686,8 @@
     }
 
     function showStatus() {
-      log(`[Status]: ${hero.name} (${hero.class}) | HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g | Poções: ${hero.potions}`, 'status');
+      log(`[Status]: ${hero.name} (${hero.class}) - Nível ${hero.level} | XP: ${hero.xp}/${hero.maxXp}`, 'status');
+      log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g | Poções: ${hero.potions}`, 'status');
       log(`[Equipamento]: Arma Nível ${hero.weaponLvl} | Armadura Nível ${hero.armorLvl}`, 'status');
     }
 
@@ -591,6 +714,7 @@
 
       hero.gold -= cost;
       hero.weaponLvl++;
+      playSound('heal');
       log(`[Loja]: Arma melhorada para o Nível ${hero.weaponLvl}! Dano aumentado.`, 'heal');
       saveGame();
       shopMenu();
@@ -607,6 +731,7 @@
       hero.armorLvl++;
       hero.maxHp += 20;
       hero.hp += 20;
+      playSound('heal');
       log(`[Loja]: Armadura melhorada para o Nível ${hero.armorLvl}! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
       saveGame();
       shopMenu();
@@ -625,6 +750,7 @@
       hero.potions--;
       const heal = 50;
       hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+      playSound('heal');
       log(`[Cura]: +${heal} HP recuperado! (HP: ${hero.hp}/${hero.maxHp})`, 'heal');
 
       saveGame();
@@ -643,6 +769,7 @@
 
       hero.gold -= 25;
       hero.potions++;
+      playSound('heal');
       log(`[Loja]: Você comprou 1x Poção de Cura por 25g. Total de poções: ${hero.potions}`, 'heal');
       saveGame();
       shopMenu();
@@ -661,6 +788,7 @@
       hero.gold -= 30;
       hero.hp = hero.maxHp;
       hero.mana = hero.maxMana;
+      playSound('heal');
       log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
       saveGame();
     }
