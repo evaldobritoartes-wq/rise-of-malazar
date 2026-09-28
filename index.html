@@ -1519,6 +1519,43 @@ function atualizarInterfaceInventario() {
         renderizarInventarioVisual(heroi);
     }
 }
+    // --- SISTEMA DE DROP DE ITENS E LIGAÇÃO DE TELA (RISE OF MALAZAR) ---
+
+// Lista de itens possíveis de serem encontrados nas masmorras
+const itensPossiveisDrop = [
+    { nome: "Adaga Envenenada", tipo: "Adaga", ataque: 12, classePermitida: "Assassino", boundToPlayer: false },
+    { nome: "Cajado de Iniciado", tipo: "Cajado", ataque: 15, classePermitida: "Mago", boundToPlayer: false },
+    { nome: "Espada Longa de Aço", tipo: "Espada", ataque: 18, classePermitida: "Guerreiro", boundToPlayer: false },
+    { nome: "Martelo Sagrado", tipo: "Martelo", ataque: 14, classePermitida: "Sacerdote", boundToPlayer: false },
+    { nome: "Armadura de Couro Batido", tipo: "Armadura Leve", ataque: 0, classePermitida: null, boundToPlayer: false }
+];
+
+// Função chamada após vencer um combate para sortear um item para o herói
+function sortearItemAposCombate(heroi) {
+    // 40% de chance de dropar um item ao vencer
+    if (Math.random() < 0.40) {
+        const itemSorteado = JSON.parse(JSON.stringify(itensPossiveisDrop[Math.floor(Math.random() * itensPossiveisDrop.length)]));
+        
+        heroi.inventario = heroi.inventario || [];
+        heroi.inventario.push(itemSorteado);
+        
+        // Exibe no log do jogo se ele existir
+        const logDiv = document.getElementById('log');
+        if (logDiv) {
+            logDiv.innerHTML += `<br><span style="color: #2ed573;">[Espólios]: Encontrou um novo item: ${itemSorteado.nome}!</span>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        atualizarInterfaceInventario();
+    }
+}
+
+// Função para abrir a aba de equipamentos/inventário ao clicar no menu
+function abrirPainelEquipamentos() {
+    if (typeof heroi !== 'undefined' && heroi) {
+        renderizarInventarioVisual(heroi);
+    }
+}
   </script>
 </body>
 </html>
