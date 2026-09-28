@@ -35,7 +35,7 @@
       color: #70a1ff;
     }
 
-    /* Animação de tremor ao receber impacto */
+    /* Animação de tremor */
     .shake {
       animation: shake 0.2s;
     }
@@ -48,7 +48,7 @@
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
-    /* Tela de Criação e Carregamento */
+    /* Tela de Criação */
     #creation-screen {
       display: flex;
       flex-direction: column;
@@ -89,7 +89,6 @@
       margin-top: 4px;
     }
 
-    /* Save Box */
     .save-box {
       background: #141824;
       border: 1px solid #2ed573;
@@ -104,7 +103,42 @@
       margin-bottom: 8px;
     }
 
-    /* Layout do Jogo Principal */
+    /* HUD do Herói */
+    #hero-hud {
+      background: #10141d;
+      border: 1px solid #1f2a38;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #eccc68;
+    }
+    .bar-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+    }
+    .bar-bg {
+      background: #2f3542;
+      border-radius: 4px;
+      height: 8px;
+      flex: 1;
+      overflow: hidden;
+    }
+    .bar-fill-hp { background: #2ed573; height: 100%; width: 100%; transition: width 0.3s; }
+    .bar-fill-mp { background: #1e90ff; height: 100%; width: 100%; transition: width 0.3s; }
+    .bar-fill-xp { background: #e1b12c; height: 100%; width: 0%; transition: width 0.3s; }
+
+    /* Layout Principal */
     #game-screen {
       display: none;
       flex-direction: column;
@@ -125,20 +159,7 @@
       font-weight: bold;
       font-size: 0.9rem;
     }
-    .hp-bar-bg {
-      background: #2f3542;
-      border-radius: 4px;
-      height: 12px;
-      width: 100%;
-      margin-top: 4px;
-      overflow: hidden;
-    }
-    .hp-bar-fill {
-      background: #ff4757;
-      height: 100%;
-      width: 100%;
-      transition: width 0.3s;
-    }
+
     #log {
       flex: 1;
       background-color: #050608;
@@ -172,16 +193,16 @@
       background: #141824;
       border: 1px solid #2f3640;
       color: #eccc68;
-      padding: 12px 6px;
+      padding: 10px 4px;
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
     }
     button:active {
       background: #2f3542;
@@ -203,7 +224,7 @@
     <div class="subtitle" id="floor-display">Criação de Personagem</div>
   </header>
 
-  <!-- TELA DE CRIAÇÃO / CARREGAMENTO -->
+  <!-- TELA DE CRIAÇÃO -->
   <div id="creation-screen">
     <div id="save-prompt" class="save-box" style="display: none;">
       <p id="save-info-text">Jogo Guardado Encontrado!</p>
@@ -234,11 +255,34 @@
 
   <!-- TELA DO JOGO -->
   <div id="game-screen">
+    <!-- HUD DO HERÓI -->
+    <div id="hero-hud">
+      <div class="hud-header">
+        <span id="hud-name-class">Herói (Nv. 1)</span>
+        <span id="hud-gold-potions">💰 150g | 🧪 2</span>
+      </div>
+      <div class="bar-container">
+        <span style="color: #2ed573; width: 24px;">HP</span>
+        <div class="bar-bg"><div class="bar-fill-hp" id="bar-hp"></div></div>
+        <span id="txt-hp" style="color: #a4b0be; font-size: 0.65rem;">100/100</span>
+      </div>
+      <div class="bar-container">
+        <span style="color: #1e90ff; width: 24px;">MP</span>
+        <div class="bar-bg"><div class="bar-fill-mp" id="bar-mp"></div></div>
+        <span id="txt-mp" style="color: #a4b0be; font-size: 0.65rem;">100/100</span>
+      </div>
+      <div class="bar-container">
+        <span style="color: #e1b12c; width: 24px;">XP</span>
+        <div class="bar-bg"><div class="bar-fill-xp" id="bar-xp"></div></div>
+        <span id="txt-xp" style="color: #a4b0be; font-size: 0.65rem;">0/50</span>
+      </div>
+    </div>
+
     <div id="enemy-hud">
       <div class="enemy-title" id="enemy-name">Inimigo</div>
       <div style="font-size: 0.75rem; color: #ff6b81; margin-top: 2px;" id="enemy-hp-text">HP: 0/0</div>
-      <div class="hp-bar-bg">
-        <div class="hp-bar-fill" id="enemy-hp-fill"></div>
+      <div class="bar-bg" style="height: 10px; margin-top: 4px;">
+        <div class="bar-fill-hp" style="background: #ff4757;" id="enemy-hp-fill"></div>
       </div>
     </div>
 
@@ -250,7 +294,6 @@
   </div>
 
   <script>
-    // Sistema de Áudio Sintetizado (Web Audio API)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
@@ -264,7 +307,6 @@
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       const now = audioCtx.currentTime;
 
       if (type === 'attack') {
@@ -293,10 +335,10 @@
         osc.stop(now + 0.3);
       } else if (type === 'levelup') {
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(261.63, now); // C4
-        osc.frequency.setValueAtTime(329.63, now + 0.1); // E4
-        osc.frequency.setValueAtTime(392.00, now + 0.2); // G4
-        osc.frequency.setValueAtTime(523.25, now + 0.3); // C5
+        osc.frequency.setValueAtTime(261.63, now);
+        osc.frequency.setValueAtTime(329.63, now + 0.1);
+        osc.frequency.setValueAtTime(392.00, now + 0.2);
+        osc.frequency.setValueAtTime(523.25, now + 0.3);
         gain.gain.setValueAtTime(0.3, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
         osc.start(now);
@@ -315,15 +357,15 @@
     function triggerShake() {
       const body = document.getElementById('game-body');
       body.classList.remove('shake');
-      void body.offsetWidth; // Reflow
+      void body.offsetWidth;
       body.classList.add('shake');
     }
 
     const classData = {
-      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], desc: 'HP: 160 | MP: 30 | Habilidade: Golpe Devastador' },
-      'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], desc: 'HP: 100 | MP: 100 | Habilidade: Bola de Fogo' },
-      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], desc: 'HP: 120 | MP: 50 | Habilidade: Ataque Sombrio' },
-      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], desc: 'HP: 140 | MP: 70 | Habilidade: Luz Sagrada' }
+      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], skill2Name: 'Grito de Guerra', skill2Cost: 15, desc: 'HP: 160 | MP: 30 | Nv.3: Grito de Guerra' },
+      'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], skill2Name: 'Meteoro Arcano', skill2Cost: 40, desc: 'HP: 100 | MP: 100 | Nv.3: Meteoro Arcano' },
+      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], skill2Name: 'Adaga Venenosa', skill2Cost: 20, desc: 'HP: 120 | MP: 50 | Nv.3: Adaga Venenosa' },
+      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], skill2Name: 'Oração Celestial', skill2Cost: 30, desc: 'HP: 140 | MP: 70 | Nv.3: Oração Celestial' }
     };
 
     let hero = {};
@@ -356,6 +398,24 @@
       document.getElementById('class-preview').innerText = classData[selectedClass].desc;
     }
 
+    function updateHeroHud() {
+      if (!hero || !hero.name) return;
+      document.getElementById('hud-name-class').innerText = `${hero.name} (${hero.class} Nv.${hero.level})`;
+      document.getElementById('hud-gold-potions').innerText = `💰 ${hero.gold}g | 🧪 ${hero.potions}`;
+
+      const hpPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
+      const mpPct = Math.max(0, (hero.mana / hero.maxMana) * 100);
+      const xpPct = Math.max(0, (hero.xp / hero.maxXp) * 100);
+
+      document.getElementById('bar-hp').style.width = `${hpPct}%`;
+      document.getElementById('bar-mp').style.width = `${mpPct}%`;
+      document.getElementById('bar-xp').style.width = `${xpPct}%`;
+
+      document.getElementById('txt-hp').innerText = `${hero.hp}/${hero.maxHp}`;
+      document.getElementById('txt-mp').innerText = `${hero.mana}/${hero.maxMana}`;
+      document.getElementById('txt-xp').innerText = `${hero.xp}/${hero.maxXp}`;
+    }
+
     function saveGame() {
       if (!hero.isAlive) {
         localStorage.removeItem('rom_save');
@@ -363,6 +423,7 @@
       }
       const data = { hero: hero, floor: currentFloor };
       localStorage.setItem('rom_save', JSON.stringify(data));
+      updateHeroHud();
     }
 
     function loadSavedGame() {
@@ -376,6 +437,10 @@
       if (!hero.xp) hero.xp = 0;
       if (!hero.maxXp) hero.maxXp = 50;
 
+      const stats = classData[hero.class];
+      hero.skill2Name = stats.skill2Name;
+      hero.skill2Cost = stats.skill2Cost;
+
       currentFloor = data.floor;
 
       creationScreen.style.display = 'none';
@@ -385,6 +450,7 @@
       log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
       log(`[Herói]: ${hero.name} (${hero.class} Nv.${hero.level}) regressou no Andar ${currentFloor}.`, 'action');
 
+      updateHeroHud();
       updateControls();
     }
 
@@ -411,6 +477,8 @@
         spellName: stats.spellName,
         spellCost: stats.spellCost,
         spellDmg: stats.spellDmg,
+        skill2Name: stats.skill2Name,
+        skill2Cost: stats.skill2Cost,
         isAlive: true
       };
 
@@ -437,7 +505,7 @@
 
     function gainXp(amount) {
       hero.xp += amount;
-      log(`[XP]: Ganhou +${amount} de XP! (${hero.xp}/${hero.maxXp})`, 'sys');
+      log(`[XP]: Ganhou +${amount} de XP!`, 'sys');
 
       if (hero.xp >= hero.maxXp) {
         hero.level++;
@@ -453,8 +521,13 @@
 
         playSound('levelup');
         triggerShake();
-        log(`[LEVEL UP! 🎉]: ${hero.name} subiu para o Nível ${hero.level}! (+${hpGain} Max HP, +${mpGain} Max MP, Vida/Mana restauradas!)`, 'levelup');
+        log(`[LEVEL UP! 🎉]: ${hero.name} subiu para o Nível ${hero.level}! (+${hpGain} HP, +${mpGain} MP!)`, 'levelup');
+
+        if (hero.level === 3) {
+          log(`[HABILIDADE NOVA! ✨]: Desbloqueou a habilidade: ${hero.skill2Name}!`, 'event');
+        }
       }
+      updateHeroHud();
     }
 
     function updateControls() {
@@ -465,11 +538,18 @@
       }
 
       if (inCombat) {
+        let skill2Btn = '';
+        if (hero.level >= 3) {
+          skill2Btn = `<button class="btn-status" onclick="useSkill2()">⚡ ${hero.skill2Name} (${hero.skill2Cost} MP)</button>`;
+        } else {
+          skill2Btn = `<button class="btn-flee" onclick="flee()">🏃 Fugir</button>`;
+        }
+
         buttonsContainer.innerHTML = `
           <button class="btn-explore" onclick="attackPhysical()">🗡️ Atacar</button>
           <button class="btn-status" onclick="attackMagic()">🪄 ${hero.spellName} (${hero.spellCost} MP)</button>
+          ${skill2Btn}
           <button class="btn-bag" onclick="usePotion()">🧪 Poção (${hero.potions})</button>
-          <button class="btn-flee" onclick="flee()">🏃 Fugir</button>
         `;
       } else {
         buttonsContainer.innerHTML = `
@@ -479,6 +559,7 @@
           <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
         `;
       }
+      updateHeroHud();
     }
 
     function updateEnemyHud() {
@@ -606,6 +687,38 @@
       const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg + weaponBonus;
       currentEnemy.hp -= dmg;
       log(`[Habilidade]: ${hero.name} usa ${hero.spellName} causando ${dmg} de dano!`, 'combat');
+
+      checkCombatState();
+    }
+
+    function useSkill2() {
+      if (!inCombat || hero.level < 3) return;
+
+      if (hero.mana < hero.skill2Cost) {
+        log(`[Mana]: Mana insuficiente! Você precisa de ${hero.skill2Cost} MP.`, 'danger');
+        return;
+      }
+
+      hero.mana -= hero.skill2Cost;
+      playSound('magic');
+
+      if (hero.class === 'Guerreiro') {
+        const healAmt = 35;
+        hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name}! Recuperou +${healAmt} HP.`, 'heal');
+      } else if (hero.class === 'Mago') {
+        const dmg = Math.floor(Math.random() * 30) + 55 + (hero.weaponLvl * 8);
+        currentEnemy.hp -= dmg;
+        log(`[Habilidade]: ${hero.name} invocou ${hero.skill2Name} causando ${dmg} de dano devastador!`, 'combat');
+      } else if (hero.class === 'Ladino') {
+        const dmg = Math.floor(Math.random() * 20) + 40 + (hero.weaponLvl * 6);
+        currentEnemy.hp -= dmg;
+        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} envenenando o alvo por ${dmg} de dano!`, 'combat');
+      } else if (hero.class === 'Clérigo') {
+        const healAmt = 60;
+        hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
+        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} recuperando +${healAmt} HP!`, 'heal');
+      }
 
       checkCombatState();
     }
