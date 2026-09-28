@@ -1556,6 +1556,18 @@ function abrirPainelEquipamentos() {
         renderizarInventarioVisual(heroi);
     }
 }
+    // --- LIGAÇÃO DOS BOTÕES DE MENU AOS NOVOS SISTEMAS (RISE OF MALAZAR) ---
+document.addEventListener("DOMContentLoaded", () => {
+    // Procura o botão de Loja / Equipamento pelo texto ou classe e liga o evento
+    const botoes = document.querySelectorAll('button');
+    botoes.forEach(btn => {
+        if (btn.textContent.includes("Loja / Equipamento") || btn.textContent.includes("Equipamento")) {
+            btn.addEventListener("click", () => {
+                abrirPainelEquipamentos();
+            });
+        }
+    });
+});
   </script>
 </body>
 </html>
