@@ -1568,6 +1568,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+    // --- CORREÇÃO DE UI: EXIBIR APENAS A ÚLTIMA AÇÃO NO LOG (RISE OF MALAZAR) ---
+(function() {
+    // Guarda a referência original se existir
+    const logAntigo = window.log;
+    
+    // Sobrescreve a função log global do jogo
+    window.log = function(mensagem) {
+        const logDiv = document.getElementById('log');
+        if (logDiv) {
+            // Em vez de acumular com +=, substituímos o conteúdo para mostrar apenas a última ação
+            logDiv.innerHTML = mensagem;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        } else if (typeof logAntigo === 'function') {
+            logAntigo(mensagem);
+        }
+    };
+})();
   </script>
 </body>
 </html>
