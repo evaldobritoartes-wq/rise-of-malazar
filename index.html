@@ -1328,52 +1328,42 @@
   </script>
 </body>
 </html>
+<script>
 // --- SISTEMA DE CLASSE, VÍNCULO E TROCAS (RISE OF MALAZAR) ---
 
-// Exemplo de criação de item com suporte a classes e travas de troca
 function criarItemMasmorra(nomeItem, tipoItem, classeObrigatoria, ataqueBase) {
     return {
         id: "item_" + Date.now(),
         nome: nomeItem,
-        tipo: tipoItem, // Ex: "Cajado", "Livro", "Espada"
-        classePermitida: classeObrigatoria, // Ex: "Mago", "Guerreiro"
+        tipo: tipoItem,
+        classePermitida: classeObrigatoria,
         ataque: ataqueBase,
-        isTraded: false,       // Começa falso (nunca foi negociado)
-        boundToPlayer: false   // Não está vinculado a ninguém ainda
+        isTraded: false,
+        boundToPlayer: false
     };
 }
 
-// Função executada quando um item é comprado ou trocado com outro jogador
 function receberItemDeTroca(item, heroi) {
-    // Trava de segurança: se já foi trocado, bloqueia novas negociações
     if (item.isTraded || item.boundToPlayer) {
         alert("Este item já foi negociado anteriormente e está vinculado a um jogador. Não pode ser trocado novamente!");
         return false;
     }
-
-    // Aplica o vínculo ao novo dono
     item.isTraded = true;
     item.boundToPlayer = true;
-
-    // Adiciona ao inventário do herói atual
     heroi.inventario.push(item);
     alert(`Recebeste e vinculaste o item: ${item.nome}! Ele agora não pode mais ser trocado.`);
     return true;
 }
 
-// Função para o jogador descartar voluntariamente um item obsoleto (mesmo vinculado)
 function descartarItemObsoleto(indexInventario, heroi) {
     const item = heroi.inventario[indexInventario];
-    
-    // O jogador tem liberdade total para destruir o item e ganhar ouro residual
     const ouroRecebido = Math.max(5, Math.floor(item.ataque / 2));
     heroi.ouro += ouroRecebido;
-    
-    // Remove o item do inventário
     heroi.inventario.splice(indexInventario, 1);
-    
     alert(`Item destruído com sucesso. Recebeste ${ouroRecebido} de ouro.`);
     if (typeof atualizarInterfaceInventario === 'function') {
         atualizarInterfaceInventario();
     }
 }
+</script>
+
