@@ -1568,20 +1568,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-    // --- CORREÇÃO DE UI: EXIBIR APENAS A ÚLTIMA AÇÃO NO LOG (RISE OF MALAZAR) ---
-(function() {
-    // Guarda a referência original se existir
-    const logAntigo = window.log;
     
-    // Sobrescreve a função log global do jogo
+        }
+  // --- CORREÇÃO DE UI: EXIBIR AS DUAS ÚLTIMAS AÇÕES NO LOG (RISE OF MALAZAR) ---
+(function() {
+    let historicoLogs = [];
+    
     window.log = function(mensagem) {
         const logDiv = document.getElementById('log');
         if (logDiv) {
-            // Em vez de acumular com +=, substituímos o conteúdo para mostrar apenas a última ação
-            logDiv.innerHTML = mensagem;
+            // Adiciona a nova mensagem ao array
+            historicoLogs.push(mensagem);
+            
+            // Mantém apenas as últimas 2 mensagens
+            if (historicoLogs.length > 2) {
+                historicoLogs.shift(); // Remove a mais antiga
+            }
+            
+            // Exibe as duas últimas separadas por uma quebra de linha
+            logDiv.innerHTML = historicoLogs.join('<br>');
             logDiv.scrollTop = logDiv.scrollHeight;
-        } else if (typeof logAntigo === 'function') {
-            logAntigo(mensagem);
         }
     };
 })();
