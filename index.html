@@ -2,33 +2,50 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Rise of Malazar</title>
+  
+  <!-- Configurações PWA e Mobile -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh; /* Adapta-se dinamicamente às barras do navegador */
       background-color: #0b0d12;
       color: #33ff33;
       font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+    }
+    body {
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      padding: 10px;
-      overflow: hidden;
-      position: relative;
+      padding: 8px;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      padding-top: max(8px, env(safe-area-inset-top));
     }
     header {
       text-align: center;
-      padding: 6px 0;
+      padding: 4px 0;
       border-bottom: 2px solid #1f293d;
       margin-bottom: 6px;
+      flex-shrink: 0;
     }
     h1 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: #2ed573;
       letter-spacing: 2px;
     }
@@ -111,11 +128,12 @@
       background: #10141d;
       border: 1px solid #1f2a38;
       border-radius: 6px;
-      padding: 8px;
+      padding: 6px 8px;
       margin-bottom: 6px;
       display: flex;
       flex-direction: column;
       gap: 4px;
+      flex-shrink: 0;
     }
     .hud-header {
       display: flex;
@@ -162,6 +180,7 @@
       flex-direction: column;
       flex: 1;
       height: 100%;
+      min-height: 0; /* Impede estourar o container pai flex */
       overflow: hidden;
     }
     #enemy-hud {
@@ -169,25 +188,27 @@
       background: #1e1215;
       border: 1px solid #ff4757;
       border-radius: 6px;
-      padding: 8px;
+      padding: 6px 8px;
       margin-bottom: 6px;
       text-align: center;
+      flex-shrink: 0;
     }
     .enemy-title {
       color: #ff4757;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     #log {
       flex: 1;
+      min-height: 0; /* Garante rolagem interna correta no mobile */
       background-color: #050608;
       border: 1px solid #1f2a38;
       border-radius: 6px;
-      padding: 10px;
+      padding: 8px;
       overflow-y: auto;
-      font-size: 0.85rem;
-      line-height: 1.4;
+      font-size: 0.82rem;
+      line-height: 1.35;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -207,8 +228,9 @@
     .controls {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 6px;
+      margin-top: 6px;
+      flex-shrink: 0;
     }
     button {
       background: #141824;
@@ -224,6 +246,7 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
+      touch-action: manipulation;
     }
     button:active {
       background: #2f3542;
@@ -254,6 +277,8 @@
       gap: 12px;
       z-index: 999;
       transition: top 0.5s ease-in-out;
+      width: 90%;
+      max-width: 380px;
     }
     #achievement-popup.show {
       top: 15px;
@@ -352,7 +377,7 @@
     <div id="enemy-hud">
       <div class="enemy-title" id="enemy-name">Inimigo</div>
       <div style="font-size: 0.75rem; color: #ff6b81; margin-top: 2px;" id="enemy-hp-text">HP: 0/0</div>
-      <div class="bar-bg" style="height: 10px; margin-top: 4px;">
+      <div class="bar-bg" style="height: 8px; margin-top: 4px;">
         <div class="bar-fill-hp" style="background: #ff4757;" id="enemy-hp-fill"></div>
       </div>
     </div>
