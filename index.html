@@ -35,7 +35,7 @@
       color: #70a1ff;
     }
 
-    /* Tela de Criação de Personagem */
+    /* Tela de Criação e Carregamento */
     #creation-screen {
       display: flex;
       flex-direction: column;
@@ -76,7 +76,22 @@
       margin-top: 4px;
     }
 
-    /* Layout do Jogo Principial */
+    /* Save Box */
+    .save-box {
+      background: #141824;
+      border: 1px solid #2ed573;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .save-box p {
+      color: #2ed573;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    /* Layout do Jogo Principal */
     #game-screen {
       display: none;
       flex-direction: column;
@@ -157,7 +172,8 @@
       background: #2f3542;
       transform: scale(0.98);
     }
-    .btn-start { background: #2ed573; color: #050608; border-color: #2ed573; font-size: 1rem; padding: 14px; }
+    .btn-start { background: #2ed573; color: #050608; border-color: #2ed573; font-size: 1rem; padding: 12px; width: 100%; }
+    .btn-load { background: #1e90ff; color: #ffffff; border-color: #1e90ff; font-size: 1rem; padding: 12px; width: 100%; }
     .btn-explore { border-color: #ff4757; color: #ff6b81; }
     .btn-status { border-color: #1e90ff; color: #70a1ff; }
     .btn-bag { border-color: #ffa502; color: #eccc68; }
@@ -172,8 +188,13 @@
     <div class="subtitle" id="floor-display">Criação de Personagem</div>
   </header>
 
-  <!-- TELA DE CRIAÇÃO -->
+  <!-- TELA DE CRIAÇÃO / CARREGAMENTO -->
   <div id="creation-screen">
+    <div id="save-prompt" class="save-box" style="display: none;">
+      <p id="save-info-text">Jogo Guardado Encontrado!</p>
+      <button class="btn-load" onclick="loadSavedGame()">📂 Continuar Jornada</button>
+    </div>
+
     <div class="form-group">
       <label for="hero-name">Nome do Herói:</label>
       <input type="text" id="hero-name" placeholder="Ex: Dimitrian" value="Dimitrian" maxlength="15">
@@ -190,10 +211,10 @@
     </div>
 
     <div class="class-info" id="class-preview">
-      HP: 120 | MP: 80 | Habilidade: Bola de Fogo
+      HP: 100 | MP: 100 | Habilidade: Bola de Fogo
     </div>
 
-    <button class="btn-start" onclick="startAdventure()">🚀 Iniciar Aventura</button>
+    <button class="btn-start" onclick="startNewGame()">🚀 Novo Jogo</button>
   </div>
 
   <!-- TELA DO JOGO -->
@@ -214,7 +235,6 @@
   </div>
 
   <script>
-    // Configurações das Classes
     const classData = {
       'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], desc: 'HP: 160 | MP: 30 | Habilidade: Golpe Devastador' },
       'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], desc: 'HP: 100 | MP: 100 | Habilidade: Bola de Fogo' },
@@ -237,12 +257,53 @@
     const floorDisplayEl = document.getElementById('floor-display');
     const buttonsContainer = document.getElementById('action-buttons');
 
+    // Verificar se existe jogo guardado
+    window.onload = () => {
+      updateClassPreview();
+      const savedData = localStorage.getItem('rom_save');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('save-prompt').style.display = 'block';
+        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class}) - Andar ${data.floor}`;
+      }
+    };
+
     function updateClassPreview() {
       const selectedClass = document.getElementById('hero-class').value;
       document.getElementById('class-preview').innerText = classData[selectedClass].desc;
     }
 
-    function startAdventure() {
+    function saveGame() {
+      if (!hero.isAlive) {
+        localStorage.removeItem('rom_save');
+        return;
+      }
+      const data = {
+        hero: hero,
+        floor: currentFloor
+      };
+      localStorage.setItem('rom_save', JSON.stringify(data));
+    }
+
+    function loadSavedGame() {
+      const savedData = localStorage.getItem('rom_save');
+      if (!savedData) return;
+
+      const data = JSON.parse(savedData);
+      hero = data.hero;
+      currentFloor = data.floor;
+
+      creationScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
+      floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
+
+      log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
+      log(`[Herói]: ${hero.name} (${hero.class}) regressou à aventura no Andar ${currentFloor}.`, 'action');
+
+      updateControls();
+    }
+
+    function startNewGame() {
       const nameInput = document.getElementById('hero-name').value.trim();
       const selectedClass = document.getElementById('hero-class').value;
       const stats = classData[selectedClass];
@@ -256,12 +317,15 @@
         maxMana: stats.mana,
         gold: 150,
         potions: 2,
+        weaponLvl: 1,
+        armorLvl: 1,
         spellName: stats.spellName,
         spellCost: stats.spellCost,
         spellDmg: stats.spellDmg,
         isAlive: true
       };
 
+      currentFloor = 1;
       creationScreen.style.display = 'none';
       gameScreen.style.display = 'flex';
       floorDisplayEl.innerText = `Andar 1 da Masmorra`;
@@ -270,6 +334,7 @@
       log(`[Herói]: ${hero.name}, o ${hero.class}, iniciou a sua jornada!`, 'action');
       log(`[Masmorra]: Toque em "Explorar" para adentrar o Andar ${currentFloor}.`, 'sys');
 
+      saveGame();
       updateControls();
     }
 
@@ -283,6 +348,7 @@
 
     function updateControls() {
       if (!hero.isAlive) {
+        localStorage.removeItem('rom_save');
         buttonsContainer.innerHTML = `<button class="btn-explore" style="grid-column: span 2;" onclick="location.reload()">🔄 Reiniciar Aventura</button>`;
         return;
       }
@@ -298,7 +364,7 @@
         buttonsContainer.innerHTML = `
           <button class="btn-explore" onclick="explore()">⚔️ Explorar</button>
           <button class="btn-status" onclick="showStatus()">📊 Status</button>
-          <button class="btn-bag" onclick="buyPotion()">🛍️ Comprar Poção (25g)</button>
+          <button class="btn-bag" onclick="shopMenu()">🛍️ Loja / Equipamentos</button>
           <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
         `;
       }
@@ -349,9 +415,10 @@
     function attackPhysical() {
       if (!inCombat) return;
 
-      const dmg = Math.floor(Math.random() * 8) + 10;
+      const weaponBonus = (hero.weaponLvl - 1) * 5;
+      const dmg = Math.floor(Math.random() * 8) + 10 + weaponBonus;
       currentEnemy.hp -= dmg;
-      log(`[Ataque]: ${hero.name} ataca causando ${dmg} de dano!`, 'combat');
+      log(`[Ataque]: ${hero.name} ataca causando ${dmg} de dano físico!`, 'combat');
 
       checkCombatState();
     }
@@ -366,7 +433,8 @@
 
       hero.mana -= hero.spellCost;
       const [minDmg, maxDmg] = hero.spellDmg;
-      const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg;
+      const weaponBonus = (hero.weaponLvl - 1) * 6;
+      const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg + weaponBonus;
       currentEnemy.hp -= dmg;
       log(`[Habilidade]: ${hero.name} usa ${hero.spellName} causando ${dmg} de dano!`, 'combat');
 
@@ -385,6 +453,7 @@
         currentFloor++;
         floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
         
+        saveGame();
         updateEnemyHud();
         updateControls();
         return;
@@ -395,7 +464,10 @@
     }
 
     function enemyTurn() {
-      const enemyDmg = Math.floor(Math.random() * 6) + (currentEnemy.atk - 2);
+      const armorReduction = (hero.armorLvl - 1) * 3;
+      const rawDmg = Math.floor(Math.random() * 6) + (currentEnemy.atk - 2);
+      const enemyDmg = Math.max(2, rawDmg - armorReduction);
+
       hero.hp -= enemyDmg;
       log(`[Dano]: O ${currentEnemy.name} atacou e causou ${enemyDmg} de dano em ${hero.name}!`, 'danger');
 
@@ -407,6 +479,7 @@
         updateEnemyHud();
       }
 
+      saveGame();
       updateControls();
     }
 
@@ -428,6 +501,51 @@
 
     function showStatus() {
       log(`[Status]: ${hero.name} (${hero.class}) | HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g | Poções: ${hero.potions}`, 'status');
+      log(`[Equipamento]: Arma Nível ${hero.weaponLvl} | Armadura Nível ${hero.armorLvl}`, 'status');
+    }
+
+    function shopMenu() {
+      const weaponCost = hero.weaponLvl * 50;
+      const armorCost = hero.armorLvl * 50;
+      log(`[Loja]: O que deseja comprar/melhorar?`, 'sys');
+      log(`1. Poção de Cura (25g) | 2. Melhorar Arma Nv.${hero.weaponLvl+1} (${weaponCost}g) | 3. Melhorar Armadura Nv.${hero.armorLvl+1} (${armorCost}g)`, 'sys');
+
+      buttonsContainer.innerHTML = `
+        <button class="btn-bag" onclick="buyPotion()">🧪 Poção (25g)</button>
+        <button class="btn-explore" onclick="upgradeWeapon()">🗡️ +Arma (${weaponCost}g)</button>
+        <button class="btn-status" onclick="upgradeArmor()">🛡️ +Armadura (${armorCost}g)</button>
+        <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
+      `;
+    }
+
+    function upgradeWeapon() {
+      const cost = hero.weaponLvl * 50;
+      if (hero.gold < cost) {
+        log(`[Loja]: Ouro insuficiente para melhorar a Arma (Custa ${cost}g).`, 'danger');
+        return;
+      }
+
+      hero.gold -= cost;
+      hero.weaponLvl++;
+      log(`[Loja]: Arma melhorada para o Nível ${hero.weaponLvl}! Dano aumentado.`, 'heal');
+      saveGame();
+      shopMenu();
+    }
+
+    function upgradeArmor() {
+      const cost = hero.armorLvl * 50;
+      if (hero.gold < cost) {
+        log(`[Loja]: Ouro insuficiente para melhorar a Armadura (Custa ${cost}g).`, 'danger');
+        return;
+      }
+
+      hero.gold -= cost;
+      hero.armorLvl++;
+      hero.maxHp += 20;
+      hero.hp += 20;
+      log(`[Loja]: Armadura melhorada para o Nível ${hero.armorLvl}! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
+      saveGame();
+      shopMenu();
     }
 
     function usePotion() {
@@ -445,6 +563,7 @@
       hero.hp = Math.min(hero.maxHp, hero.hp + heal);
       log(`[Cura]: +${heal} HP recuperado! (HP: ${hero.hp}/${hero.maxHp})`, 'heal');
 
+      saveGame();
       if (inCombat) {
         enemyTurn();
       } else {
@@ -461,7 +580,8 @@
       hero.gold -= 25;
       hero.potions++;
       log(`[Loja]: Você comprou 1x Poção de Cura por 25g. Total de poções: ${hero.potions}`, 'heal');
-      updateControls();
+      saveGame();
+      shopMenu();
     }
 
     function rest() {
@@ -478,6 +598,7 @@
       hero.hp = hero.maxHp;
       hero.mana = hero.maxMana;
       log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
+      saveGame();
     }
   </script>
 </body>
