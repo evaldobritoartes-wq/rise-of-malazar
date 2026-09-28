@@ -1361,6 +1361,58 @@ function descartarItemObsoleto(indexInventario, heroi) {
         atualizarInterfaceInventario();
     }
 }
+    // --- SISTEMA DE RESTRIÇÃO DE EQUIPAMENTOS POR CLASSE (RISE OF MALAZAR) ---
+
+// Define quais tipos de armas/itens cada classe pode equipar
+const restricoesDeClasse = {
+    "Guerreiro": ["Espada", "Machado", "Escudo", "Armadura Pesada"],
+    "Mago": ["Cajado", "Livro", "Grimório", "Armadura Leve"],
+    "Assassino": ["Adaga", "Lâmina", "Armadura Leve"],
+    "Sacerdote": ["Maça", "Martelo", "Cajado", "Armadura Média"]
+};
+
+// Função para verificar se o herói pode equipar o item
+function heroiPodeEquipar(heroi, item) {
+    // Se o item não tiver restrição de classe, qualquer um pode equipar
+    if (!item.classePermitida && !item.tipo) return true;
+
+    const classeHeroi = heroi.classe;
+    const tiposPermitidos = restricoesDeClasse[classeHeroi] || [];
+
+    // Verifica se a classe do herói é compatível com a exigência do item
+    const classeCompativel = !item.classePermitida || item.classePermitida === classeHeroi;
+    const tipoCompativel = !item.tipo || tiposPermitidos.includes(item.tipo);
+
+    if (!classeCompativel || !tipoCompativel) {
+        alert(`O ${classeHeroi} não tem treino suficiente para equipar ${item.nome}! (Restrito a: ${item.classePermitida || 'Classes específicas'})`);
+        return false;
+    }
+
+    return true;
+}
+
+// Função para tentar equipar um item do inventário
+function tentarEquiparItem(indexInventario, heroi) {
+    const item = heroi.inventario[indexInventario];
+    
+    if (!heroiPodeEquipar(heroi, item)) {
+        return false;
+    }
+
+    // Se passou na validação, equipa o item (exemplo básico de slot)
+    heroi.equipado = heroi.equipado || {};
+    heroi.equipado[item.tipo] = item;
+    
+    // Remove do inventário ao equipar
+    heroi.inventario.splice(indexInventario, 1);
+    
+    alert(`Equipado com sucesso: ${item.nome}!`);
+    
+    if (typeof atualizarInterfaceInventario === 'function') {
+        atualizarInterfaceInventario();
+    }
+    return true;
+}
   </script>
 </body>
 </html>
