@@ -1582,6 +1582,47 @@ setInterval(() => {
         }
     }
 }, 100);
+    // --- SISTEMA DE EQUIPAMENTOS E AFINIDADE DE CLASSES (RISE OF MALAZAR) ---
+
+// Define as afinidades permitidas para cada classe do herói
+const afinidadesClasse = {
+    "Guerreiro": { armas: ["Espada", "Machado", "Espadão"], armaduras: ["Pesada", "Placas"] },
+    "Mago": { armas: ["Cajado", "Varinha"], armaduras: ["Manto", "Tecido"] },
+    "Assassino": { armas: ["Adaga", "Katana"], armaduras: ["Leve", "Couro"] },
+    "Sacerdote": { armas: ["Maça", "Cetro"], armaduras: ["Média", "Malha"] }
+};
+
+// Função para validar e equipar um item com base na classe atual
+function tentarEquiparItem(heroi, item) {
+    if (!heroi || !item) return false;
+
+    // Obtém a classe do herói (ex: "Mago", "Guerreiro", etc.)
+    const classeHeroi = heroi.classe || "Guerreiro";
+    const regras = afinidadesClasse[classeHeroi];
+
+    if (!regras) {
+        log(`[Equipamento]: Classe desconhecida para validação!`);
+        return false;
+    }
+
+    // Verifica se o tipo do item corresponde às restrições da classe
+    const eArmaValida = item.tipo === 'arma' && regras.armas.includes(item.subtipo);
+    const eArmaduraValida = item.tipo === 'armadura' && regras.armaduras.includes(item.subtipo);
+
+    if (eArmaValida || eArmaduraValida) {
+        log(`[Equipamento]: ${heroi.name} equipou com sucesso: ${item.nome}!`);
+        // Aqui aplicamos o item ao slot correspondente do herói
+        if (item.tipo === 'arma') {
+            heroi.armaEquipada = item;
+        } else {
+            heroi.armaduraEquipada = item;
+        }
+        return true;
+    } else {
+        log(`[Equipamento]: A classe ${classeHeroi} não possui afinidade com ${item.nome}!`);
+        return false;
+    }
+}
   </script>
 </body>
 </html>
