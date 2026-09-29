@@ -1570,25 +1570,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
     
         }
-  // --- CORREÇÃO DE UI: EXIBIR AS DUAS ÚLTIMAS AÇÕES NO LOG (RISE OF MALAZAR) ---
+  // --- CORREÇÃO DE UI: EXIBIR AS DUAS ÚLTIMAS AÇÕES NO LOG (SEGURO) ---
 (function() {
     let historicoLogs = [];
     
     window.log = function(mensagem) {
         const logDiv = document.getElementById('log');
-        if (logDiv) {
-            // Adiciona a nova mensagem ao array
-            historicoLogs.push(mensagem);
-            
-            // Mantém apenas as últimas 2 mensagens
-            if (historicoLogs.length > 2) {
-                historicoLogs.shift(); // Remove a mais antiga
-            }
-            
-            // Exibe as duas últimas separadas por uma quebra de linha
-            logDiv.innerHTML = historicoLogs.join('<br>');
-            logDiv.scrollTop = logDiv.scrollHeight;
+        // Se a caixa de log ainda não existir na tela, apenas ignora para não travar o jogo
+        if (!logDiv) return;
+        
+        historicoLogs.push(mensagem);
+        
+        // Mantém apenas as últimas 2 mensagens
+        if (historicoLogs.length > 2) {
+            historicoLogs.shift();
         }
+        
+        logDiv.innerHTML = historicoLogs.join('<br>');
+        logDiv.scrollTop = logDiv.scrollHeight;
     };
 })();
   </script>
