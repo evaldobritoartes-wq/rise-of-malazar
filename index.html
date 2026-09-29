@@ -1667,6 +1667,19 @@ function interagirPrimeiroItem(heroi) {
         heroi.inventarioItens.shift();
     }
 }
+    // --- SISTEMA DE INVENTÁRIO (BASE SEGURA) ---
+function inicializarInventarioHeroi(h) {
+    if (!h) return;
+    if (!h.inventarioItens) {
+        h.inventarioItens = [];
+    }
+    if (!h.equipamentos) {
+        h.equipamentos = {
+            arma: null,
+            armadura: null
+        };
+    }
+}
   </script>
 </body>
 </html>
