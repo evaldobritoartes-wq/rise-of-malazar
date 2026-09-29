@@ -746,6 +746,7 @@
 
       saveGame();
       updateControls();
+      atualizarInterfacePersonagem(hero);
     }
 
     function log(msg, type = 'sys') {
@@ -755,8 +756,7 @@
       logDiv.appendChild(entry);
       logDiv.scrollTop = logDiv.scrollHeight;
     }
-    atualizarInterfacePersonagem(hero);
-
+    
     function gainXp(amount) {
       hero.xp += amount;
       log(`[XP]: Ganhou +${amount} de XP!`, 'sys');
