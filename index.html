@@ -1732,7 +1732,20 @@ function interagirPrimeiroItem(h) {
         if (typeof log === 'function') log(`[Reciclagem]: Item ${item.nome} reciclado por ${ouroGanho} de ouro.`);
         h.inventarioItens.shift();
     }
+  // --- DIAGNÓSTICO DO INVENTÁRIO ---
+function listarInventario(h) {
+    if (!h) return;
+    if (!h.inventarioItens || h.inventarioItens.length === 0) {
+        if (typeof log === 'function') log('[Mochila]: A mochila está vazia.');
+        return;
+    }
+    if (typeof log === 'function') log(`[Mochila]: A abrir inventário (${h.inventarioItens.length} itens):`);
+    h.inventarioItens.forEach((item, index) => {
+        if (typeof log === 'function') log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
+    });
 }
+}
+    
   </script>
 </body>
 </html>
