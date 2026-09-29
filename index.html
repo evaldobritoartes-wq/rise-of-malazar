@@ -1801,11 +1801,7 @@ function criarHeroi(nome, genero, raca, classe) {
         }
     };
 
-    // Aplicação de Bónus Raciais Passivos
-    aplicarBonusRacial(heroi);
-    
-    // Aplicação de Passivas e Características de Classe
-    aplicarBonusClasse(heroi);
+  
 
     if (typeof log === 'function') {
         log(`[Herói Criado]: ${heroi.nome} (${heroi.genero}, ${heroi.raca} ${heroi.classe}) inicializado com sucesso!`);
