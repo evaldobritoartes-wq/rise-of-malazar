@@ -1623,6 +1623,26 @@ function tentarEquiparItem(heroi, item) {
         return false;
     }
 }
+    // --- RENDERIZAÇÃO SIMPLES DO INVENTÁRIO (RISE OF MALAZAR) ---
+function renderizarInventarioVisual(heroi) {
+    if (!heroi) return;
+    
+    // Garante que o herói tem uma lista de itens na mochila
+    if (!heroi.inventarioItens) {
+        heroi.inventarioItens = [];
+    }
+
+    log(`[Inventario]: A abrir mochila de ${heroi.name} (${heroi.classe})...`);
+    
+    // Se houver itens, lista-os; caso contrário, avisa que está vazia
+    if (heroi.inventarioItens.length === 0) {
+        log(`[Inventario]: A mochila está vazia.`);
+    } else {
+        heroi.inventarioItens.forEach((item, index) => {
+            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo} - ${item.subtipo})`);
+        });
+    }
+}
   </script>
 </body>
 </html>
