@@ -350,6 +350,35 @@
 
   <!-- TELA DO JOGO -->
   <div id="game-screen">
+    <div id="aba-personagem" class="painel-jogo">
+    <h2>Ficha do Herói</h2>
+    
+    <div class="card-perfil">
+        <p><strong>Nome:</strong> <span id="ui-nome">-</span></p>
+        <p><strong>Género:</strong> <span id="ui-genero">-</span></p>
+        <p><strong>Raça:</strong> <span id="ui-raca">-</span> <small id="ui-passiva-raca" style="color: #888;"></small></p>
+        <p><strong>Classe:</strong> <span id="ui-classe">-</span> <small id="ui-passiva-classe" style="color: #888;"></small></p>
+    </div>
+
+    <div class="grid-stats">
+        <div class="bloco-stats">
+            <h3>Ofensiva & Precisão</h3>
+            <p>Dano Físico: <span id="ui-dano-fisico">0</span></p>
+            <p>Dano Mágico: <span id="ui-dano-magico">0</span></p>
+            <p>Crítico: <span id="ui-critico">0</span>%</p>
+            <p>Precisão: <span id="ui-precisao">0</span></p>
+            <p>Destreza: <span id="ui-destreza">0</span></p>
+        </div>
+        
+        <div class="bloco-stats">
+            <h3>Defesa & Sobrevivência</h3>
+            <p>Defesa Física: <span id="ui-defesa-fisica">0</span></p>
+            <p>Resistência (Mágica): <span id="ui-resistencia">0</span></p>
+            <p>Evasão: <span id="ui-evasao">0</span>%</p>
+            <p>Bloqueio (Escudo): <span id="ui-bloqueio">0</span></p>
+        </div>
+    </div>
+</div>
     <!-- HUD DO HERÓI -->
     <div id="hero-hud">
       <div class="hud-header">
