@@ -1643,6 +1643,30 @@ function renderizarInventarioVisual(heroi) {
         });
     }
 }
+    // --- AÇÃO DE EQUIPAR OU RECICLAR ITEM (RISE OF MALAZAR) ---
+function interagirPrimeiroItem(heroi) {
+    if (!heroi || !heroi.inventarioItens || heroi.inventarioItens.length === 0) {
+        log(`[Inventario]: Não há itens na mochila para interagir.`);
+        return;
+    }
+
+    // Pega no primeiro item da mochila
+    const item = heroi.inventarioItens[0];
+    
+    // Tenta equipar usando a validação de classe criada anteriormente
+    const equipadoComSucesso = tentarEquiparItem(heroi, item);
+
+    if (equipadoComSucesso) {
+        // Se equipou com sucesso, remove o item da mochila
+        heroi.inventarioItens.shift();
+    } else {
+        // Se a classe não for compatível, recicla o item por ouro (ex: 15 de ouro)
+        const ouroGanho = 15;
+        heroi.gold = (heroi.gold || 0) + ouroGanho;
+        log(`[Reciclagem]: O item ${item.nome} foi reciclado por +${ouroGanho}g.`);
+        heroi.inventarioItens.shift();
+    }
+}
   </script>
 </body>
 </html>
