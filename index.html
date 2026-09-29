@@ -673,10 +673,10 @@
 
       const stats = classData[hero.class];
       hero.skill2Name = stats.skill2Name;
-          inicializarAtributosHeroi(hero);
-    atualizarInterfacePersonagem(hero);
-          creationScreen.style.display = 'none';
-    gameScreen.style.display = 'flex';
+      inicializarAtributosHeroi(hero);
+      atualizarInterfacePersonagem(hero);
+      creationScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
       floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra (Ciclo ${ngCycle})`;
 
       log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
