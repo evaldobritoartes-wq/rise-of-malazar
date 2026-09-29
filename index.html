@@ -1691,6 +1691,25 @@ function adicionarItemAoHeroi(h, item) {
         log(`[Inventário]: ${item.nome} adicionado à mochila.`);
     }
 }
+    // --- EQUIPAR ITEM DO HERÓI ---
+function equiparItemHeroi(h, item) {
+    if (!h || !item) return false;
+    
+    if (!h.equipamentos) {
+        h.equipamentos = { arma: null, armadura: null };
+    }
+
+    if (item.tipo === 'arma') {
+        h.equipamentos.arma = item;
+        if (typeof log === 'function') log(`[Equipamento]: ${item.nome} equipado como arma.`);
+        return true;
+    } else if (item.tipo === 'armadura') {
+        h.equipamentos.armadura = item;
+        if (typeof log === 'function') log(`[Equipamento]: ${item.nome} equipado como armadura.`);
+        return true;
+    }
+    return false;
+}
   </script>
 </body>
 </html>
