@@ -1832,10 +1832,11 @@ function criarHeroi(nome, genero, raca, classe) {
         }
     };
 
-      if (typeof log === 'function') {
-        log(`[Herói Criado]: ${heroi.name}`);
+          if (typeof log === 'function') {
+        log(`[Herói Criado]: ${heroi.nome}`);
     }
 
+    inicializarAtributosHeroi(heroi);
     atualizarInterfacePersonagem(heroi);
 
     return heroi;
