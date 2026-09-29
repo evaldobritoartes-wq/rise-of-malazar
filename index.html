@@ -1934,6 +1934,12 @@ function atualizarInterfacePersonagem(heroi) {
 
     if (typeof log === 'function') log('[Interface]: Aba Personagem atualizada com segurança.');
 }
+    // Gatilho de teste para garantir que a interface responde assim que o jogo arranca
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof meuHeroi !== 'undefined' && meuHeroi) {
+        atualizarInterfacePersonagem(meuHeroi);
+    }
+});
   </script>
 </body>
 </html>
