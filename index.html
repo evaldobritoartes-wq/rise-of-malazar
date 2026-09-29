@@ -1940,6 +1940,15 @@ document.addEventListener("DOMContentLoaded", () => {
         atualizarInterfacePersonagem(meuHeroi);
     }
 });
+    // Gatilho de atualização automática da ficha do herói
+window.addEventListener('load', () => {
+    // Tenta encontrar a variável do herói independentemente do nome usado no seu motor
+    let heroiAtual = typeof meuHeroi !== 'undefined' ? meuHeroi : (typeof hero !== 'undefined' ? hero : null);
+    
+    if (heroiAtual && typeof atualizarInterfacePersonagem === 'function') {
+        atualizarInterfacePersonagem(heroiAtual);
+    }
+});
   </script>
 </body>
 </html>
