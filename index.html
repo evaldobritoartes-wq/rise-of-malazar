@@ -1550,15 +1550,16 @@ function sortearItemAposCombate(heroi) {
     }
 }
 
-// Função para abrir a aba de equipamentos/inventário ao clicar no menu
+// --- SISTEMA DE EQUIPAMENTOS E NAVEGAÇÃO (RISE OF MALAZAR) ---
 function abrirPainelEquipamentos() {
     if (typeof heroi !== 'undefined' && heroi) {
-        renderizarInventarioVisual(heroi);
+        if (typeof renderizarInventarioVisual === 'function') {
+            renderizarInventarioVisual(heroi);
+        }
     }
 }
-    // --- LIGAÇÃO DOS BOTÕES DE MENU AOS NOVOS SISTEMAS (RISE OF MALAZAR) ---
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Procura o botão de Loja / Equipamento pelo texto ou classe e liga o evento
     const botoes = document.querySelectorAll('button');
     botoes.forEach(btn => {
         if (btn.textContent.includes("Loja / Equipamento") || btn.textContent.includes("Equipamento")) {
@@ -1568,8 +1569,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-    
-        }
   </script>
 </body>
 </html>
