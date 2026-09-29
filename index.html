@@ -1779,65 +1779,58 @@ setInterval(() => {
                 log(`[Inventario]: Erro - Herói não encontrado.`);
             }
         };
+        // --- SISTEMA DE MOCHILA INTEGRADO (RISE OF MALAZAR) ---
+// Função dedicada para abrir e gerir a mochila visualmente
+function abrirMochilaDoHeroi() {
+    const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
+    
+    if (!h) {
+        log(`[Inventario]: Erro - Herói não encontrado.`);
+        return;
+    }
+    
+    if (!h.inventarioItens) {
+        h.inventarioItens = [];
+    }
+    
+    log(`[Mochila]: A abrir inventário de ${h.name}...`);
+    
+    if (h.inventarioItens.length === 0) {
+        log(`[Mochila]: A mochila está vazia!`);
+    } else {
+        h.inventarioItens.forEach((item, index) => {
+            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
+        });
+        // Permite interagir com o primeiro item se houver
+        interagirPrimeiroItem(h);
+    }
+}
+
+// Injeção limpa do botão diretamente ligada à função oficial
+setInterval(() => {
+    const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
+    
+    if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
+        const btnMochila = document.createElement('button');
+        btnMochila.id = 'btn-mochila-custom';
+        btnMochila.textContent = '🎒 Mochila / Equipamentos';
+        btnMochila.style.background = '#2a1a3a';
+        btnMochila.style.border = '1px solid #9b59b6';
+        btnMochila.style.color = '#e2b714';
+        btnMochila.style.padding = '12px';
+        btnMochila.style.cursor = 'pointer';
+        btnMochila.style.width = '100%';
+        btnMochila.style.marginTop = '8px';
+        btnMochila.style.fontSize = '14px';
+        btnMochila.style.fontWeight = 'bold';
+        btnMochila.style.borderRadius = '6px';
+        
+        // Atribui diretamente a função global limpa
+        btnMochila.onclick = abrirMochilaDoHeroi;
         
         containerBotoes.appendChild(btnMochila);
     }
-}, 500);
-    // --- INJEÇÃO ÚNICA E SEGURA DO BOTÃO DA MOCHILA (RISE OF MALAZAR) ---
-(function() {
-    let tentativa = 0;
-    const injetarBotaoMochila = setInterval(() => {
-        tentativa++;
-        // Procura qualquer container de botões ativo na tela
-        const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
-        
-        if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
-            const btnMochila = document.createElement('button');
-            btnMochila.id = 'btn-mochila-custom';
-            btnMochila.textContent = '🎒 Mochila / Equipamentos';
-            btnMochila.style.background = '#2a1a3a';
-            btnMochila.style.border = '1px solid #9b59b6';
-            btnMochila.style.color = '#e2b714';
-            btnMochila.style.padding = '12px';
-            btnMochila.style.cursor = 'pointer';
-            btnMochila.style.width = '100%';
-            btnMochila.style.marginTop = '8px';
-            btnMochila.style.fontSize = '14px';
-            btnMochila.style.fontWeight = 'bold';
-            btnMochila.style.borderRadius = '6px';
-            
-            btnMochila.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
-                
-                if (h) {
-                    if (!h.inventarioItens) h.inventarioItens = [];
-                    log(`[Mochila]: A abrir inventário de ${h.name}...`);
-                    
-                    if (h.inventarioItens.length === 0) {
-                        log(`[Mochila]: A mochila está vazia!`);
-                    } else {
-                        h.inventarioItens.forEach((item, index) => {
-                            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
-                        });
-                    }
-                } else {
-                    log(`[Inventario]: Erro - Objeto do herói não encontrado.`);
-                }
-            };
-            
-            containerBotoes.appendChild(btnMochila);
-            clearInterval(injetarBotaoMochila); // Para o ciclo assim que o botão é criado com sucesso!
-        }
-        
-        // Se passar muito tempo e não encontrar, cancela para poupar bateria/processamento
-        if (tentativa > 40) {
-            clearInterval(injetarBotaoMochila);
-        }
-    }, 500);
-})();
+}, 1000);
   </script>
 </body>
 </html>
