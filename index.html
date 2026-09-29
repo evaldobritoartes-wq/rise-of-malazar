@@ -1569,6 +1569,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+    // --- LIMPEZA SEGURA DO LOG DE COMBATE (RISE OF MALAZAR) ---
+setInterval(() => {
+    const logDiv = document.getElementById('log');
+    // Só executa se o log existir e o jogo já estiver a decorrer na tela principal
+    if (logDiv && logDiv.offsetParent !== null) {
+        let linhas = logDiv.innerHTML.split('<br>');
+        // Se houver mais do que 2 blocos/linhas acumulados, mantém apenas os 2 mais recentes
+        if (linhas.length > 2) {
+            logDiv.innerHTML = linhas.slice(-2).join('<br>');
+        }
+    }
+}, 400);
   </script>
 </body>
 </html>
