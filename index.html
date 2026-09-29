@@ -1667,61 +1667,6 @@ function interagirPrimeiroItem(heroi) {
         heroi.inventarioItens.shift();
     }
 }
-    // --- INTEGRAÇÃO VISUAL DA MOCHILA NO MENU (RISE OF MALAZAR) ---
-// Observador inteligente para adicionar o botão da Mochila quando o menu de itens estiver ativo
-setInterval(() => {
-    const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
-    
-    // Procura se o botão de Loja/Itens está visível e se o botão da Mochila ainda não foi inserido
-    if (containerBotoes && document.body.textContent.includes("Lâmina do Caos") && !document.getElementById('btn-mochila-custom')) {
-        const btnMochila = document.createElement('button');
-        btnMochila.id = 'btn-mochila-custom';
-        btnMochila.textContent = '🎒 Mochila / Equipamentos';
-        btnMochila.style.background = '#2a1a3a';
-        btnMochila.style.border = '1px solid #9b59b6';
-        btnMochila.style.color = '#e2b714';
-        btnMochila.style.padding = '10px';
-        btnMochila.style.cursor = 'pointer';
-        
-        // Ao clicar, executa a nossa função de renderizar o inventário e interagir com o primeiro item
-        btnMochila.addEventListener('click', () => {
-            if (typeof heroi !== 'undefined' && heroi) {
-                renderizarInventarioVisual(heroi);
-                interagirPrimeiroItem(heroi);
-            }
-        });
-        
-        containerBotoes.appendChild(btnMochila);
-    }
-}, 500);
-    // --- CORREÇÃO DO CLIQUE DA MOCHILA (RISE OF MALAZAR) ---
-setInterval(() => {
-    const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
-    
-    // Insere o botão sempre que o container de botões estiver visível e o botão ainda não existir
-    if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
-        const btnMochila = document.createElement('button');
-        btnMochila.id = 'btn-mochila-custom';
-        btnMochila.textContent = '🎒 Mochila / Equipamentos';
-        btnMochila.style.background = '#2a1a3a';
-        btnMochila.style.border = '1px solid #9b59b6';
-        btnMochila.style.color = '#e2b714';
-        btnMochila.style.padding = '10px';
-        btnMochila.style.cursor = 'pointer';
-        btnMochila.style.width = '100%'; // Garante bom tamanho visual
-        btnMochila.style.marginTop = '5px';
-        
-        // Ação direta ao clicar: executa a renderização e interatividade com segurança
-        btnMochila.addEventListener('click', () => {
-            function renderizarInventarioVisual(heroiAlvo) {
-    // Função estabilizada para evitar congelamento
-    const h = heroiAlvo || (typeof heroi !== 'undefined' ? heroi : null);
-    if (!h) return;
-    
-    if (!h.inventarioItens) {
-        h.inventarioItens = [];
-    }
-}
   </script>
 </body>
 </html>
