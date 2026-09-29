@@ -1745,7 +1745,32 @@ function listarInventario(h) {
     });
 }
 }
+    // --- ATRIBUTOS DE COMBATE E PROGRESSÃO DO HERÓI (FASE 2 ATUALIZADA) ---
+function inicializarAtributosHeroi(h) {
+    if (!h) return;
     
+    // Inicializa o objeto de atributos caso ainda não exista
+    h.atributos = h.atributos || {
+        // Atributos Primários / Base
+        destreza: 10,       // Influencia diretamente a Precisão e a velocidade/crítico
+        
+        // Ofensiva e Precisão
+        danoFisico: 10,
+        danoMagico: 5,
+        critico: 5,         // Percentagem base de crítico (ex: 5%)
+        precisao: 10,       // Counter direto da Evasão (escala com a Destreza)
+        
+        // Defesa e Sobrevivência
+        defesaFisica: 5,
+        resistencia: 5,     // Defesa Mágica
+        evasao: 5,          // Percentagem base de esquiva (anulada pela Precisão)
+        
+        // Mecânica Especial de Escudo
+        bloqueio: 0         // 0 por defeito (só ativa se equipar escudo)
+    };
+    
+    if (typeof log === 'function') log('[Herói]: Atributos de combate, destreza e precisão inicializados com sucesso.');
+}
   </script>
 </body>
 </html>
