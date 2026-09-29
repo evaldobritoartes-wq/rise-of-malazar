@@ -1713,36 +1713,13 @@ setInterval(() => {
         
         // Ação direta ao clicar: executa a renderização e interatividade com segurança
         btnMochila.addEventListener('click', () => {
-            // Tenta encontrar o herói em várias variáveis globais possíveis do motor original
-            const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
-            
-            if (h) {
-                renderizarInventarioVisual(h);
-                interagirPrimeiroItem(h);
-            } else {
-                log(`[Inventario]: Erro - Objeto do herói não encontrado na sessão.`);
-            }
-        });
-        
-        containerBotoes.appendChild(btnMochila);
-    }
-}, 500);
-    // --- DIAGNÓSTICO VISUAL DO INVENTÁRIO (RISE OF MALAZAR) ---
-function renderizarInventarioVisual(heroi) {
-    if (!heroi) return;
+            function renderizarInventarioVisual(heroiAlvo) {
+    // Função estabilizada para evitar congelamento
+    const h = heroiAlvo || (typeof heroi !== 'undefined' ? heroi : null);
+    if (!h) return;
     
-    if (!heroi.inventarioItens) {
-        heroi.inventarioItens = [];
-    }
-
-    log(`[Mochila]: A abrir inventário de ${heroi.name}...`);
-    
-    if (heroi.inventarioItens.length === 0) {
-        log(`[Mochila]: A mochila está vazia! (Nenhum item não equipado encontrado).`);
-    } else {
-        heroi.inventarioItens.forEach((item, index) => {
-            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
-        });
+    if (!h.inventarioItens) {
+        h.inventarioItens = [];
     }
 }
   </script>
