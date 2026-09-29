@@ -1910,45 +1910,24 @@ function atualizarInterfacePersonagem(heroi) {
         if (el) el.innerText = text;
     }
 
-    setElementText('ui-nome', heroi.nome);
-    setElementText('ui-genero', heroi.genero);
-    setElementText('ui-raca', heroi.raca);
-    setElementText('ui-passiva-raca', `[${heroi.passivaRacial || ''}]`);
+    setElementText('ui-nome', heroi.nome || heroi.name || 'Dimitrian');
+    setElementText('ui-genero', heroi.genero || heroi.gender || '-');
+    setElementText('ui-raca', heroi.raca || heroi.race || '-');
+    setElementText('ui-passiva-raca', heroi.passivaRacial ? `[${heroi.passivaRacial}]` : '');
     
-    setElementText('ui-classe', heroi.classe);
-    setElementText('ui-passiva-classe', `[${heroi.passivaClasse || ''}]`);
+    setElementText('ui-classe', heroi.classe || heroi.class || '-');
+    setElementText('ui-passiva-classe', heroi.passivaClasse ? `[${heroi.passivaClasse}]` : '');
 
-    if (heroi.atributos) {
-        let attr = heroi.atributos;
-        setElementText('ui-dano-fisico', attr.danoFisico);
-        setElementText('ui-dano-magico', attr.danoMagico);
-        setElementText('ui-critico', attr.critico);
-        setElementText('ui-precisao', attr.precisao);
-        setElementText('ui-destreza', attr.destreza);
-        
-        setElementText('ui-defesa-fisica', attr.defesaFisica);
-        setElementText('ui-resistencia', attr.resistencia);
-        setElementText('ui-evasao', attr.evasao);
-        setElementText('ui-bloqueio', attr.bloqueio);
-    }
+    let attr = heroi.atributos || heroi.attributes || {};
+    setElementText('ui-forca', attr.forca !== undefined ? attr.forca : 5);
+    setElementText('ui-destreza', attr.destreza !== undefined ? attr.destreza : 5);
+    setElementText('ui-vitalidade', attr.vitalidade !== undefined ? attr.vitalidade : 5);
+    setElementText('ui-defesa', attr.defesa !== undefined ? attr.defesa : 5);
+    setElementText('ui-resistencia', attr.resistencia !== undefined ? attr.resistencia : 5);
+    setElementText('ui-inteligencia', attr.inteligencia !== undefined ? attr.inteligencia : 5);
 
-    if (typeof log === 'function') log('[Interface]: Aba Personagem atualizada com segurança.');
+    if (typeof log === 'function') log('[Interface]: Ficha do herói atualizada com sucesso.');
 }
-    // Gatilho de teste para garantir que a interface responde assim que o jogo arranca
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof meuHeroi !== 'undefined' && meuHeroi) {
-        atualizarInterfacePersonagem(meuHeroi);
-    }
-});
-    // Gatilho de atualização automática da ficha do herói
-window.addEventListener('load', () => {
-    // Tenta encontrar a variável do herói independentemente do nome usado no seu motor
-    let heroiAtual = typeof meuHeroi !== 'undefined' ? meuHeroi : (typeof hero !== 'undefined' ? hero : null);
-    
-    if (heroiAtual && typeof atualizarInterfacePersonagem === 'function') {
-        atualizarInterfacePersonagem(heroiAtual);
-    }
-});
   </script>
 </body>
 </html>
