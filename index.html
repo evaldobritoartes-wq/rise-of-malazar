@@ -1710,6 +1710,29 @@ function equiparItemHeroi(h, item) {
     }
     return false;
 }
+    // --- INTERAGIR COM O PRIMEIRO ITEM DA MOCHA ---
+function interagirPrimeiroItem(h) {
+    if (!h || !h.inventarioItens || h.inventarioItens.length === 0) {
+        if (typeof log === 'function') log('[Inventário]: A mochila está vazia.');
+        return;
+    }
+    
+    // Pega o primeiro item
+    const item = h.inventarioItens[0];
+    
+    // Tenta equipar
+    const equipado = equiparItemHeroi(h, item);
+    if (equipado) {
+        // Remove do inventário se foi equipado com sucesso
+        h.inventarioItens.shift();
+    } else {
+        // Se não for equipamento válido, recicla por ouro
+        const ouroGanho = 15;
+        h.gold = (h.gold || 0) + ouroGanho;
+        if (typeof log === 'function') log(`[Reciclagem]: Item ${item.nome} reciclado por ${ouroGanho} de ouro.`);
+        h.inventarioItens.shift();
+    }
+}
   </script>
 </body>
 </html>
