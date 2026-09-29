@@ -1570,26 +1570,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
     
         }
-  // --- CORREÇÃO DE UI: EXIBIR AS DUAS ÚLTIMAS AÇÕES NO LOG (SEGURO) ---
-(function() {
-    let historicoLogs = [];
-    
-    window.log = function(mensagem) {
-        const logDiv = document.getElementById('log');
-        // Se a caixa de log ainda não existir na tela, apenas ignora para não travar o jogo
-        if (!logDiv) return;
-        
-        historicoLogs.push(mensagem);
-        
-        // Mantém apenas as últimas 2 mensagens
-        if (historicoLogs.length > 2) {
-            historicoLogs.shift();
+  // --- LIMPEZA SEGURA DO LOG DE COMBATE (RISE OF MALAZAR) ---
+setInterval(() => {
+    const logDiv = document.getElementById('log');
+    if (logDiv) {
+        let linhas = logDiv.innerHTML.split('<br>');
+        // Se houver mais de 3 linhas acumuladas, mantém apenas as 2 mais recentes
+        if (linhas.length > 3) {
+            logDiv.innerHTML = linhas.slice(-2).join('<br>');
         }
-        
-        logDiv.innerHTML = historicoLogs.join('<br>');
-        logDiv.scrollTop = logDiv.scrollHeight;
-    };
-})();
+    }
+}, 500);
   </script>
 </body>
 </html>
