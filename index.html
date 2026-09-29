@@ -1769,18 +1769,7 @@ setInterval(() => {
                 if (!h.inventarioItens) h.inventarioItens = [];
                 log(`[Mochila]: A abrir inventário de ${h.name}...`);
                 if (h.inventarioItens.length === 0) {
-                    log(`[Mochila]: A mochila está vazia!`);
-                } else {
-                    h.inventarioItens.forEach((item, index) => {
-                        log(`[Item ${index + 1}]: ${item.nome}`);
-                    });
-                }
-            } else {
-                log(`[Inventario]: Erro - Herói não encontrado.`);
-            }
-        };
-        // --- SISTEMA DE MOCHILA INTEGRADO (RISE OF MALAZAR) ---
-// Função dedicada para abrir e gerir a mochila visualmente
+                    // --- SISTEMA DE MOCHILA DEFINITIVO (RISE OF MALAZAR) ---
 function abrirMochilaDoHeroi() {
     const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
     
@@ -1801,13 +1790,14 @@ function abrirMochilaDoHeroi() {
         h.inventarioItens.forEach((item, index) => {
             log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
         });
-        // Permite interagir com o primeiro item se houver
-        interagirPrimeiroItem(h);
+        if (typeof interagirPrimeiroItem === 'function') {
+            interagirPrimeiroItem(h);
+        }
     }
 }
 
-// Injeção limpa do botão diretamente ligada à função oficial
-setInterval(() => {
+// Injeção limpa do botão
+const verificarEInserirBotaoMochila = setInterval(() => {
     const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
     
     if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
@@ -1825,10 +1815,12 @@ setInterval(() => {
         btnMochila.style.fontWeight = 'bold';
         btnMochila.style.borderRadius = '6px';
         
-        // Atribui diretamente a função global limpa
-        btnMochila.onclick = abrirMochilaDoHeroi;
+        btnMochila.onclick = function() {
+            abrirMochilaDoHeroi();
+        };
         
         containerBotoes.appendChild(btnMochila);
+        clearInterval(verificarEInserirBotaoMochila);
     }
 }, 1000);
   </script>
