@@ -1771,6 +1771,108 @@ function inicializarAtributosHeroi(h) {
     
     if (typeof log === 'function') log('[Herói]: Atributos de combate, destreza e precisão inicializados com sucesso.');
 }
+    // --- SISTEMA DE CRIAÇÃO E ATRIBUTOS DO HERÓI (FASE 2 COMPLETA) ---
+function criarHeroi(nome, genero, raca, classe) {
+    let heroi = {
+        nome: nome || "Aventureiro",
+        genero: genero || "Não especificado",
+        raca: raca || "Humano",
+        classe: classe || "Guerreiro",
+        
+        // Atributos base e de combate
+        atributos: {
+            destreza: 10,
+            danoFisico: 10,
+            danoMagico: 5,
+            critico: 5,         // 5% base
+            precisao: 10,       // Escala com Destreza contra Evasão
+            defesaFisica: 5,
+            resistencia: 5,     // Defesa Mágica
+            evasao: 5,          // 5% base
+            bloqueio: 0         // Exclusivo de escudo
+        },
+        
+        // Inventário e Equipamentos (já estabelecidos na Fase 1)
+        inventarioItens: [],
+        equipamentos: {
+            arma: null,
+            armadura: null,
+            escudo: null
+        }
+    };
+
+    // Aplicação de Bónus Raciais Passivos
+    aplicarBonusRacial(heroi);
+    
+    // Aplicação de Passivas e Características de Classe
+    aplicarBonusClasse(heroi);
+
+    if (typeof log === 'function') {
+        log(`[Herói Criado]: ${heroi.nome} (${heroi.genero}, ${heroi.raca} ${heroi.classe}) inicializado com sucesso!`);
+    }
+
+    return heroi;
+}
+
+// Aplicação matemática e segura dos bónus de Raça
+function aplicarBonusRacial(h) {
+    switch (h.raca.toLowerCase()) {
+        case 'elfo':
+            h.atributos.evasao += 5;
+            h.atributos.precisao += 3;
+            h.passivaRacial = "Graça Élfica (+5 Evasão, +3 Precisão)";
+            break;
+        case 'meio-orc':
+        case 'meio orc':
+            h.atributos.danoFisico += 3;
+            h.atributos.critico += 3;
+            h.passivaRacial = "Fúria Bruta (+3 Dano Físico, +3% Crítico)";
+            break;
+        case 'tiefling':
+            h.atributos.resistencia += 5;
+            h.atributos.danoMagico += 3;
+            h.passivaRacial = "Sangue Demoníaco (+5 Resistência Mágica, +3 Dano Mágico)";
+            break;
+        case 'humano':
+        default:
+            // Versatilidade equilibrada
+            h.atributos.danoFisico += 1;
+            h.atributos.danoMagico += 1;
+            h.atributos.defesaFisica += 1;
+            h.atributos.resistencia += 1;
+            h.passivaRacial = "Adaptação (Atributos equilibrados)";
+            break;
+    }
+}
+
+// Aplicação de Características de Classe
+function aplicarBonusClasse(h) {
+    switch (h.classe.toLowerCase()) {
+        case 'guerreiro':
+            h.atributos.defesaFisica += 5;
+            h.passivaClasse = "Muralha de Aço (Especialista em Defesa e Escudos)";
+            break;
+        case 'ladino':
+        case 'caçador':
+            h.atributos.destreza += 5;
+            h.atributos.critico += 5;
+            h.passivaClasse = "Golpe Sombra (Foco em Agilidade e Crítico)";
+            break;
+        case 'mago':
+            h.atributos.danoMagico += 8;
+            h.passivaClasse = "Clarividência Arcana (Artilharia de Dano Mágico)";
+            break;
+        case 'clérigo':
+        case 'paladino':
+            h.atributos.resistencia += 4;
+            h.atributos.defesaFisica += 3;
+            h.passivaClasse = "Bênção Divina (Suporte e Resistência de Grupo)";
+            break;
+        default:
+            h.passivaClasse = "Aventureiro Genérico";
+            break;
+    }
+}
   </script>
 </body>
 </html>
