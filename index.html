@@ -1873,64 +1873,6 @@ function aplicarBonusClasse(h) {
             break;
     }
 }
-    <div id="aba-personagem" class="painel-jogo">
-    <h2>Ficha do Herói</h2>
-    
-    <div class="card-perfil">
-        <p><strong>Nome:</strong> <span id="ui-nome">-</span></p>
-        <p><strong>Género:</strong> <span id="ui-genero">-</span></p>
-        <p><strong>Raça:</strong> <span id="ui-raca">-</span> <small id="ui-passiva-raca" style="color: #888;"></small></p>
-        <p><strong>Classe:</strong> <span id="ui-classe">-</span> <small id="ui-passiva-classe" style="color: #888;"></small></p>
-    </div>
-
-    <div class="grid-stats">
-        <div class="bloco-stats">
-            <h3>Ofensiva & Precisão</h3>
-            <p>Dano Físico: <span id="ui-dano-fisico">0</span></p>
-            <p>Dano Mágico: <span id="ui-dano-magico">0</span></p>
-            <p>Crítico: <span id="ui-critico">0</span>%</p>
-            <p>Precisão: <span id="ui-precisao">0</span></p>
-            <p>Destreza: <span id="ui-destreza">0</span></p>
-        </div>
-        
-        <div class="bloco-stats">
-            <h3>Defesa & Sobrevivência</h3>
-            <p>Defesa Física: <span id="ui-defesa-fisica">0</span></p>
-            <p>Resistência (Mágica): <span id="ui-resistencia">0</span></p>
-            <p>Evasão: <span id="ui-evasao">0</span>%</p>
-            <p>Bloqueio (Escudo): <span id="ui-bloqueio">0</span></p>
-        </div>
-    </div>
-</div>
-    // --- RENDERIZAÇÃO DA ABA PERSONAGEM (FASE 4) ---
-function atualizarInterfacePersonagem(heroi) {
-    if (!heroi) return;
-
-    // Identidade
-    document.getElementById('ui-nome').innerText = heroi.nome;
-    document.getElementById('ui-genero').innerText = heroi.genero;
-    document.getElementById('ui-raca').innerText = heroi.raca;
-    document.getElementById('ui-passiva-raca').innerText = `[${heroi.passivaRacial || ''}]`;
-    
-    document.getElementById('ui-classe').innerText = heroi.classe;
-    document.getElementById('ui-passiva-classe').innerText = `[${heroi.passivaClasse || ''}]`;
-
-    // Atributos
-    let attr = heroi.atributos;
-    document.getElementById('ui-dano-fisico').innerText = attr.danoFisico;
-    document.getElementById('ui-dano-magico').innerText = attr.danoMagico;
-    document.getElementById('ui-critico').innerText = attr.critico;
-    document.getElementById('ui-precisao').innerText = attr.precisao;
-    document.getElementById('ui-destreza').innerText = attr.destreza;
-    
-    document.getElementById('ui-defesa-fisica').innerText = attr.defesaFisica;
-    document.getElementById('ui-resistencia').innerText = attr.resistencia;
-    document.getElementById('ui-evasao').innerText = attr.evasao;
-    document.getElementById('ui-bloqueio').innerText = attr.bloqueio;
-
-    if (typeof log === 'function') log('[Interface]: Aba Personagem atualizada visualmente.');
-}
-    atualizarInterfacePersonagem(meuHeroi);
   </script>
 </body>
 </html>
