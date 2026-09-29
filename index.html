@@ -1899,33 +1899,32 @@ function aplicarBonusClasse(h) {
     }
 }
     // --- RENDERIZAÇÃO DA ABA PERSONAGEM (VERSÃO ULTRA-SEGURA) ---
-function atualizarInterfacePersonagem(heroi) {
-    if (!heroi) {
-        if (typeof log === 'function') log('[Erro Interface]: Herói não encontrado.');
-        return;
-    }
-
+function atualizarInterfacePersonagem(alvo) {
+    // Garante que apanhamos o objeto global 'hero' caso nenhum seja passado
+    let h = alvo || window.hero || {};
+    
     function setElementText(id, text) {
         let el = document.getElementById(id);
         if (el) el.innerText = text;
     }
 
-    setElementText('ui-nome', heroi.nome || heroi.name || 'Dimitrian');
-    setElementText('ui-genero', heroi.genero || heroi.gender || '-');
-    setElementText('ui-raca', heroi.raca || heroi.race || '-');
-    setElementText('ui-passiva-raca', heroi.passivaRacial ? `[${heroi.passivaRacial}]` : '');
+    setElementText('ui-nome', h.nome || h.name || 'Dimitrian');
+    setElementText('ui-genero', h.genero || h.gender || '-');
+    setElementText('ui-raca', h.raca || h.race || '-');
+    setElementText('ui-passiva-raca', h.passivaRacial ? `[${h.passivaRacial}]` : '');
     
-    setElementText('ui-classe', heroi.classe || heroi.class || '-');
-    setElementText('ui-passiva-classe', heroi.passivaClasse ? `[${heroi.passivaClasse}]` : '');
+    setElementText('ui-classe', h.classe || h.class || '-');
+    setElementText('ui-passiva-classe', h.passivaClasse ? `[${h.passivaClasse}]` : '');
 
-    let attr = heroi.atributos || heroi.attributes || heroi;
+    // Verifica atributos no objeto ou usa 5 como base inicial acordada
+    let attr = h.atributos || h.attributes || h;
     
-    let forca = attr.forca !== undefined ? attr.forca : (heroi.forca !== undefined ? heroi.forca : 5);
-    let destreza = attr.destreza !== undefined ? attr.destreza : (heroi.destreza !== undefined ? heroi.destreza : 5);
-    let vitalidade = attr.vitalidade !== undefined ? attr.vitalidade : (heroi.vitalidade !== undefined ? heroi.vitalidade : 5);
-    let defesa = attr.defesa !== undefined ? attr.defesa : (heroi.defesa !== undefined ? heroi.defesa : 5);
-    let resistencia = attr.resistencia !== undefined ? attr.resistencia : (heroi.resistencia !== undefined ? heroi.resistencia : 5);
-    let inteligencia = attr.inteligencia !== undefined ? attr.inteligencia : (heroi.inteligencia !== undefined ? heroi.inteligencia : 5);
+    let forca = attr.forca !== undefined ? attr.forca : (h.forca !== undefined ? h.forca : 5);
+    let destreza = attr.destreza !== undefined ? attr.destreza : (h.destreza !== undefined ? h.destreza : 5);
+    let vitalidade = attr.vitalidade !== undefined ? attr.vitalidade : (h.vitalidade !== undefined ? h.vitalidade : 5);
+    let defesa = attr.defesa !== undefined ? attr.defesa : (h.defesa !== undefined ? h.defesa : 5);
+    let resistencia = attr.resistencia !== undefined ? attr.resistencia : (h.resistencia !== undefined ? h.resistencia : 5);
+    let inteligencia = attr.inteligencia !== undefined ? attr.inteligencia : (h.inteligencia !== undefined ? h.inteligencia : 5);
 
     setElementText('ui-forca', forca);
     setElementText('ui-destreza', destreza);
@@ -1937,13 +1936,11 @@ function atualizarInterfacePersonagem(heroi) {
     let hpCalculado = vitalidade * 10;
     let mpCalculado = inteligencia * 10;
 
-    if (heroi.hpMax !== undefined) heroi.hpMax = hpCalculado;
-    if (heroi.mpMax !== undefined) heroi.mpMax = mpCalculado;
+    if (h.hpMax !== undefined) h.hpMax = hpCalculado;
+    if (h.mpMax !== undefined) h.mpMax = mpCalculado;
 
-    setElementText('txt-hp', `${heroi.hp !== undefined ? heroi.hp : hpCalculado}/${hpCalculado}`);
-    setElementText('txt-mp', `${heroi.mp !== undefined ? heroi.mp : mpCalculado}/${mpCalculado}`);
-
-    if (typeof log === 'function') log('[Interface]: Ficha do herói atualizada com sucesso.');
+    setElementText('txt-hp', `${h.hp !== undefined ? h.hp : hpCalculado}/${hpCalculado}`);
+    setElementText('txt-mp', `${h.mp !== undefined ? h.mp : mpCalculado}/${mpCalculado}`);
 }
   </script>
 </body>
