@@ -1902,6 +1902,34 @@ function aplicarBonusClasse(h) {
         </div>
     </div>
 </div>
+    // --- RENDERIZAÇÃO DA ABA PERSONAGEM (FASE 4) ---
+function atualizarInterfacePersonagem(heroi) {
+    if (!heroi) return;
+
+    // Identidade
+    document.getElementById('ui-nome').innerText = heroi.nome;
+    document.getElementById('ui-genero').innerText = heroi.genero;
+    document.getElementById('ui-raca').innerText = heroi.raca;
+    document.getElementById('ui-passiva-raca').innerText = `[${heroi.passivaRacial || ''}]`;
+    
+    document.getElementById('ui-classe').innerText = heroi.classe;
+    document.getElementById('ui-passiva-classe').innerText = `[${heroi.passivaClasse || ''}]`;
+
+    // Atributos
+    let attr = heroi.atributos;
+    document.getElementById('ui-dano-fisico').innerText = attr.danoFisico;
+    document.getElementById('ui-dano-magico').innerText = attr.danoMagico;
+    document.getElementById('ui-critico').innerText = attr.critico;
+    document.getElementById('ui-precisao').innerText = attr.precisao;
+    document.getElementById('ui-destreza').innerText = attr.destreza;
+    
+    document.getElementById('ui-defesa-fisica').innerText = attr.defesaFisica;
+    document.getElementById('ui-resistencia').innerText = attr.resistencia;
+    document.getElementById('ui-evasao').innerText = attr.evasao;
+    document.getElementById('ui-bloqueio').innerText = attr.bloqueio;
+
+    if (typeof log === 'function') log('[Interface]: Aba Personagem atualizada visualmente.');
+}
   </script>
 </body>
 </html>
