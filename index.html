@@ -1680,6 +1680,17 @@ function inicializarInventarioHeroi(h) {
         };
     }
 }
+    // --- ADICIONAR ITEM À MOCHILA ---
+function adicionarItemAoHeroi(h, item) {
+    if (!h) return;
+    if (!h.inventarioItens) {
+        h.inventarioItens = [];
+    }
+    h.inventarioItens.push(item);
+    if (typeof log === 'function') {
+        log(`[Inventário]: ${item.nome} adicionado à mochila.`);
+    }
+}
   </script>
 </body>
 </html>
