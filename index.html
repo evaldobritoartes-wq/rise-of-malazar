@@ -1898,6 +1898,42 @@ function aplicarBonusClasse(h) {
             break;
     }
 }
+    // --- RENDERIZAÇÃO DA ABA PERSONAGEM (VERSÃO ULTRA-SEGURA) ---
+function atualizarInterfacePersonagem(heroi) {
+    if (!heroi) {
+        if (typeof log === 'function') log('[Erro Interface]: Herói não encontrado.');
+        return;
+    }
+
+    function setElementText(id, text) {
+        let el = document.getElementById(id);
+        if (el) el.innerText = text;
+    }
+
+    setElementText('ui-nome', heroi.nome);
+    setElementText('ui-genero', heroi.genero);
+    setElementText('ui-raca', heroi.raca);
+    setElementText('ui-passiva-raca', `[${heroi.passivaRacial || ''}]`);
+    
+    setElementText('ui-classe', heroi.classe);
+    setElementText('ui-passiva-classe', `[${heroi.passivaClasse || ''}]`);
+
+    if (heroi.atributos) {
+        let attr = heroi.atributos;
+        setElementText('ui-dano-fisico', attr.danoFisico);
+        setElementText('ui-dano-magico', attr.danoMagico);
+        setElementText('ui-critico', attr.critico);
+        setElementText('ui-precisao', attr.precisao);
+        setElementText('ui-destreza', attr.destreza);
+        
+        setElementText('ui-defesa-fisica', attr.defesaFisica);
+        setElementText('ui-resistencia', attr.resistencia);
+        setElementText('ui-evasao', attr.evasao);
+        setElementText('ui-bloqueio', attr.bloqueio);
+    }
+
+    if (typeof log === 'function') log('[Interface]: Aba Personagem atualizada com segurança.');
+}
   </script>
 </body>
 </html>
