@@ -1570,17 +1570,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
     
         }
-  // --- LIMPEZA SEGURA DO LOG DE COMBATE (RISE OF MALAZAR) ---
-setInterval(() => {
-    const logDiv = document.getElementById('log');
-    if (logDiv) {
-        let linhas = logDiv.innerHTML.split('<br>');
-        // Se houver mais de 3 linhas acumuladas, mantém apenas as 2 mais recentes
-        if (linhas.length > 3) {
-            logDiv.innerHTML = linhas.slice(-2).join('<br>');
-        }
-    }
-}, 500);
   </script>
 </body>
 </html>
