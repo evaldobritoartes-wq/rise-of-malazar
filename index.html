@@ -1769,12 +1769,16 @@ setInterval(() => {
                 if (!h.inventarioItens) h.inventarioItens = [];
                 log(`[Mochila]: A abrir inventário de ${h.name}...`);
                 if (h.inventarioItens.length === 0) {
-                    // --- SISTEMA DE MOCHILA DEFINITIVO (RISE OF MALAZAR) ---
-function abrirMochilaDoHeroi() {
-    const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
+                    function abrirMochilaDoHeroi() {
+    let h = null;
+    if (typeof heroi !== 'undefined') {
+        h = heroi;
+    } else if (typeof player !== 'undefined') {
+        h = player;
+    }
     
     if (!h) {
-        log(`[Inventario]: Erro - Herói não encontrado.`);
+        log('[Inventario]: Erro - Heroi nao encontrado.');
         return;
     }
     
@@ -1782,44 +1786,44 @@ function abrirMochilaDoHeroi() {
         h.inventarioItens = [];
     }
     
-    log(`[Mochila]: A abrir inventário de ${h.name}...`);
+    log('[Mochila]: A abrir inventario...');
     
     if (h.inventarioItens.length === 0) {
-        log(`[Mochila]: A mochila está vazia!`);
+        log('[Mochila]: A mochila esta vazia!');
     } else {
-        h.inventarioItens.forEach((item, index) => {
-            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
+        h.inventarioItens.forEach(function(item, index) {
+            log('[Item ' + (index + 1) + ']: ' + item.nome);
         });
         if (typeof interagirPrimeiroItem === 'function') {
             interagirPrimeiroItem(h);
         }
     }
 }
-// Injeção limpa do botão
-const verificarEInserirBotaoMochila = setInterval(() => {
-    const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
+
+const timerMochila = setInterval(function() {
+    const container = document.querySelector('.buttons-container') || document.getElementById('buttons-container');
     
-    if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
-        const btnMochila = document.createElement('button');
-        btnMochila.id = 'btn-mochila-custom';
-        btnMochila.textContent = '🎒 Mochila / Equipamentos';
-        btnMochila.style.background = '#2a1a3a';
-        btnMochila.style.border = '1px solid #9b59b6';
-        btnMochila.style.color = '#e2b714';
-        btnMochila.style.padding = '12px';
-        btnMochila.style.cursor = 'pointer';
-        btnMochila.style.width = '100%';
-        btnMochila.style.marginTop = '8px';
-        btnMochila.style.fontSize = '14px';
-        btnMochila.style.fontWeight = 'bold';
-        btnMochila.style.borderRadius = '6px';
+    if (container && !document.getElementById('btn-mochila-custom')) {
+        const btn = document.createElement('button');
+        btn.id = 'btn-mochila-custom';
+        btn.textContent = '🎒 Mochila / Equipamentos';
+        btn.style.background = '#2a1a3a';
+        btn.style.border = '1px solid #9b59b6';
+        btn.style.color = '#e2b714';
+        btn.style.padding = '12px';
+        btn.style.cursor = 'pointer';
+        btn.style.width = '100%';
+        btn.style.marginTop = '8px';
+        btn.style.fontSize = '14px';
+        btn.style.fontWeight = 'bold';
+        btn.style.borderRadius = '6px';
         
-        btnMochila.onclick = function() {
+        btn.onclick = function() {
             abrirMochilaDoHeroi();
         };
         
-        containerBotoes.appendChild(btnMochila);
-        clearInterval(verificarEInserirBotaoMochila);
+        container.appendChild(btn);
+        clearInterval(timerMochila);
     }
 }, 1000);
   </script>
