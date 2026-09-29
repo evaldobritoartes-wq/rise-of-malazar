@@ -1918,13 +1918,30 @@ function atualizarInterfacePersonagem(heroi) {
     setElementText('ui-classe', heroi.classe || heroi.class || '-');
     setElementText('ui-passiva-classe', heroi.passivaClasse ? `[${heroi.passivaClasse}]` : '');
 
-    let attr = heroi.atributos || heroi.attributes || {};
-    setElementText('ui-forca', attr.forca !== undefined ? attr.forca : 5);
-    setElementText('ui-destreza', attr.destreza !== undefined ? attr.destreza : 5);
-    setElementText('ui-vitalidade', attr.vitalidade !== undefined ? attr.vitalidade : 5);
-    setElementText('ui-defesa', attr.defesa !== undefined ? attr.defesa : 5);
-    setElementText('ui-resistencia', attr.resistencia !== undefined ? attr.resistencia : 5);
-    setElementText('ui-inteligencia', attr.inteligencia !== undefined ? attr.inteligencia : 5);
+    let attr = heroi.atributos || heroi.attributes || heroi;
+    
+    let forca = attr.forca !== undefined ? attr.forca : (heroi.forca !== undefined ? heroi.forca : 5);
+    let destreza = attr.destreza !== undefined ? attr.destreza : (heroi.destreza !== undefined ? heroi.destreza : 5);
+    let vitalidade = attr.vitalidade !== undefined ? attr.vitalidade : (heroi.vitalidade !== undefined ? heroi.vitalidade : 5);
+    let defesa = attr.defesa !== undefined ? attr.defesa : (heroi.defesa !== undefined ? heroi.defesa : 5);
+    let resistencia = attr.resistencia !== undefined ? attr.resistencia : (heroi.resistencia !== undefined ? heroi.resistencia : 5);
+    let inteligencia = attr.inteligencia !== undefined ? attr.inteligencia : (heroi.inteligencia !== undefined ? heroi.inteligencia : 5);
+
+    setElementText('ui-forca', forca);
+    setElementText('ui-destreza', destreza);
+    setElementText('ui-vitalidade', vitalidade);
+    setElementText('ui-defesa', defesa);
+    setElementText('ui-resistencia', resistencia);
+    setElementText('ui-inteligencia', inteligencia);
+
+    let hpCalculado = vitalidade * 10;
+    let mpCalculado = inteligencia * 10;
+
+    if (heroi.hpMax !== undefined) heroi.hpMax = hpCalculado;
+    if (heroi.mpMax !== undefined) heroi.mpMax = mpCalculado;
+
+    setElementText('txt-hp', `${heroi.hp !== undefined ? heroi.hp : hpCalculado}/${hpCalculado}`);
+    setElementText('txt-mp', `${heroi.mp !== undefined ? heroi.mp : mpCalculado}/${mpCalculado}`);
 
     if (typeof log === 'function') log('[Interface]: Ficha do herói atualizada com sucesso.');
 }
