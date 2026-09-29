@@ -1727,6 +1727,24 @@ setInterval(() => {
         containerBotoes.appendChild(btnMochila);
     }
 }, 500);
+    // --- DIAGNÓSTICO VISUAL DO INVENTÁRIO (RISE OF MALAZAR) ---
+function renderizarInventarioVisual(heroi) {
+    if (!heroi) return;
+    
+    if (!heroi.inventarioItens) {
+        heroi.inventarioItens = [];
+    }
+
+    log(`[Mochila]: A abrir inventário de ${heroi.name}...`);
+    
+    if (heroi.inventarioItens.length === 0) {
+        log(`[Mochila]: A mochila está vazia! (Nenhum item não equipado encontrado).`);
+    } else {
+        heroi.inventarioItens.forEach((item, index) => {
+            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
+        });
+    }
+}
   </script>
 </body>
 </html>
