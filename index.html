@@ -1922,12 +1922,12 @@ function atualizarInterfacePersonagem(alvo) {
     // Verifica atributos no objeto ou usa 5 como base inicial acordada
     let attr = h.atributos || h.attributes || h;
     
-    let forca = attr.forca !== undefined ? attr.forca : (h.forca !== undefined ? h.forca : 5);
-    let destreza = attr.destreza !== undefined ? attr.destreza : (h.destreza !== undefined ? h.destreza : 5);
-    let vitalidade = attr.vitalidade !== undefined ? attr.vitalidade : (h.vitalidade !== undefined ? h.vitalidade : 5);
-    let defesa = attr.defesa !== undefined ? attr.defesa : (h.defesa !== undefined ? h.defesa : 5);
-    let resistencia = attr.resistencia !== undefined ? attr.resistencia : (h.resistencia !== undefined ? h.resistencia : 5);
-    let inteligencia = attr.inteligencia !== undefined ? attr.inteligencia : (h.inteligencia !== undefined ? h.inteligencia : 5);
+        let forca = h.forca ?? h.atributos?.forca ?? 5;
+    let destreza = h.destreza ?? h.atributos?.destreza ?? 5;
+    let vitalidade = h.vitalidade ?? h.atributos?.vitalidade ?? 5;
+    let defesa = h.defesa ?? h.atributos?.defesa ?? 5;
+    let resistencia = h.resistencia ?? h.atributos?.resistencia ?? 5;
+    let inteligencia = h.inteligencia ?? h.atributos?.inteligencia ?? 5;
 
     setElementText('ui-forca', forca);
     setElementText('ui-destreza', destreza);
