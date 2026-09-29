@@ -359,30 +359,24 @@
     <div id="aba-personagem" class="painel-jogo">
     <h2>Ficha do Herói</h2>
     
-    <div class="card-perfil">
+    <div id="aba-personagem" class="painel-jogo" style="max-height: 80vh; overflow-y: auto;">
+    <h2>Ficha do Herói</h2>
+    
+    <div class="card-perfil" style="margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
         <p><strong>Nome:</strong> <span id="ui-nome">-</span></p>
         <p><strong>Género:</strong> <span id="ui-genero">-</span></p>
         <p><strong>Raça:</strong> <span id="ui-raca">-</span> <small id="ui-passiva-raca" style="color: #888;"></small></p>
         <p><strong>Classe:</strong> <span id="ui-classe">-</span> <small id="ui-passiva-classe" style="color: #888;"></small></p>
     </div>
 
-    <div class="grid-stats">
-        <div class="bloco-stats">
-            <h3>Ofensiva & Precisão</h3>
-            <p>Dano Físico: <span id="ui-dano-fisico">0</span></p>
-            <p>Dano Mágico: <span id="ui-dano-magico">0</span></p>
-            <p>Crítico: <span id="ui-critico">0</span>%</p>
-            <p>Precisão: <span id="ui-precisao">0</span></p>
-            <p>Destreza: <span id="ui-destreza">0</span></p>
-        </div>
-        
-        <div class="bloco-stats">
-            <h3>Defesa & Sobrevivência</h3>
-            <p>Defesa Física: <span id="ui-defesa-fisica">0</span></p>
-            <p>Resistência (Mágica): <span id="ui-resistencia">0</span></p>
-            <p>Evasão: <span id="ui-evasao">0</span>%</p>
-            <p>Bloqueio (Escudo): <span id="ui-bloqueio">0</span></p>
-        </div>
+    <div class="bloco-stats" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+        <h3 style="color: #4CAF50; margin-top: 0;">Atributos Básicos</h3>
+        <p>⚔️ Força: <span id="ui-forca">0</span></p>
+        <p>🎯 Destreza: <span id="ui-destreza">0</span></p>
+        <p>❤️ Vitalidade: <span id="ui-vitalidade">0</span></p>
+        <p>🛡️ Defesa: <span id="ui-defesa">0</span></p>
+        <p>✨ Resistência: <span id="ui-resistencia">0</span></p>
+        <p>🔮 Inteligência: <span id="ui-inteligencia">0</span></p>
     </div>
 </div>
     <!-- HUD DO HERÓI -->
