@@ -764,7 +764,8 @@
         hero.level++;
         hero.xp -= hero.maxXp;
         hero.maxXp = Math.round(hero.maxXp * 1.5);
-
+atualizarInterfacePersonagem(hero);
+        
         const hpGain = 20;
         const mpGain = 10;
         hero.maxHp += hpGain;
