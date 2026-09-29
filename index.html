@@ -1745,6 +1745,44 @@ function renderizarInventarioVisual(heroi) {
         });
     }
 }
+    // --- CORREÇÃO INFALÍVEL DO BOTÃO DA MOCHILA (RISE OF MALAZAR) ---
+setInterval(() => {
+    const containerBotoes = document.querySelector('.buttons-container') || document.getElementById('buttons-container') || document.querySelector('div[style*="flex"]');
+    
+    if (containerBotoes && !document.getElementById('btn-mochila-custom')) {
+        const btnMochila = document.createElement('button');
+        btnMochila.id = 'btn-mochila-custom';
+        btnMochila.textContent = '🎒 Mochila / Equipamentos';
+        btnMochila.style.background = '#2a1a3a';
+        btnMochila.style.border = '1px solid #9b59b6';
+        btnMochila.style.color = '#e2b714';
+        btnMochila.style.padding = '10px';
+        btnMochila.style.cursor = 'pointer';
+        btnMochila.style.width = '100%';
+        btnMochila.style.marginTop = '5px';
+        
+        // Usando onclick direto para garantir que o evento dispara sem falhas de listener
+        btnMochila.onclick = function() {
+            const h = typeof heroi !== 'undefined' ? heroi : (typeof player !== 'undefined' ? player : null);
+            
+            if (h) {
+                if (!h.inventarioItens) h.inventarioItens = [];
+                log(`[Mochila]: A abrir inventário de ${h.name}...`);
+                if (h.inventarioItens.length === 0) {
+                    log(`[Mochila]: A mochila está vazia!`);
+                } else {
+                    h.inventarioItens.forEach((item, index) => {
+                        log(`[Item ${index + 1}]: ${item.nome}`);
+                    });
+                }
+            } else {
+                log(`[Inventario]: Erro - Herói não encontrado.`);
+            }
+        };
+        
+        containerBotoes.appendChild(btnMochila);
+    }
+}, 500);
   </script>
 </body>
 </html>
