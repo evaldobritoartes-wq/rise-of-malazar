@@ -1,1952 +1,387 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Rise of Malazar</title>
-  
-  <!-- Configurações PWA e Mobile -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="apple-touch-icon" href="icon.png">
-  <meta name="theme-color" content="#0b0d12">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise of Malazar — Crônicas Antigas 📜</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .painel-jogo {
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 15px;
-    box-sizing: border-box;
-}
-    html, body {
-      width: 100%;
-      height: 100%;
-      height: 100dvh; /* Adapta-se dinamicamente às barras do navegador */
-      background-color: #0b0d12;
-      color: #33ff33;
-      font-family: 'Courier New', Courier, monospace;
-      overflow: hidden;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      padding: 8px;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-      padding-top: max(8px, env(safe-area-inset-top));
-    }
-    header {
-      text-align: center;
-      padding: 4px 0;
-      border-bottom: 2px solid #1f293d;
-      margin-bottom: 6px;
-      flex-shrink: 0;
-    }
-    h1 {
-      font-size: 1.1rem;
-      color: #2ed573;
-      letter-spacing: 2px;
-    }
-    .subtitle {
-      font-size: 0.75rem;
-      color: #70a1ff;
-    }
+        :root {
+            --papel: #f4e4c1;
+            --papel-escuro: #e6d09c;
+            --envelhecido: #b89a65;
+            --ouro: #c8a951;
+            --ouro-escuro: #9a7f38;
+            --tinta: #3a2f1f;
+            --tinta-suave: #5c4a32;
+            --borda: #8b7355;
+            --sombra: rgba(58, 47, 31, 0.35);
+            --dourado-brilho: rgba(200, 169, 81, 0.4);
+        }
 
-    /* Animação de tremor */
-    .shake {
-      animation: shake 0.2s;
-    }
-    @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      20% { transform: translate(-3px, 0px) rotate(-1deg); }
-      40% { transform: translate(3px, 2px) rotate(1deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      80% { transform: translate(3px, 1px) rotate(-1deg); }
-      100% { transform: translate(0, 0) rotate(0deg); }
-    }
+        body {
+            background: linear-gradient(135deg, #2c2418 0%, #1f1a12 50%, #2c2418 100%);
+            min-height: 100vh;
+            font-family: 'Playfair Display', serif;
+            color: var(--tinta);
+            overflow: hidden;
+        }
 
-    /* Tela de Criação */
-    #creation-screen {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: #050608;
-      border: 1px solid #1f2a38;
-      border-radius: 6px;
-      padding: 16px;
-      flex: 1;
-      justify-content: center;
-      overflow-y: auto;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    label {
-      color: #eccc68;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-    input, select {
-      background: #141824;
-      border: 1px solid #2f3640;
-      color: #ffffff;
-      padding: 10px;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-    .class-info {
-      font-size: 0.75rem;
-      color: #a4b0be;
-      background: #10141d;
-      padding: 8px;
-      border-radius: 4px;
-      border-left: 3px solid #70a1ff;
-      margin-top: 4px;
-    }
+        /* === TELA DE INÍCIO — ESTILO LIVRO ANTIGO === */
+        #tela-inicio {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: radial-gradient(ellipse at center, rgba(44,36,24,0.9) 0%, rgba(26,21,14,0.98) 100%);
+        }
 
-    .save-box {
-      background: #141824;
-      border: 1px solid #2ed573;
-      border-radius: 6px;
-      padding: 12px;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    .save-box p {
-      color: #2ed573;
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-    }
+        .livro-capa {
+            background: linear-gradient(145deg, var(--papel) 0%, var(--papel-escuro) 100%);
+            border: 4px solid var(--borda);
+            box-shadow: 
+                inset 0 0 40px var(--sombra),
+                0 0 30px rgba(0,0,0,0.5),
+                0 10px 40px rgba(0,0,0,0.4);
+            padding: 4rem 5rem;
+            max-width: 650px;
+            text-align: center;
+            position: relative;
+        }
 
-    /* HUD do Herói */
-    #hero-hud {
-      background: #10141d;
-      border: 1px solid #1f2a38;
-      border-radius: 6px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-    .hud-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      font-weight: bold;
-      color: #eccc68;
-    }
-    .bar-container {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.7rem;
-    }
-    .bar-bg {
-      background: #2f3542;
-      border-radius: 4px;
-      height: 8px;
-      flex: 1;
-      overflow: hidden;
-    }
-    .bar-fill-hp { background: #2ed573; height: 100%; width: 100%; transition: width 0.3s; }
-    .bar-fill-mp { background: #1e90ff; height: 100%; width: 100%; transition: width 0.3s; }
-    .bar-fill-xp { background: #e1b12c; height: 100%; width: 0%; transition: width 0.3s; }
+        .livro-capa::before, .livro-capa::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px solid var(--ouro);
+            pointer-events: none;
+        }
 
-    /* Buffs Display */
-    .buffs-container {
-      display: flex;
-      gap: 6px;
-      font-size: 0.65rem;
-      color: #eccc68;
-      margin-top: 2px;
-    }
-    .buff-tag {
-      background: #1f2a38;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid #70a1ff;
-    }
+        .titulo-jogo {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 8vw, 3.8rem);
+            color: var(--tinta);
+            font-weight: 700;
+            letter-spacing: 5px;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px var(--sombra);
+        }
 
-    /* Layout Principal */
-    #game-screen {
-      display: none;
-      flex-direction: column;
-      flex: 1;
-      height: 100%;
-      min-height: 0; /* Impede estourar o container pai flex */
-      overflow: hidden;
-    }
-    #enemy-hud {
-      display: none;
-      background: #1e1215;
-      border: 1px solid #ff4757;
-      border-radius: 6px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-    .enemy-title {
-      color: #ff4757;
-      font-weight: bold;
-      font-size: 0.85rem;
-    }
+        .subtitulo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--tinta-suave);
+            letter-spacing: 3px;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+        }
 
-    #log {
-      flex: 1;
-      min-height: 0; /* Garante rolagem interna correta no mobile */
-      background-color: #050608;
-      border: 1px solid #1f2a38;
-      border-radius: 6px;
-      padding: 8px;
-      overflow-y: auto;
-      font-size: 0.82rem;
-      line-height: 1.35;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .entry { word-break: break-word; }
-    .sys { color: #a4b0be; }
-    .action { color: #ffa502; }
-    .combat { color: #ff4757; }
-    .heal { color: #2ed573; }
-    .status { color: #1e90ff; }
-    .danger { color: #ff6b81; font-weight: bold; }
-    .event { color: #eccc68; font-weight: bold; }
-    .levelup { color: #e1b12c; font-weight: bold; font-size: 0.95rem; }
-    .victory { color: #70a1ff; font-weight: bold; font-size: 1rem; }
-    .achievement-log { color: #eccc68; font-weight: bold; border-left: 3px solid #e1b12c; padding-left: 6px; }
+        .divisor {
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+            margin: 1rem auto 2rem;
+        }
 
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 6px;
-      flex-shrink: 0;
-    }
-    button {
-      background: #141824;
-      border: 1px solid #2f3640;
-      color: #eccc68;
-      padding: 10px 4px;
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      touch-action: manipulation;
-    }
-    button:active {
-      background: #2f3542;
-      transform: scale(0.98);
-    }
-    .btn-start { background: #2ed573; color: #050608; border-color: #2ed573; font-size: 1rem; padding: 12px; width: 100%; }
-    .btn-load { background: #1e90ff; color: #ffffff; border-color: #1e90ff; font-size: 1rem; padding: 12px; width: 100%; }
-    .btn-explore { border-color: #ff4757; color: #ff6b81; }
-    .btn-status { border-color: #1e90ff; color: #70a1ff; }
-    .btn-bag { border-color: #ffa502; color: #eccc68; }
-    .btn-rest { border-color: #2ed573; color: #2ed573; }
-    .btn-flee { border-color: #a4b0be; color: #a4b0be; }
-    .btn-ngplus { background: #e1b12c; color: #050608; border-color: #e1b12c; font-size: 1rem; grid-column: span 2; padding: 12px; }
+        .botao {
+            font-family: 'Cinzel', serif;
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            background: linear-gradient(180deg, var(--ouro) 0%, var(--ouro-escuro) 100%);
+            border: 2px solid var(--borda);
+            color: #fff;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            min-width: 240px;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
 
-    /* Pop-up de Conquistas */
-    #achievement-popup {
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #10141d;
-      border: 2px solid #e1b12c;
-      box-shadow: 0 0 15px rgba(225, 177, 44, 0.4);
-      border-radius: 8px;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 999;
-      transition: top 0.5s ease-in-out;
-      width: 90%;
-      max-width: 380px;
-    }
-    #achievement-popup.show {
-      top: 15px;
-    }
-    .ach-icon { font-size: 1.8rem; }
-    .ach-text { display: flex; flex-direction: column; }
-    .ach-title { font-weight: bold; color: #e1b12c; font-size: 0.85rem; }
-    .ach-desc { color: #ffffff; font-size: 0.75rem; }
+        .botao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--dourado-brilho);
+            background: linear-gradient(180deg, #d4b65c, #a88c42);
+        }
 
-    /* Texto Flutuante de Dano/Cura */
-    .floating-text {
-      position: absolute;
-      font-weight: bold;
-      font-size: 1.2rem;
-      pointer-events: none;
-      animation: floatUp 1s ease-out forwards;
-      z-index: 100;
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      50% { opacity: 1; transform: translateY(-25px) scale(1.2); }
-      100% { opacity: 0; transform: translateY(-50px) scale(0.8); }
-    }
-  </style>
+        .botoes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .rodape {
+            margin-top: 2.5rem;
+            color: var(--envelhecido);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* === TELA DE HISTÓRIA — PERGAMINHO === */
+        .pergaminho {
+            background: linear-gradient(to right, var(--papel-escuro) 0%, var(--papel) 15%, var(--papel) 85%, var(--papel-escuro) 100%);
+            border: 3px solid var(--borda);
+            box-shadow: inset 0 0 30px var(--sombra), 0 10px 30px rgba(0,0,0,0.4);
+            padding: 3rem 4rem;
+            max-width: 750px;
+            line-height: 1.9;
+            color: var(--tinta);
+            position: relative;
+        }
+
+        .pergaminho h2 {
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--tinta);
+            border-bottom: 1px solid var(--ouro);
+            padding-bottom: 1rem;
+        }
+
+        .pergaminho p {
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+
+        .destaque {
+            font-weight: 600;
+            color: var(--ouro-escuro);
+        }
+
+        /* === TELA DE MODO DE JOGO === */
+        .modos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .modo-card {
+            background: var(--papel);
+            border: 2px solid var(--borda);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modo-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px var(--sombra);
+            border-color: var(--ouro);
+        }
+
+        .modo-titulo {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--tinta);
+        }
+
+        .modo-desc {
+            font-size: 0.9rem;
+            color: var(--tinta-suave);
+        }
+
+        /* === ÁREA DO JOGO === */
+        #jogo {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .painel-topo {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(to bottom, rgba(44,36,24,0.95), transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Cinzel', serif;
+            z-index: 10;
+        }
+
+        .quadro-status {
+            background: var(--papel);
+            border: 2px solid var(--borda);
+            padding: 0.8rem 1.5rem;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .barra-vida {
+            width: 200px; height: 20px;
+            background: var(--papel-escuro);
+            border: 1px solid var(--borda);
+            margin-top: 0.5rem;
+        }
+
+        .vida {
+            height: 100%;
+            background: linear-gradient(90deg, #5a8f5a, #74b874);
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        .nome-chefe {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--tinta);
+        }
+
+        .caixa-info {
+            background: rgba(244, 228, 193, 0.9);
+            border: 2px solid var(--borda);
+            padding: 0.8rem 1.2rem;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+        }
+
+        .tela-campo {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #3a3020 0%, #1f1a12 100%);
+        }
+
+        .comandos {
+            position: absolute;
+            bottom: 1.5rem; right: 1.5rem;
+            background: rgba(244, 228, 193, 0.9);
+            border: 2px solid var(--borda);
+            padding: 1rem 1.2rem;
+            font-size: 0.9rem;
+            color: var(--tinta-suave);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+        }
+
+        .escondido { display: none !important; }
+        .voltar { background: linear-gradient(180deg, var(--envelhecido), #9a8060); }
+        .voltar:hover { background: linear-gradient(180deg, #c0a070, #a08050); }
+    </style>
 </head>
-<body id="game-body">
-
-  <div id="achievement-popup">
-    <div class="ach-icon" id="ach-pop-icon">🏆</div>
-    <div class="ach-text">
-      <span class="ach-title" id="ach-pop-title">CONQUISTA DESBLOQUEADA!</span>
-      <span class="ach-desc" id="ach-pop-desc">Descrição da conquista</span>
-    </div>
-  </div>
-
-  <header>
-    <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
-    <div class="subtitle" id="floor-display">Criação de Personagem</div>
-  </header>
-
-  <!-- TELA DE CRIAÇÃO -->
-  <div id="creation-screen">
-    <div id="save-prompt" class="save-box" style="display: none;">
-      <p id="save-info-text">Jogo Guardado Encontrado!</p>
-      <button class="btn-load" onclick="loadSavedGame()">📂 Continuar Jornada</button>
-    </div>
-
-    <div class="form-group">
-      <label for="hero-name">Nome do Herói:</label>
-      <input type="text" id="hero-name" placeholder="Ex: Dimitrian" value="Dimitrian" maxlength="15">
-    </div>
-
-    <div class="form-group">
-      <label for="hero-class">Classe do Herói:</label>
-      <select id="hero-class" onchange="updateClassPreview()">
-        <option value="Guerreiro">🗡️ Guerreiro (Alta Vida / Ataque Forte)</option>
-        <option value="Mago" selected>🪄 Mago (Alta Mana / Dano Mágico)</option>
-        <option value="Ladino">🗡️ Ladino (Ataque Rápido / Fuga Fácil)</option>
-        <option value="Clérigo">✝️ Clérigo (Equilibrado / Cura Eficiente)</option>
-      </select>
-    </div>
-
-    <div class="class-info" id="class-preview">
-      HP: 100 | MP: 100 | Habilidade: Bola de Fogo
-    </div>
-
-    <button class="btn-start" onclick="startNewGame()">🚀 Novo Jogo</button>
-  </div>
-
-  <!-- TELA DO JOGO -->
-  <div id="game-screen">
-    <div id="aba-personagem" class="painel-jogo">
-    <h2>Ficha do Herói</h2>
-    
-    <div id="aba-personagem" class="painel-jogo" style="max-height: 80vh; overflow-y: auto;">
-    <h2>Ficha do Herói</h2>
-    
-    <div class="card-perfil" style="margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
-        <p><strong>Nome:</strong> <span id="ui-nome">-</span></p>
-        <p><strong>Género:</strong> <span id="ui-genero">-</span></p>
-        <p><strong>Raça:</strong> <span id="ui-raca">-</span> <small id="ui-passiva-raca" style="color: #888;"></small></p>
-        <p><strong>Classe:</strong> <span id="ui-classe">-</span> <small id="ui-passiva-classe" style="color: #888;"></small></p>
-    </div>
-
-    <div class="bloco-stats" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
-        <h3 style="color: #4CAF50; margin-top: 0;">Atributos Básicos</h3>
-        <p>⚔️ Força: <span id="ui-forca">0</span></p>
-        <p>🎯 Destreza: <span id="ui-destreza">0</span></p>
-        <p>❤️ Vitalidade: <span id="ui-vitalidade">0</span></p>
-        <p>🛡️ Defesa: <span id="ui-defesa">0</span></p>
-        <p>✨ Resistência: <span id="ui-resistencia">0</span></p>
-        <p>🔮 Inteligência: <span id="ui-inteligencia">0</span></p>
-    </div>
-</div>
-    <!-- HUD DO HERÓI -->
-    <div id="hero-hud">
-      <div class="hud-header">
-        <span id="hud-name-class">Herói (Nv. 1)</span>
-        <span id="hud-gold-potions">💰 150g</span>
-      </div>
-      <div class="bar-container">
-        <span style="color: #2ed573; width: 24px;">HP</span>
-        <div class="bar-bg"><div class="bar-fill-hp" id="bar-hp"></div></div>
-        <span id="txt-hp" style="color: #a4b0be; font-size: 0.65rem;">100/100</span>
-      </div>
-      <div class="bar-container">
-        <span style="color: #1e90ff; width: 24px;">MP</span>
-        <div class="bar-bg"><div class="bar-fill-mp" id="bar-mp"></div></div>
-        <span id="txt-mp" style="color: #a4b0be; font-size: 0.65rem;">100/100</span>
-      </div>
-      <div class="bar-container">
-        <span style="color: #e1b12c; width: 24px;">XP</span>
-        <div class="bar-bg"><div class="bar-fill-xp" id="bar-xp"></div></div>
-        <span id="txt-xp" style="color: #a4b0be; font-size: 0.65rem;">0/50</span>
-      </div>
-      <div class="buffs-container" id="buffs-container"></div>
-    </div>
-
-    <div id="enemy-hud">
-      <div class="enemy-title" id="enemy-name">Inimigo</div>
-      <div style="font-size: 0.75rem; color: #ff6b81; margin-top: 2px;" id="enemy-hp-text">HP: 0/0</div>
-      <div class="bar-bg" style="height: 8px; margin-top: 4px;">
-        <div class="bar-fill-hp" style="background: #ff4757;" id="enemy-hp-fill"></div>
-      </div>
-    </div>
-
-    <div id="log"></div>
-
-    <div class="controls" id="action-buttons">
-      <!-- Botões via JS -->
-    </div>
-  </div>
-
-  <script>
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-
-    function initAudio() {
-      if (!audioCtx) audioCtx = new AudioCtx();
-    }
-
-    function playSound(type) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-
-      if (type === 'attack') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now);
-        osc.stop(now + 0.15);
-      } else if (type === 'magic') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(700, now + 0.25);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      } else if (type === 'heal') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.exponentialRampToValueAtTime(500, now + 0.3);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      } else if (type === 'levelup') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(261.63, now);
-        osc.frequency.setValueAtTime(329.63, now + 0.1);
-        osc.frequency.setValueAtTime(392.00, now + 0.2);
-        osc.frequency.setValueAtTime(523.25, now + 0.3);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      } else if (type === 'achievement') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(523.25, now);
-        osc.frequency.setValueAtTime(659.25, now + 0.1);
-        osc.frequency.setValueAtTime(783.99, now + 0.2);
-        osc.frequency.setValueAtTime(1046.50, now + 0.3);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-        osc.start(now);
-        osc.stop(now + 0.6);
-      } else if (type === 'defeat') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      }
-    }
-
-    function triggerShake() {
-      const body = document.getElementById('game-body');
-      body.classList.remove('shake');
-      void body.offsetWidth;
-      body.classList.add('shake');
-    }
-
-    function spawnFloatingText(text, color = '#ff4757') {
-      const el = document.createElement('div');
-      el.className = 'floating-text';
-      el.innerText = text;
-      el.style.color = color;
-      
-      const randomX = Math.floor(Math.random() * 80) + 10;
-      el.style.left = `${randomX}%`;
-      el.style.top = `40%`;
-
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1000);
-    }
-
-    /* SISTEMA DE CONQUISTAS */
-    const achievements = {
-      'first_kill': { icon: '🗡️', name: 'Primeiro Sangue', desc: 'Derrotou o seu primeiro inimigo.' },
-      'boss_hunter': { icon: '👑', name: 'Caçador de Chefes', desc: 'Derrotou o seu primeiro Guardião.' },
-      'rich': { icon: '💰', name: 'Magnata das Ruínas', desc: 'Acumulou 500 moedas de ouro.' },
-      'max_gear': { icon: '🛡️', name: 'Forjado na Glória', desc: 'Melhorou arma e armadura para Nível 3+.' },
-      'slayer_of_malazar': { icon: '🏆', name: 'Destruidor do Mal', desc: 'Derrotou Malazar e salvou o reino!' },
-      'ng_plus_warrior': { icon: '🔥', name: 'Lenda Imortal', desc: 'Iniciou um ciclo New Game+.' }
-    };
-
-    let unlockedAchievements = [];
-
-    function checkAchievements() {
-      if (hero.kills >= 1 && !unlockedAchievements.includes('first_kill')) {
-        unlockAchievement('first_kill');
-      }
-      if (hero.bossKills >= 1 && !unlockedAchievements.includes('boss_hunter')) {
-        unlockAchievement('boss_hunter');
-      }
-      if (hero.gold >= 500 && !unlockedAchievements.includes('rich')) {
-        unlockAchievement('rich');
-      }
-      if (hero.weaponLvl >= 3 && hero.armorLvl >= 3 && !unlockedAchievements.includes('max_gear')) {
-        unlockAchievement('max_gear');
-      }
-      if (gameWon && !unlockedAchievements.includes('slayer_of_malazar')) {
-        unlockAchievement('slayer_of_malazar');
-      }
-      if (ngCycle > 1 && !unlockedAchievements.includes('ng_plus_warrior')) {
-        unlockAchievement('ng_plus_warrior');
-      }
-    }
-
-    function unlockAchievement(id) {
-      if (unlockedAchievements.includes(id)) return;
-
-      unlockedAchievements.push(id);
-      localStorage.setItem('rom_achievements', JSON.stringify(unlockedAchievements));
-
-      const ach = achievements[id];
-      playSound('achievement');
-
-      const pop = document.getElementById('achievement-popup');
-      document.getElementById('ach-pop-icon').innerText = ach.icon;
-      document.getElementById('ach-pop-title').innerText = `CONQUISTA: ${ach.name}`;
-      document.getElementById('ach-pop-desc').innerText = ach.desc;
-
-      pop.classList.add('show');
-      log(`[🏆 CONQUISTA]: ${ach.icon} ${ach.name} - ${ach.desc}`, 'achievement-log');
-
-      setTimeout(() => {
-        pop.classList.remove('show');
-      }, 4000);
-    }
-
-    const weaponNames = ['Espada de Madeira', 'Lâmina de Aço', 'Machado do Vento', 'Cetro Elemental', 'Lâmina do Caos'];
-    const armorNames = ['Manto de Pano', 'Armadura de Couro', 'Cota de Malha', 'Placas de Aço', 'Armadura Divina'];
-
-    const classData = {
-      'Guerreiro': { hp: 160, mana: 30, spellName: 'Golpe Devastador', spellCost: 10, spellDmg: [25, 35], skill2Name: 'Grito de Guerra', skill2Cost: 15, desc: 'HP: 160 | MP: 30 | Nv.3: Grito de Guerra (+Escudo)' },
-      'Mago': { hp: 100, mana: 100, spellName: 'Bola de Fogo', spellCost: 15, spellDmg: [30, 45], skill2Name: 'Meteoro Arcano', skill2Cost: 40, desc: 'HP: 100 | MP: 100 | Nv.3: Meteoro Arcano' },
-      'Ladino': { hp: 120, mana: 50, spellName: 'Ataque Sombrio', spellCost: 12, spellDmg: [28, 40], skill2Name: 'Adaga Venenosa', skill2Cost: 20, desc: 'HP: 120 | MP: 50 | Nv.3: Adaga Venenosa (+Veneno)' },
-      'Clérigo': { hp: 140, mana: 70, spellName: 'Luz Sagrada', spellCost: 15, spellDmg: [20, 30], skill2Name: 'Oração Celestial', skill2Cost: 30, desc: 'HP: 140 | MP: 70 | Nv.3: Oração (+Regeneração)' }
-    };
-
-    let hero = {};
-    let currentFloor = 1;
-    let ngCycle = 1;
-    let inCombat = false;
-    let gameWon = false;
-    let currentEnemy = null;
-
-    const creationScreen = document.getElementById('creation-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const logDiv = document.getElementById('log');
-    const enemyHud = document.getElementById('enemy-hud');
-    const enemyNameEl = document.getElementById('enemy-name');
-    const enemyHpTextEl = document.getElementById('enemy-hp-text');
-    const enemyHpFillEl = document.getElementById('enemy-hp-fill');
-    const floorDisplayEl = document.getElementById('floor-display');
-    const buttonsContainer = document.getElementById('action-buttons');
-    const buffsContainer = document.getElementById('buffs-container');
-
-    window.onload = () => {
-      updateClassPreview();
-      const savedAch = localStorage.getItem('rom_achievements');
-      if (savedAch) unlockedAchievements = JSON.parse(savedAch);
-
-      const savedData = localStorage.getItem('rom_save');
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        document.getElementById('save-prompt').style.display = 'block';
-        const cycleText = data.ngCycle > 1 ? ` [NG+${data.ngCycle - 1}]` : '';
-        document.getElementById('save-info-text').innerText = `Jogo Guardado: ${data.hero.name} (${data.hero.class} Nv.${data.hero.level})${cycleText} - Andar ${data.floor}`;
-      }
-    };
-
-    function updateClassPreview() {
-      const selectedClass = document.getElementById('hero-class').value;
-      document.getElementById('class-preview').innerText = classData[selectedClass].desc;
-    }
-
-    function updateHeroHud() {
-      if (!hero || !hero.name) return;
-      const cycleText = ngCycle > 1 ? ` (NG+${ngCycle - 1})` : '';
-      document.getElementById('hud-name-class').innerText = `${hero.name} (${hero.class} Nv.${hero.level})${cycleText}`;
-      document.getElementById('hud-gold-potions').innerText = `💰 ${hero.gold}g`;
-
-      const hpPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
-      const mpPct = Math.max(0, (hero.mana / hero.maxMana) * 100);
-      const xpPct = Math.max(0, (hero.xp / hero.maxXp) * 100);
-
-      document.getElementById('bar-hp').style.width = `${hpPct}%`;
-      document.getElementById('bar-mp').style.width = `${mpPct}%`;
-      document.getElementById('bar-xp').style.width = `${xpPct}%`;
-
-      document.getElementById('txt-hp').innerText = `${hero.hp}/${hero.maxHp}`;
-      document.getElementById('txt-mp').innerText = `${hero.mana}/${hero.maxMana}`;
-      document.getElementById('txt-xp').innerText = `${hero.xp}/${hero.maxXp}`;
-
-      /* Renderizar Buffs */
-      buffsContainer.innerHTML = '';
-      if (hero.buffs) {
-        if (hero.buffs.regen > 0) {
-          buffsContainer.innerHTML += `<span class="buff-tag">💖 Regen (${hero.buffs.regen}t)</span>`;
-        }
-        if (hero.buffs.shield > 0) {
-          buffsContainer.innerHTML += `<span class="buff-tag">🛡️ Escudo (${hero.buffs.shield}t)</span>`;
-        }
-      }
-    }
-
-    function saveGame() {
-      if (!hero.isAlive) {
-        localStorage.removeItem('rom_save');
-        return;
-      }
-      const data = { hero: hero, floor: currentFloor, ngCycle: ngCycle };
-      localStorage.setItem('rom_save', JSON.stringify(data));
-      checkAchievements();
-      updateHeroHud();
-    }
-
-    function loadSavedGame() {
-      initAudio();
-      const savedData = localStorage.getItem('rom_save');
-      if (!savedData) return;
-
-      const data = JSON.parse(savedData);
-      hero = data.hero;
-      currentFloor = data.floor;
-      ngCycle = data.ngCycle || 1;
-
-      if (hero.kills === undefined) hero.kills = 0;
-      if (hero.bossKills === undefined) hero.bossKills = 0;
-      if (!hero.buffs) hero.buffs = { regen: 0, shield: 0 };
-
-      if (!hero.inventory) {
-        hero.inventory = { hpPotion: hero.potions || 2, manaElixir: 1, fireScroll: 1 };
-      }
-
-      const stats = classData[hero.class];
-      hero.skill2Name = stats.skill2Name;
-      inicializarAtributosHeroi(hero);
-      atualizarInterfacePersonagem(hero);
-      creationScreen.style.display = 'none';
-      gameScreen.style.display = 'flex';
-      floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra (Ciclo ${ngCycle})`;
-
-      log(`[Sistema]: Jogo guardado carregado com sucesso!`, 'sys');
-      log(`[Herói]: ${hero.name} (${hero.class} Nv.${hero.level}) regressou no Andar ${currentFloor}.`, 'action');
-
-      updateHeroHud();
-      updateControls();
-    }
-
-    function startNewGame() {
-      initAudio();
-      const nameInput = document.getElementById('hero-name').value.trim();
-      const selectedClass = document.getElementById('hero-class').value;
-      const stats = classData[selectedClass];
-
-      hero = {
-        name: nameInput || 'Herói',
-        class: selectedClass,
-        level: 1,
-        xp: 0,
-        maxXp: 50,
-        hp: stats.hp,
-        maxHp: stats.hp,
-        mana: stats.mana,
-        maxMana: stats.mana,
-        gold: 150,
-        inventory: { hpPotion: 2, manaElixir: 1, fireScroll: 1 },
-        weaponLvl: 1,
-        armorLvl: 1,
-        spellName: stats.spellName,
-        spellCost: stats.spellCost,
-        spellDmg: stats.spellDmg,
-        skill2Name: stats.skill2Name,
-        skill2Cost: stats.skill2Cost,
-        buffs: { regen: 0, shield: 0 },
-        kills: 0,
-        bossKills: 0,
-        isAlive: true
-      };
-        inicializarAtributosHeroi(hero);
-    atualizarInterfacePersonagem(hero);
-
-      currentFloor = 1;
-      ngCycle = 1;
-      gameWon = false;
-
-      creationScreen.style.display = 'none';
-      gameScreen.style.display = 'flex';
-      floorDisplayEl.innerText = `Andar 1 da Masmorra`;
-
-      log(`[Sistema]: Bem-vindo ao Rise of Malazar!`, 'sys');
-      log(`[Herói]: ${hero.name}, o ${hero.class}, iniciou a sua jornada!`, 'action');
-      log(`[Masmorra]: Toque em "Explorar" para adentrar o Andar ${currentFloor}.`, 'sys');
-
-      saveGame();
-      updateControls();
-    }
-
-    function startNgPlus() {
-      ngCycle++;
-      currentFloor = 1;
-      gameWon = false;
-      hero.hp = hero.maxHp;
-      hero.mana = hero.maxMana;
-      hero.buffs = { regen: 0, shield: 0 };
-
-      floorDisplayEl.innerText = `Andar 1 da Masmorra (NG+${ngCycle - 1})`;
-      log(`[NEW GAME+]: Você iniciou o Ciclo ${ngCycle}! Os inimigos estão muito mais poderosos!`, 'levelup');
-
-      saveGame();
-      updateControls();
-      atualizarInterfacePersonagem(hero);
-    }
-
-    function log(msg, type = 'sys') {
-      const entry = document.createElement('div');
-      entry.className = `entry ${type}`;
-      entry.innerText = msg;
-      logDiv.appendChild(entry);
-      logDiv.scrollTop = logDiv.scrollHeight;
-    }
-    
-    function gainXp(amount) {
-      hero.xp += amount;
-      log(`[XP]: Ganhou +${amount} de XP!`, 'sys');
-
-      if (hero.xp >= hero.maxXp) {
-        hero.level++;
-        hero.xp -= hero.maxXp;
-        hero.maxXp = Math.round(hero.maxXp * 1.5);
-atualizarInterfacePersonagem(hero);
-        
-        const hpGain = 20;
-        const mpGain = 10;
-        hero.maxHp += hpGain;
-        hero.hp = hero.maxHp;
-        hero.maxMana += mpGain;
-        hero.mana = hero.maxMana;
-
-        playSound('levelup');
-        triggerShake();
-        spawnFloatingText('LEVEL UP!', '#e1b12c');
-        log(`[LEVEL UP! 🎉]: ${hero.name} subiu para o Nível ${hero.level}! (+${hpGain} HP, +${mpGain} MP!)`, 'levelup');
-
-        if (hero.level === 3) {
-          log(`[HABILIDADE NOVA! ✨]: Desbloqueou a habilidade: ${hero.skill2Name}!`, 'event');
-        }
-      }
-      updateHeroHud();
-    }
-
-    function updateControls() {
-      if (!hero.isAlive) {
-        localStorage.removeItem('rom_save');
-        buttonsContainer.innerHTML = `<button class="btn-explore" style="grid-column: span 2;" onclick="location.reload()">🔄 Reiniciar Aventura</button>`;
-        return;
-      }
-
-      if (gameWon) {
-        buttonsContainer.innerHTML = `
-          <button class="btn-ngplus" onclick="startNgPlus()">🔥 Iniciar New Game+ (Ciclo ${ngCycle + 1})</button>
-        `;
-        return;
-      }
-
-      if (inCombat) {
-        let skill2Btn = '';
-        if (hero.level >= 3) {
-          skill2Btn = `<button class="btn-status" onclick="useSkill2()">⚡ ${hero.skill2Name} (${hero.skill2Cost} MP)</button>`;
-        } else {
-          skill2Btn = `<button class="btn-flee" onclick="flee()">🏃 Fugir</button>`;
-        }
-
-        buttonsContainer.innerHTML = `
-          <button class="btn-explore" onclick="attackPhysical()">🗡️ Atacar</button>
-          <button class="btn-status" onclick="attackMagic()">🪄 ${hero.spellName} (${hero.spellCost} MP)</button>
-          ${skill2Btn}
-          <button class="btn-bag" onclick="openBagMenu()">🎒 Mochila</button>
-        `;
-      } else {
-        buttonsContainer.innerHTML = `
-          <button class="btn-explore" onclick="explore()">⚔️ Explorar</button>
-          <button class="btn-status" onclick="showStatus()">📊 Status / 🏆</button>
-          <button class="btn-bag" onclick="shopMenu()">🛍️ Loja / Equipamento</button>
-          <button class="btn-rest" onclick="rest()">🍺 Taverna (30g)</button>
-        `;
-      }
-      updateHeroHud();
-    }
-
-    function updateEnemyHud() {
-      if (inCombat && currentEnemy) {
-        enemyHud.style.display = 'block';
-        const isBoss = currentEnemy.isBoss ? '👑 CHEFE: ' : '';
-        const poisonTag = currentEnemy.poison ? ` 🧪 (${currentEnemy.poison}t)` : '';
-        enemyNameEl.innerText = `${isBoss}${currentEnemy.name}${poisonTag}`;
-        enemyHpTextEl.innerText = `HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`;
-        const pct = Math.max(0, (currentEnemy.hp / currentEnemy.maxHp) * 100);
-        enemyHpFillEl.style.width = `${pct}%`;
-      } else {
-        enemyHud.style.display = 'none';
-      }
-    }
-
-    function explore() {
-      if (!hero.isAlive || inCombat) return;
-
-      log(`[Masmorra]: Você explora as profundezas do Andar ${currentFloor}...`, 'action');
-
-      if (currentFloor === 10) {
-        const ngMult = 1 + (ngCycle - 1) * 0.8;
-        currentEnemy = {
-          name: 'MALAZAR, O SENHOR DAS SOMBRAS',
-          hp: Math.round(350 * ngMult),
-          maxHp: Math.round(350 * ngMult),
-          atk: Math.round(45 * ngMult),
-          gold: 1000,
-          xp: 500,
-          poison: 0,
-          isBoss: true,
-          isFinalBoss: true
-        };
-
-        log(`[🔥 CHEFE FINAL 🔥]: Malazar ergue-se do trono sombrio! "Você ousou desafiar-me, ${hero.name}? Prepare-se para a ruína!"`, 'danger');
-        inCombat = true;
-        updateEnemyHud();
-        updateControls();
-        return;
-      }
-
-      if (currentFloor % 5 !== 0 && Math.random() < 0.25) {
-        triggerRandomEvent();
-        return;
-      }
-
-      const ngMult = 1 + (ngCycle - 1) * 0.5;
-
-      if (currentFloor % 5 === 0) {
-        const bosses = [
-          { name: 'Lorde Esqueleto', baseHp: 120, baseAtk: 25, baseGold: 150, xp: 100 },
-          { name: 'Devorador de Almas', baseHp: 150, baseAtk: 30, baseGold: 200, xp: 130 }
-        ];
-        const bossTemplate = bosses[Math.floor(Math.random() * bosses.length)];
-        const floorMult = 1 + (currentFloor / 5 - 1) * 0.5;
-
-        currentEnemy = {
-          name: bossTemplate.name,
-          hp: Math.round(bossTemplate.baseHp * floorMult * ngMult),
-          maxHp: Math.round(bossTemplate.baseHp * floorMult * ngMult),
-          atk: Math.round(bossTemplate.baseAtk * floorMult * ngMult),
-          gold: Math.round(bossTemplate.baseGold * floorMult),
-          xp: Math.round(bossTemplate.xp * floorMult),
-          poison: 0,
-          isBoss: true
-        };
-
-        log(`[⚠️ CHEFE ⚠️]: O guardião ${currentEnemy.name} surgiu para proteger o Andar ${currentFloor}!`, 'danger');
-      } else {
-        const enemyTypes = [
-          { name: 'Esqueleto', baseHp: 30, baseAtk: 10, baseGold: 20, xp: 20 },
-          { name: 'Goblin', baseHp: 25, baseAtk: 8, baseGold: 15, xp: 15 },
-          { name: 'Orc Guerreiro', baseHp: 50, baseAtk: 18, baseGold: 40, xp: 35 },
-          { name: 'Cultista de Malazar', baseHp: 40, baseAtk: 15, baseGold: 35, xp: 30 }
-        ];
-
-        const template = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-        const hpMultiplier = (1 + (currentFloor - 1) * 0.25) * ngMult;
-        const atkMultiplier = (1 + (currentFloor - 1) * 0.2) * ngMult;
-
-        currentEnemy = {
-          name: template.name,
-          hp: Math.round(template.baseHp * hpMultiplier),
-          maxHp: Math.round(template.baseHp * hpMultiplier),
-          atk: Math.round(template.baseAtk * atkMultiplier),
-          gold: Math.round(template.baseGold * hpMultiplier),
-          xp: Math.round(template.xp * hpMultiplier),
-          poison: 0,
-          isBoss: false
-        };
-
-        log(`[Combate]: Um ${currentEnemy.name} bloqueia o seu caminho!`, 'danger');
-      }
-
-      inCombat = true;
-      updateEnemyHud();
-      updateControls();
-    }
-
-    function triggerRandomEvent() {
-      const roll = Math.random();
-
-      if (roll < 0.25) {
-        const goldFound = Math.floor(Math.random() * 30) + 20 * currentFloor;
-        hero.gold += goldFound;
-        playSound('heal');
-        spawnFloatingText(`+${goldFound}g`, '#e1b12c');
-        log(`[🧰 Evento]: Encontrou um Baú Antigo nas ruínas! Ganhou +${goldFound}g.`, 'event');
-      } else if (roll < 0.50) {
-        hero.hp = Math.min(hero.maxHp, hero.hp + 40);
-        hero.mana = Math.min(hero.maxMana, hero.mana + 30);
-        playSound('heal');
-        spawnFloatingText('+40 HP', '#2ed573');
-        log(`[⛲ Evento]: Encontrou uma Fonte Mágica. +40 HP e +30 MP recuperados!`, 'heal');
-      } else if (roll < 0.75) {
-        const xpBonus = 15 * currentFloor;
-        playSound('magic');
-        log(`[📜 Evento]: Encontrou Runas Antigas gravadas nas paredes da masmorra!`, 'event');
-        gainXp(xpBonus);
-      } else {
-        const trapDmg = Math.floor(Math.random() * 10) + 5;
-        hero.hp = Math.max(1, hero.hp - trapDmg);
-        playSound('attack');
-        triggerShake();
-        spawnFloatingText(`-${trapDmg} HP`, '#ff4757');
-        log(`[⚠️ Evento]: Ativou uma armadilha de espinhos! Perdeu ${trapDmg} de HP.`, 'danger');
-      }
-
-      saveGame();
-      updateControls();
-    }
-
-    function attackPhysical() {
-      if (!inCombat) return;
-
-      playSound('attack');
-      const weaponBonus = (hero.weaponLvl - 1) * 5;
-      const dmg = Math.floor(Math.random() * 8) + 10 + weaponBonus;
-      currentEnemy.hp -= dmg;
-      spawnFloatingText(`-${dmg}`, '#ff4757');
-      log(`[Ataque]: ${hero.name} ataca causando ${dmg} de dano físico!`, 'combat');
-
-      checkCombatState();
-    }
-
-    function attackMagic() {
-      if (!inCombat) return;
-
-      if (hero.mana < hero.spellCost) {
-        log(`[Mana]: Mana insuficiente! Você precisa de ${hero.spellCost} MP.`, 'danger');
-        return;
-      }
-
-      playSound('magic');
-      hero.mana -= hero.spellCost;
-      const [minDmg, maxDmg] = hero.spellDmg;
-      const weaponBonus = (hero.weaponLvl - 1) * 6;
-      const dmg = Math.floor(Math.random() * (maxDmg - minDmg + 1)) + minDmg + weaponBonus;
-      currentEnemy.hp -= dmg;
-      spawnFloatingText(`-${dmg}`, '#1e90ff');
-      log(`[Habilidade]: ${hero.name} usa ${hero.spellName} causando ${dmg} de dano!`, 'combat');
-
-      checkCombatState();
-    }
-
-    function useSkill2() {
-      if (!inCombat || hero.level < 3) return;
-
-      if (hero.mana < hero.skill2Cost) {
-        log(`[Mana]: Mana insuficiente! Você precisa de ${hero.skill2Cost} MP.`, 'danger');
-        return;
-      }
-
-      hero.mana -= hero.skill2Cost;
-      playSound('magic');
-
-      if (hero.class === 'Guerreiro') {
-        const healAmt = 35;
-        hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
-        hero.buffs.shield = 3;
-        spawnFloatingText(`+${healAmt} HP`, '#2ed573');
-        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name}! Recuperou +${healAmt} HP e ativou Escudo (3 turnos)!`, 'heal');
-      } else if (hero.class === 'Mago') {
-        const dmg = Math.floor(Math.random() * 30) + 55 + (hero.weaponLvl * 8);
-        currentEnemy.hp -= dmg;
-        spawnFloatingText(`-${dmg}`, '#ffa502');
-        log(`[Habilidade]: ${hero.name} invocou ${hero.skill2Name} causando ${dmg} de dano devastador!`, 'combat');
-      } else if (hero.class === 'Ladino') {
-        const dmg = Math.floor(Math.random() * 20) + 40 + (hero.weaponLvl * 6);
-        currentEnemy.hp -= dmg;
-        currentEnemy.poison = 3;
-        spawnFloatingText(`-${dmg}`, '#2ed573');
-        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} envenenando o alvo por ${dmg} de dano!`, 'combat');
-      } else if (hero.class === 'Clérigo') {
-        const healAmt = 60;
-        hero.hp = Math.min(hero.maxHp, hero.hp + healAmt);
-        hero.buffs.regen = 3;
-        spawnFloatingText(`+${healAmt} HP`, '#2ed573');
-        log(`[Habilidade]: ${hero.name} usou ${hero.skill2Name} recuperando +${healAmt} HP e ativando Regeneração!`, 'heal');
-      }
-
-      checkCombatState();
-    }
-
-    function checkCombatState() {
-      if (currentEnemy.hp <= 0) {
-        currentEnemy.hp = 0;
-        updateEnemyHud();
-
-        hero.kills++;
-
-        if (currentEnemy.isBoss) {
-          hero.bossKills++;
-        }
-
-        if (currentEnemy.isFinalBoss) {
-          triggerVictoryEnding();
-          return;
-        }
-
-        if (currentEnemy.isBoss) {
-          log(`[👑 VITÓRIA LENDÁRIA]: O Chefe ${currentEnemy.name} foi destruído! Recompensa: ${currentEnemy.gold}g!`, 'heal');
-        } else {
-          log(`[Vitória]: O ${currentEnemy.name} foi derrotado! Você ganhou ${currentEnemy.gold}g.`, 'heal');
-        }
-
-        hero.gold += currentEnemy.gold;
-        const xpEarned = currentEnemy.xp;
-
-        inCombat = false;
-        currentEnemy = null;
-        
-        currentFloor++;
-        floorDisplayEl.innerText = `Andar ${currentFloor} da Masmorra`;
-        
-        gainXp(xpEarned);
-        saveGame();
-        updateEnemyHud();
-        updateControls();
-        return;
-      }
-
-      updateEnemyHud();
-      enemyTurn();
-    }
-
-    function triggerVictoryEnding() {
-      inCombat = false;
-      gameWon = true;
-      playSound('levelup');
-
-      log(`[🏆 VITÓRIA ABSOLUTA 🏆]: MALAZAR FOI DERROTADO!`, 'victory');
-
-      if (hero.hp > hero.maxHp * 0.5) {
-        log(`[📜 FINAL GLORIOSO]: ${hero.name} triunfou com facilidade e libertou todo o reino da maldição eterna de Malazar!`, 'victory');
-      } else {
-        log(`[📜 FINAL SOBREVIVENTE]: À beira da morte, ${hero.name} desferiu o golpe final, selando Malazar nas profundezas!`, 'event');
-      }
-
-      saveGame();
-      updateEnemyHud();
-      updateControls();
-    }
-
-    function processTurnEffects() {
-      /* Processar regeneração do Herói */
-      if (hero.buffs && hero.buffs.regen > 0) {
-        const regenVal = 15;
-        hero.hp = Math.min(hero.maxHp, hero.hp + regenVal);
-        hero.buffs.regen--;
-        spawnFloatingText(`+${regenVal} HP`, '#2ed573');
-        log(`[✨ Regeneração]: Recuperou +${regenVal} HP!`, 'heal');
-      }
-
-      /* Processar veneno no Inimigo */
-      if (currentEnemy && currentEnemy.poison > 0) {
-        const poisonDmg = 12;
-        currentEnemy.hp = Math.max(0, currentEnemy.hp - poisonDmg);
-        currentEnemy.poison--;
-        spawnFloatingText(`-${poisonDmg}`, '#2ed573');
-        log(`[🧪 Veneno]: O ${currentEnemy.name} sofreu ${poisonDmg} de dano de veneno!`, 'combat');
-      }
-    }
-
-    function enemyTurn() {
-      processTurnEffects();
-
-      if (currentEnemy && currentEnemy.hp <= 0) {
-        checkCombatState();
-        return;
-      }
-
-      let armorReduction = (hero.armorLvl - 1) * 3;
-      if (hero.buffs && hero.buffs.shield > 0) {
-        armorReduction += 10;
-        hero.buffs.shield--;
-        log(`[🛡️ Escudo]: O Escudo reduziu o dano sofrido!`, 'sys');
-      }
-
-      const rawDmg = Math.floor(Math.random() * 6) + (currentEnemy.atk - 2);
-      const enemyDmg = Math.max(2, rawDmg - armorReduction);
-
-      hero.hp -= enemyDmg;
-      playSound('attack');
-      triggerShake();
-      spawnFloatingText(`-${enemyDmg}`, '#ff4757');
-      log(`[Dano]: O ${currentEnemy.name} atacou e causou ${enemyDmg} de dano em ${hero.name}!`, 'danger');
-
-      if (hero.hp <= 0) {
-        hero.hp = 0;
-        hero.isAlive = false;
-        inCombat = false;
-        playSound('defeat');
-        log(`[DERROTA]: ${hero.name} caiu no Andar ${currentFloor}... O Malazar triunfou!`, 'danger');
-        updateEnemyHud();
-      }
-
-      saveGame();
-      updateControls();
-    }
-
-    function flee() {
-      if (!inCombat) return;
-
-      if (currentEnemy.isBoss) {
-        log(`[Fuga]: Não é possível fugir da batalha contra um Chefe!`, 'danger');
-        return;
-      }
-
-      const chance = hero.class === 'Ladino' ? 0.7 : 0.4;
-      if (Math.random() < chance) {
-        log(`[Fuga]: Você conseguiu escapar com sucesso!`, 'sys');
-        inCombat = false;
-        currentEnemy = null;
-        updateEnemyHud();
-        updateControls();
-      } else {
-        log(`[Fuga]: Falha ao tentar fugir! O inimigo aproveitou o seu deslize.`, 'danger');
-        enemyTurn();
-      }
-    }
-
-    function showStatus() {
-      const weaponName = weaponNames[Math.min(hero.weaponLvl - 1, weaponNames.length - 1)];
-      const armorName = armorNames[Math.min(hero.armorLvl - 1, armorNames.length - 1)];
-
-      log(`[Status]: ${hero.name} (${hero.class}) - Nível ${hero.level} | XP: ${hero.xp}/${hero.maxXp}`, 'status');
-      log(`[Atributos]: HP: ${hero.hp}/${hero.maxHp} | MP: ${hero.mana}/${hero.maxMana} | Ouro: ${hero.gold}g`, 'status');
-      log(`[🎒 Inventário]: 🧪 HP (${hero.inventory.hpPotion}) | 🧪 MP (${hero.inventory.manaElixir}) | 📜 Pergaminho (${hero.inventory.fireScroll})`, 'status');
-      log(`[Equipamento]: 🗡️ ${weaponName} (+Nv.${hero.weaponLvl}) | 🛡️ ${armorName} (+Nv.${hero.armorLvl})`, 'status');
-
-      log(`--- 🏆 CONQUISTAS (${unlockedAchievements.length}/${Object.keys(achievements).length}) ---`, 'event');
-      for (const [id, ach] of Object.entries(achievements)) {
-        const isUnlocked = unlockedAchievements.includes(id);
-        const icon = isUnlocked ? ach.icon : '🔒';
-        const title = isUnlocked ? ach.name : '???';
-        log(`${icon} ${title}: ${ach.desc}`, isUnlocked ? 'achievement-log' : 'sys');
-      }
-    }
-
-    function openBagMenu() {
-      log(`[🎒 Mochila]: Escolha um item para utilizar:`, 'sys');
-      buttonsContainer.innerHTML = `
-        <button class="btn-bag" onclick="useHpPotion()">🧪 Poção HP (${hero.inventory.hpPotion})</button>
-        <button class="btn-status" onclick="useManaElixir()">🧪 Elixir MP (${hero.inventory.manaElixir})</button>
-        <button class="btn-explore" onclick="useFireScroll()">📜 Pergaminho (${hero.inventory.fireScroll})</button>
-        <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
-      `;
-    }
-
-    function useHpPotion() {
-      if (hero.inventory.hpPotion <= 0) {
-        log(`[Mochila]: Sem Poções de HP no inventário!`, 'danger');
-        return;
-      }
-      hero.inventory.hpPotion--;
-      const heal = 50;
-      hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-      playSound('heal');
-      spawnFloatingText(`+${heal} HP`, '#2ed573');
-      log(`[Mochila]: Usou Poção de HP! Recuperou +${heal} HP.`, 'heal');
-
-      saveGame();
-      if (inCombat) enemyTurn();
-      else updateControls();
-    }
-
-    function useManaElixir() {
-      if (hero.inventory.manaElixir <= 0) {
-        log(`[Mochila]: Sem Elixires de Mana no inventário!`, 'danger');
-        return;
-      }
-      hero.inventory.manaElixir--;
-      const manaRec = 45;
-      hero.mana = Math.min(hero.maxMana, hero.mana + manaRec);
-      playSound('heal');
-      spawnFloatingText(`+${manaRec} MP`, '#1e90ff');
-      log(`[Mochila]: Usou Elixir de Mana! Recuperou +${manaRec} MP.`, 'heal');
-
-      saveGame();
-      if (inCombat) enemyTurn();
-      else updateControls();
-    }
-
-    function useFireScroll() {
-      if (hero.inventory.fireScroll <= 0) {
-        log(`[Mochila]: Sem Pergaminhos de Fogo!`, 'danger');
-        return;
-      }
-      if (!inCombat) {
-        log(`[Mochila]: O Pergaminho de Fogo só pode ser usado em combate!`, 'status');
-        return;
-      }
-      hero.inventory.fireScroll--;
-      playSound('magic');
-      const dmg = 65;
-      currentEnemy.hp -= dmg;
-      spawnFloatingText(`-${dmg}`, '#ffa502');
-      log(`[Mochila]: Usou Pergaminho de Fogo! Causou ${dmg} de dano explosivo no inimigo!`, 'combat');
-
-      checkCombatState();
-    }
-
-    function shopMenu() {
-      const weaponCost = hero.weaponLvl * 50;
-      const armorCost = hero.armorLvl * 50;
-      const weaponName = weaponNames[Math.min(hero.weaponLvl, weaponNames.length - 1)];
-      const armorName = armorNames[Math.min(hero.armorLvl, armorNames.length - 1)];
-
-      log(`[Loja]: O que deseja comprar ou forjar?`, 'sys');
-
-      buttonsContainer.innerHTML = `
-        <button class="btn-bag" onclick="buyHpPotion()">🧪 Poção HP (25g)</button>
-        <button class="btn-status" onclick="buyManaElixir()">🧪 Elixir MP (30g)</button>
-        <button class="btn-explore" onclick="buyScroll()">📜 Pergaminho (45g)</button>
-        <button class="btn-explore" onclick="upgradeWeapon()">🗡️ ${weaponName} (${weaponCost}g)</button>
-        <button class="btn-status" onclick="upgradeArmor()">🛡️ ${armorName} (${armorCost}g)</button>
-        <button class="btn-rest" onclick="updateControls()">⬅️ Voltar</button>
-      `;
-    }
-
-    function buyHpPotion() {
-      if (hero.gold < 25) {
-        log(`[Loja]: Ouro insuficiente para Poção de HP (25g).`, 'danger');
-        return;
-      }
-      hero.gold -= 25;
-      hero.inventory.hpPotion++;
-      playSound('heal');
-      log(`[Loja]: Comprou 1x Poção de HP!`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function buyManaElixir() {
-      if (hero.gold < 30) {
-        log(`[Loja]: Ouro insuficiente para Elixir de Mana (30g).`, 'danger');
-        return;
-      }
-      hero.gold -= 30;
-      hero.inventory.manaElixir++;
-      playSound('heal');
-      log(`[Loja]: Comprou 1x Elixir de Mana!`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function buyScroll() {
-      if (hero.gold < 45) {
-        log(`[Loja]: Ouro insuficiente para Pergaminho de Fogo (45g).`, 'danger');
-        return;
-      }
-      hero.gold -= 45;
-      hero.inventory.fireScroll++;
-      playSound('heal');
-      log(`[Loja]: Comprou 1x Pergaminho de Fogo!`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function upgradeWeapon() {
-      const cost = hero.weaponLvl * 50;
-      if (hero.gold < cost) {
-        log(`[Loja]: Ouro insuficiente para melhorar a Arma (Custa ${cost}g).`, 'danger');
-        return;
-      }
-
-      hero.gold -= cost;
-      hero.weaponLvl++;
-      const name = weaponNames[Math.min(hero.weaponLvl - 1, weaponNames.length - 1)];
-      playSound('heal');
-      log(`[Loja]: Forjou: ${name} (Nível ${hero.weaponLvl})! Dano aumentado.`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function upgradeArmor() {
-      const cost = hero.armorLvl * 50;
-      if (hero.gold < cost) {
-        log(`[Loja]: Ouro insuficiente para melhorar a Armadura (Custa ${cost}g).`, 'danger');
-        return;
-      }
-
-      hero.gold -= cost;
-      hero.armorLvl++;
-      hero.maxHp += 20;
-      hero.hp += 20;
-      const name = armorNames[Math.min(hero.armorLvl - 1, armorNames.length - 1)];
-      playSound('heal');
-      log(`[Loja]: Forjou: ${name} (Nível ${hero.armorLvl})! Defesa e HP máximo aumentados (+20 HP).`, 'heal');
-      saveGame();
-      shopMenu();
-    }
-
-    function rest() {
-      if (hero.gold < 30) {
-        log(`[Taverna]: Ouro insuficiente para descansar (Custa 30g).`, 'danger');
-        return;
-      }
-      if (hero.hp === hero.maxHp && hero.mana === hero.maxMana) {
-        log(`[Taverna]: Você já está com a vida e mana no máximo.`, 'status');
-        return;
-      }
-
-      hero.gold -= 30;
-      hero.hp = hero.maxHp;
-      hero.mana = hero.maxMana;
-      playSound('heal');
-      spawnFloatingText('RESTED!', '#2ed573');
-      log(`[Taverna]: Você pagou 30g, descansou e recuperou todo HP e Mana!`, 'heal');
-      saveGame();
-    }
-    // --- SISTEMA DE CLASSE, VÍNCULO E TROCAS (RISE OF MALAZAR) ---
-
-function criarItemMasmorra(nomeItem, tipoItem, classeObrigatoria, ataqueBase) {
-    return {
-        id: "item_" + Date.now(),
-        nome: nomeItem,
-        tipo: tipoItem,
-        classePermitida: classeObrigatoria,
-        ataque: ataqueBase,
-        isTraded: false,
-        boundToPlayer: false
-    };
-}
-
-function receberItemDeTroca(item, heroi) {
-    if (item.isTraded || item.boundToPlayer) {
-        alert("Este item já foi negociado anteriormente e está vinculado a um jogador. Não pode ser trocado novamente!");
-        return false;
-    }
-    item.isTraded = true;
-    item.boundToPlayer = true;
-    heroi.inventario.push(item);
-    alert(`Recebeste e vinculaste o item: ${item.nome}! Ele agora não pode mais ser trocado.`);
-    return true;
-}
-
-function descartarItemObsoleto(indexInventario, heroi) {
-    const item = heroi.inventario[indexInventario];
-    const ouroRecebido = Math.max(5, Math.floor(item.ataque / 2));
-    heroi.ouro += ouroRecebido;
-    heroi.inventario.splice(indexInventario, 1);
-    alert(`Item destruído com sucesso. Recebeste ${ouroRecebido} de ouro.`);
-    if (typeof atualizarInterfaceInventario === 'function') {
-        atualizarInterfaceInventario();
-    }
-}
-    // --- SISTEMA DE RESTRIÇÃO DE EQUIPAMENTOS POR CLASSE (RISE OF MALAZAR) ---
-
-// Define quais tipos de armas/itens cada classe pode equipar
-const restricoesDeClasse = {
-    "Guerreiro": ["Espada", "Machado", "Escudo", "Armadura Pesada"],
-    "Mago": ["Cajado", "Livro", "Grimório", "Armadura Leve"],
-    "Assassino": ["Adaga", "Lâmina", "Armadura Leve"],
-    "Sacerdote": ["Maça", "Martelo", "Cajado", "Armadura Média"]
-};
-
-// Função para verificar se o herói pode equipar o item
-function heroiPodeEquipar(heroi, item) {
-    // Se o item não tiver restrição de classe, qualquer um pode equipar
-    if (!item.classePermitida && !item.tipo) return true;
-
-    const classeHeroi = heroi.classe;
-    const tiposPermitidos = restricoesDeClasse[classeHeroi] || [];
-
-    // Verifica se a classe do herói é compatível com a exigência do item
-    const classeCompativel = !item.classePermitida || item.classePermitida === classeHeroi;
-    const tipoCompativel = !item.tipo || tiposPermitidos.includes(item.tipo);
-
-    if (!classeCompativel || !tipoCompativel) {
-        alert(`O ${classeHeroi} não tem treino suficiente para equipar ${item.nome}! (Restrito a: ${item.classePermitida || 'Classes específicas'})`);
-        return false;
-    }
-
-    return true;
-}
-
-// Função para tentar equipar um item do inventário
-function tentarEquiparItem(indexInventario, heroi) {
-    const item = heroi.inventario[indexInventario];
-    
-    if (!heroiPodeEquipar(heroi, item)) {
-        return false;
-    }
-
-    // Se passou na validação, equipa o item (exemplo básico de slot)
-    heroi.equipado = heroi.equipado || {};
-    heroi.equipado[item.tipo] = item;
-    
-    // Remove do inventário ao equipar
-    heroi.inventario.splice(indexInventario, 1);
-    
-    alert(`Equipado com sucesso: ${item.nome}!`);
-    
-    if (typeof atualizarInterfaceInventario === 'function') {
-        atualizarInterfaceInventario();
-    }
-    return true;
-}
-    // --- BOTÃO VISUAL DE DESCARTE NO INVENTÁRIO (RISE OF MALAZAR) ---
-
-// Função auxiliar para atualizar a exibição do inventário com o botão de reciclagem
-function renderizarInventarioVisual(heroi) {
-    // Procura o contentor do inventario no HTML
-    const containerInventario = document.getElementById('inventario-container') || document.getElementById('inventario');
-    
-    if (!containerInventario) {
-        console.warn("Contentor do inventário não encontrado na DOM.");
-        return;
-    }
-
-    containerInventario.innerHTML = ''; // Limpa a lista atual
-
-    if (!heroi.inventario || heroi.inventario.length === 0) {
-        containerInventario.innerHTML = '<p>O inventário está vazio.</p>';
-        return;
-    }
-
-    heroi.inventario.forEach((item, index) => {
-        const divItem = document.createElement('div');
-        divItem.className = 'item-inventario-card';
-        
-        // Define texto de vínculo ou restrição se houver
-        const statusVinculo = item.boundToPlayer ? '🔒 (Vinculado)' : '✨ (Negociável)';
-        const infoClasse = item.classePermitida ? `[Classe: ${item.classePermitida}]` : '';
-
-        divItem.innerHTML = `
-            <span><strong>${item.nome}</strong> (${item.tipo}) - Atq: ${item.ataque} ${infoClasse} ${statusVinculo}</span>
-            <div>
-                <button onclick="tentarEquiparItem(${index}, heroi)">Equipar</button>
-                <button onclick="descartarItemObsoleto(${index}, heroi)" style="background-color: #a93226; color: white;">Reciclar</button>
+<body>
+
+    <!-- TELA DE INÍCIO -->
+    <div id="tela-inicio">
+        <div class="livro-capa">
+            <h1 class="titulo-jogo">MALAZAR</h1>
+            <p class="subtitulo">Crônicas de uma Era Esquecida</p>
+            <div class="divisor"></div>
+            
+            <div class="botoes">
+                <button class="botao" onclick="mostrarModos()">⚔️ INICIAR AVENTURA</button>
+                <button class="botao" onclick="mostrarHistoria()">📜 O Pergaminho</button>
             </div>
-        `;
-        
-        containerInventario.appendChild(divItem);
-    });
-}
 
-// Atualiza a interface do inventário utilizando a variável heroi do jogo
-function atualizarInterfaceInventario() {
-    if (typeof heroi !== 'undefined' && heroi) {
-        renderizarInventarioVisual(heroi);
-    }
-}
-    // --- CORREÇÃO AUTOMÁTICA DA RENDERIZAÇÃO DO INVENTÁRIO (RISE OF MALAZAR) ---
-function renderizarInventarioVisual(heroi) {
-    let containerInventario = document.getElementById('inventario-container');
-    
-    // Se o contentor não existir no HTML, cria-o dinamicamente logo abaixo do HUD do herói
-    if (!containerInventario) {
-        containerInventario = document.createElement('div');
-        containerInventario.id = 'inventario-container';
-        containerInventario.style.margin = '10px 0';
-        containerInventario.style.padding = '10px';
-        containerInventario.style.background = '#10141d';
-        containerInventario.style.border = '1px solid #e1b12c';
-        containerInventario.style.borderRadius = '6px';
-        
-        const heroHud = document.getElementById('hero-hud');
-        if (heroHud && heroHud.parentNode) {
-            heroHud.parentNode.insertBefore(containerInventario, heroHud.nextSibling);
-        } else {
-            const gameScreen = document.getElementById('game-screen') || document.body;
-            gameScreen.prepend(containerInventario);
-        }
-    }
+            <p class="rodape">Rise of Malazar © 2026 — Todos os Direitos Reservados</p>
+        </div>
+    </div>
 
-    containerInventario.innerHTML = '<h3 style="color: #e1b12c; font-size: 0.95rem; margin-bottom: 8px;">📦 Inventário e Equipamentos</h3>';
-
-    if (!heroi.inventario || heroi.inventario.length === 0) {
-        containerInventario.innerHTML += '<p style="font-size: 0.85rem; color: #aaa;">O inventário está vazio.</p>';
-        return;
-    }
-
-    heroi.inventario.forEach((item, index) => {
-        const divItem = document.createElement('div');
-        divItem.style.display = 'flex';
-        divItem.style.justifyContent = 'space-between';
-        divItem.style.alignItems = 'center';
-        divItem.style.margin = '6px 0';
-        divItem.style.padding = '6px';
-        divItem.style.background = '#1a212e';
-        divItem.style.borderRadius = '4px';
-        divItem.style.border = '1px solid #2f3542';
-        
-        const statusVinculo = item.boundToPlayer ? '🔒 (Vinculado)' : '✨ (Negociável)';
-        const infoClasse = item.classePermitida ? `[Classe: ${item.classePermitida}]` : '';
-
-        divItem.innerHTML = `
-            <span style="font-size: 0.8rem; color: #fff;"><strong>${item.nome}</strong> (${item.tipo}) - Atq: ${item.ataque} ${infoClasse} ${statusVinculo}</span>
-            <div>
-                <button onclick="tentarEquiparItem(${index}, heroi)" style="margin-right: 4px; padding: 3px 6px; background: #2ed573; border: none; border-radius: 3px; color: #fff; font-size: 0.75rem; cursor: pointer;">Equipar</button>
-                <button onclick="descartarItemObsoleto(${index}, heroi)" style="padding: 3px 6px; background: #a93226; border: none; border-radius: 3px; color: #fff; font-size: 0.75rem; cursor: pointer;">Reciclar</button>
+    <!-- TELA DE HISTÓRIA -->
+    <div id="tela-historia" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:101;background:rgba(20,16,10,0.9);padding:2rem;">
+        <div class="pergaminho">
+            <h2>O Despertar de Malazar</h2>
+            <p>
+                Nos tempos antigos, quando o mundo ainda era jovem, foi selado sob a terra profunda um poder que nenhum reino ousava nomear: <span class="destaque">Malazar</span>.<br><br>
+                Uma entidade nascida da sombra e da ambição, que outrora desafiou os próprios deuses e foi banida para além do véu. Mas as correntes estão se rompendo...<br><br>
+                Agora, herói, cabe a ti — sozinho ou ao lado de aliados — enfrentar a escuridão que desperta. A lenda não será escrita nas estrelas, mas na coragem daqueles que ousam lutar.
+            </p>
+            <div style="text-align:center;margin-top:2rem;">
+                <button class="botao voltar" onclick="voltarInicio()">← Retornar</button>
             </div>
-        `;
-        
-        containerInventario.appendChild(divItem);
-    });
+        </div>
+    </div>
+
+    <!-- TELA DE SELEÇÃO DE MODOS -->
+    <div id="tela-modos" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:102;background:rgba(20,16,10,0.95);padding:2rem;">
+        <div class="livro-capa" style="max-width:700px;">
+            <h2 style="font-family:'Cinzel',serif;margin-bottom:1rem;">Escolha seu Caminho</h2>
+            <p style="color:var(--tinta-suave);margin-bottom:0.5rem;">Como enfrentarás a ameaça de Malazar?</p>
+            
+            <div class="modos-grid">
+                <div class="modo-card" onclick="iniciarJogo('pvp1')">
+                    <div class="modo-titulo">⚔️ Duelo 1×1</div>
+                    <div class="modo-desc">Jogador vs Jogador</div>
+                </div>
+                <div class="modo-card" onclick="iniciarJogo('pvp3')">
+                    <div class="modo-titulo">🛡️ Batalha 3×3</div>
+                    <div class="modo-desc">Equipes em confronto</div>
+                </div>
+                <div class="modo-card" onclick="iniciarJogo('pve')">
+                    <div class="modo-titulo">👹 Crônicas PvE</div>
+                    <div class="modo-desc">Enfrente as forças de Malazar</div>
+                </div>
+            </div>
+            
+            <button class="botao voltar" style="margin-top:2rem;" onclick="voltarInicio()">← Voltar</button>
+        </div>
+    </div>
+
+    <!-- ÁREA DO JOGO -->
+    <div id="jogo">
+        <div class="painel-topo">
+            <div class="quadro-status">
+                <div class="nome-chefe" id="nome-oponente">—</div>
+                <div class="barra-vida"><div class="vida" id="barra-vida"></div></div>
+            </div>
+            <div class="caixa-info">
+                <strong>Modo:</strong> <span id="modo-atual">—</span><br>
+                <strong>Fase:</strong> <span id="fase">1</span>
+            </div>
+        </div>
+
+        <div class="tela-campo" id="tela-campo"></div>
+
+        <div class="comandos">
+            ⌨️ Setas = Mover<br>
+            ⚔️ Espaço = Ataque<br>
+            🛡️ Shift = Defesa<br>
+            ✨ 1–4 = Habilidades
+        </div>
+    </div>
+
+<script>
+function mostrarHistoria() {
+    document.getElementById('tela-inicio').classList.add('escondido');
+    document.getElementById('tela-historia').classList.remove('escondido');
 }
 
-function atualizarInterfaceInventario() {
-    if (typeof heroi !== 'undefined' && heroi) {
-        renderizarInventarioVisual(heroi);
-    }
-}
-    // --- SISTEMA DE DROP DE ITENS E LIGAÇÃO DE TELA (RISE OF MALAZAR) ---
-
-// Lista de itens possíveis de serem encontrados nas masmorras
-const itensPossiveisDrop = [
-    { nome: "Adaga Envenenada", tipo: "Adaga", ataque: 12, classePermitida: "Assassino", boundToPlayer: false },
-    { nome: "Cajado de Iniciado", tipo: "Cajado", ataque: 15, classePermitida: "Mago", boundToPlayer: false },
-    { nome: "Espada Longa de Aço", tipo: "Espada", ataque: 18, classePermitida: "Guerreiro", boundToPlayer: false },
-    { nome: "Martelo Sagrado", tipo: "Martelo", ataque: 14, classePermitida: "Sacerdote", boundToPlayer: false },
-    { nome: "Armadura de Couro Batido", tipo: "Armadura Leve", ataque: 0, classePermitida: null, boundToPlayer: false }
-];
-
-// Função chamada após vencer um combate para sortear um item para o herói
-function sortearItemAposCombate(heroi) {
-    // 40% de chance de dropar um item ao vencer
-    if (Math.random() < 0.40) {
-        const itemSorteado = JSON.parse(JSON.stringify(itensPossiveisDrop[Math.floor(Math.random() * itensPossiveisDrop.length)]));
-        
-        heroi.inventario = heroi.inventario || [];
-        heroi.inventario.push(itemSorteado);
-        
-        // Exibe no log do jogo se ele existir
-        const logDiv = document.getElementById('log');
-        if (logDiv) {
-            logDiv.innerHTML += `<br><span style="color: #2ed573;">[Espólios]: Encontrou um novo item: ${itemSorteado.nome}!</span>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
-        
-        atualizarInterfaceInventario();
-    }
+function mostrarModos() {
+    document.getElementById('tela-inicio').classList.add('escondido');
+    document.getElementById('tela-modos').classList.remove('escondido');
 }
 
-// --- SISTEMA DE EQUIPAMENTOS E NAVEGAÇÃO (RISE OF MALAZAR) ---
-function abrirPainelEquipamentos() {
-    if (typeof heroi !== 'undefined' && heroi) {
-        if (typeof renderizarInventarioVisual === 'function') {
-            renderizarInventarioVisual(heroi);
-        }
-    }
+function voltarInicio() {
+    document.querySelectorAll('#tela-historia, #tela-modos').forEach(el => el.classList.add('escondido'));
+    document.getElementById('tela-inicio').classList.remove('escondido');
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const botoes = document.querySelectorAll('button');
-    botoes.forEach(btn => {
-        if (btn.textContent.includes("Loja / Equipamento") || btn.textContent.includes("Equipamento")) {
-            btn.addEventListener("click", () => {
-                abrirPainelEquipamentos();
-            });
-        }
-    });
-});
-    // --- LIMITADOR DE LOG PERFEITO (RISE OF MALAZAR) ---
-setInterval(() => {
-    const logDiv = document.getElementById('log');
-    if (logDiv && logDiv.offsetParent !== null) {
-        // Pega em todos os elementos de texto/linhas dentro do log
-        const itens = logDiv.children;
-        
-        // Se houver mais do que 2 linhas, remove a mais antiga do topo continuamente
-        while (itens.length > 2) {
-            logDiv.removeChild(itens[0]);
-        }
-    }
-}, 100);
-    // --- SISTEMA DE EQUIPAMENTOS E AFINIDADE DE CLASSES (RISE OF MALAZAR) ---
-
-// Define as afinidades permitidas para cada classe do herói
-const afinidadesClasse = {
-    "Guerreiro": { armas: ["Espada", "Machado", "Espadão"], armaduras: ["Pesada", "Placas"] },
-    "Mago": { armas: ["Cajado", "Varinha"], armaduras: ["Manto", "Tecido"] },
-    "Assassino": { armas: ["Adaga", "Katana"], armaduras: ["Leve", "Couro"] },
-    "Sacerdote": { armas: ["Maça", "Cetro"], armaduras: ["Média", "Malha"] }
-};
-
-// Função para validar e equipar um item com base na classe atual
-function tentarEquiparItem(heroi, item) {
-    if (!heroi || !item) return false;
-
-    // Obtém a classe do herói (ex: "Mago", "Guerreiro", etc.)
-    const classeHeroi = heroi.classe || "Guerreiro";
-    const regras = afinidadesClasse[classeHeroi];
-
-    if (!regras) {
-        log(`[Equipamento]: Classe desconhecida para validação!`);
-        return false;
-    }
-
-    // Verifica se o tipo do item corresponde às restrições da classe
-    const eArmaValida = item.tipo === 'arma' && regras.armas.includes(item.subtipo);
-    const eArmaduraValida = item.tipo === 'armadura' && regras.armaduras.includes(item.subtipo);
-
-    if (eArmaValida || eArmaduraValida) {
-        log(`[Equipamento]: ${heroi.name} equipou com sucesso: ${item.nome}!`);
-        // Aqui aplicamos o item ao slot correspondente do herói
-        if (item.tipo === 'arma') {
-            heroi.armaEquipada = item;
-        } else {
-            heroi.armaduraEquipada = item;
-        }
-        return true;
-    } else {
-        log(`[Equipamento]: A classe ${classeHeroi} não possui afinidade com ${item.nome}!`);
-        return false;
-    }
-}
-    // --- RENDERIZAÇÃO SIMPLES DO INVENTÁRIO (RISE OF MALAZAR) ---
-function renderizarInventarioVisual(heroi) {
-    if (!heroi) return;
+function iniciarJogo(modo) {
+    document.getElementById('tela-modos').classList.add('escondido');
+    document.getElementById('jogo').style.display = 'block';
     
-    // Garante que o herói tem uma lista de itens na mochila
-    if (!heroi.inventarioItens) {
-        heroi.inventarioItens = [];
-    }
-
-    log(`[Inventario]: A abrir mochila de ${heroi.name} (${heroi.classe})...`);
-    
-    // Se houver itens, lista-os; caso contrário, avisa que está vazia
-    if (heroi.inventarioItens.length === 0) {
-        log(`[Inventario]: A mochila está vazia.`);
-    } else {
-        heroi.inventarioItens.forEach((item, index) => {
-            log(`[Item ${index + 1}]: ${item.nome} (${item.tipo} - ${item.subtipo})`);
-        });
-    }
-}
-    // --- AÇÃO DE EQUIPAR OU RECICLAR ITEM (RISE OF MALAZAR) ---
-function interagirPrimeiroItem(heroi) {
-    if (!heroi || !heroi.inventarioItens || heroi.inventarioItens.length === 0) {
-        log(`[Inventario]: Não há itens na mochila para interagir.`);
-        return;
-    }
-
-    // Pega no primeiro item da mochila
-    const item = heroi.inventarioItens[0];
-    
-    // Tenta equipar usando a validação de classe criada anteriormente
-    const equipadoComSucesso = tentarEquiparItem(heroi, item);
-
-    if (equipadoComSucesso) {
-        // Se equipou com sucesso, remove o item da mochila
-        heroi.inventarioItens.shift();
-    } else {
-        // Se a classe não for compatível, recicla o item por ouro (ex: 15 de ouro)
-        const ouroGanho = 15;
-        heroi.gold = (heroi.gold || 0) + ouroGanho;
-        log(`[Reciclagem]: O item ${item.nome} foi reciclado por +${ouroGanho}g.`);
-        heroi.inventarioItens.shift();
-    }
-}
-    // --- SISTEMA DE INVENTÁRIO (BASE SEGURA) ---
-function inicializarInventarioHeroi(h) {
-    if (!h) return;
-    if (!h.inventarioItens) {
-        h.inventarioItens = [];
-    }
-    if (!h.equipamentos) {
-        h.equipamentos = {
-            arma: null,
-            armadura: null
-        };
-    }
-}
-    // --- ADICIONAR ITEM À MOCHILA ---
-function adicionarItemAoHeroi(h, item) {
-    if (!h) return;
-    if (!h.inventarioItens) {
-        h.inventarioItens = [];
-    }
-    h.inventarioItens.push(item);
-    if (typeof log === 'function') {
-        log(`[Inventário]: ${item.nome} adicionado à mochila.`);
-    }
-}
-    // --- EQUIPAR ITEM DO HERÓI ---
-function equiparItemHeroi(h, item) {
-    if (!h || !item) return false;
-    
-    if (!h.equipamentos) {
-        h.equipamentos = { arma: null, armadura: null };
-    }
-
-    if (item.tipo === 'arma') {
-        h.equipamentos.arma = item;
-        if (typeof log === 'function') log(`[Equipamento]: ${item.nome} equipado como arma.`);
-        return true;
-    } else if (item.tipo === 'armadura') {
-        h.equipamentos.armadura = item;
-        if (typeof log === 'function') log(`[Equipamento]: ${item.nome} equipado como armadura.`);
-        return true;
-    }
-    return false;
-}
-    // --- INTERAGIR COM O PRIMEIRO ITEM DA MOCHA ---
-function interagirPrimeiroItem(h) {
-    if (!h || !h.inventarioItens || h.inventarioItens.length === 0) {
-        if (typeof log === 'function') log('[Inventário]: A mochila está vazia.');
-        return;
-    }
-    
-    // Pega o primeiro item
-    const item = h.inventarioItens[0];
-    
-    // Tenta equipar
-    const equipado = equiparItemHeroi(h, item);
-    if (equipado) {
-        // Remove do inventário se foi equipado com sucesso
-        h.inventarioItens.shift();
-    } else {
-        // Se não for equipamento válido, recicla por ouro
-        const ouroGanho = 15;
-        h.gold = (h.gold || 0) + ouroGanho;
-        if (typeof log === 'function') log(`[Reciclagem]: Item ${item.nome} reciclado por ${ouroGanho} de ouro.`);
-        h.inventarioItens.shift();
-    }
-  // --- DIAGNÓSTICO DO INVENTÁRIO ---
-function listarInventario(h) {
-    if (!h) return;
-    if (!h.inventarioItens || h.inventarioItens.length === 0) {
-        if (typeof log === 'function') log('[Mochila]: A mochila está vazia.');
-        return;
-    }
-    if (typeof log === 'function') log(`[Mochila]: A abrir inventário (${h.inventarioItens.length} itens):`);
-    h.inventarioItens.forEach((item, index) => {
-        if (typeof log === 'function') log(`[Item ${index + 1}]: ${item.nome} (${item.tipo})`);
-    });
-}
-}
-    // --- ATRIBUTOS DE COMBATE E PROGRESSÃO DO HERÓI (FASE 2 ATUALIZADA) ---
-function inicializarAtributosHeroi(h) {
-    if (!h) return;
-    
-    // Inicializa o objeto de atributos caso ainda não exista
-    h.atributos = h.atributos || {
-        // Atributos Primários / Base
-        destreza: 10,       // Influencia diretamente a Precisão e a velocidade/crítico
-        
-        // Ofensiva e Precisão
-        danoFisico: 10,
-        danoMagico: 5,
-        critico: 5,         // Percentagem base de crítico (ex: 5%)
-        precisao: 10,       // Counter direto da Evasão (escala com a Destreza)
-        
-        // Defesa e Sobrevivência
-        defesaFisica: 5,
-        resistencia: 5,     // Defesa Mágica
-        evasao: 5,          // Percentagem base de esquiva (anulada pela Precisão)
-        
-        // Mecânica Especial de Escudo
-        bloqueio: 0         // 0 por defeito (só ativa se equipar escudo)
+    const nomes = {
+        pvp1: 'Duelo 1×1',
+        pvp3: 'Batalha 3×3',
+        pve: 'Crônicas PvE — Malazar'
     };
     
-    if (typeof log === 'function') log('[Herói]: Atributos de combate, destreza e precisão inicializados com sucesso.');
-}
-    // --- SISTEMA DE CRIAÇÃO E ATRIBUTOS DO HERÓI (FASE 2 COMPLETA) ---
-function criarHeroi(nome, genero, raca, classe) {
-    let heroi = {
-        nome: nome || "Aventureiro",
-        genero: genero || "Não especificado",
-        raca: raca || "Humano",
-        classe: classe || "Guerreiro",
-        
-        // Atributos base e de combate
-        atributos: {
-            destreza: 10,
-            danoFisico: 10,
-            danoMagico: 5,
-            critico: 5,         // 5% base
-            precisao: 10,       // Escala com Destreza contra Evasão
-            defesaFisica: 5,
-            resistencia: 5,     // Defesa Mágica
-            evasao: 5,          // 5% base
-            bloqueio: 0         // Exclusivo de escudo
-        },
-        
-        // Inventário e Equipamentos (já estabelecidos na Fase 1)
-        inventarioItens: [],
-        equipamentos: {
-            arma: null,
-            armadura: null,
-            escudo: null
-        }
-    };
-
-          if (typeof log === 'function') {
-        log(`[Herói Criado]: ${heroi.nome}`);
-    }
-
-    inicializarAtributosHeroi(heroi);
-    atualizarInterfacePersonagem(heroi);
-
-    return heroi;
-}
-
-// Aplicação matemática e segura dos bónus de Raça
-function aplicarBonusRacial(h) {
-    switch (h.raca.toLowerCase()) {
-        case 'elfo':
-            h.atributos.evasao += 5;
-            h.atributos.precisao += 3;
-            h.passivaRacial = "Graça Élfica (+5 Evasão, +3 Precisão)";
-            break;
-        case 'meio-orc':
-        case 'meio orc':
-            h.atributos.danoFisico += 3;
-            h.atributos.critico += 3;
-            h.passivaRacial = "Fúria Bruta (+3 Dano Físico, +3% Crítico)";
-            break;
-        case 'tiefling':
-            h.atributos.resistencia += 5;
-            h.atributos.danoMagico += 3;
-            h.passivaRacial = "Sangue Demoníaco (+5 Resistência Mágica, +3 Dano Mágico)";
-            break;
-        case 'humano':
-        default:
-            // Versatilidade equilibrada
-            h.atributos.danoFisico += 1;
-            h.atributos.danoMagico += 1;
-            h.atributos.defesaFisica += 1;
-            h.atributos.resistencia += 1;
-            h.passivaRacial = "Adaptação (Atributos equilibrados)";
-            break;
-    }
-}
-
-// Aplicação de Características de Classe
-function aplicarBonusClasse(h) {
-    switch (h.classe.toLowerCase()) {
-        case 'guerreiro':
-            h.atributos.defesaFisica += 5;
-            h.passivaClasse = "Muralha de Aço (Especialista em Defesa e Escudos)";
-            break;
-        case 'ladino':
-        case 'caçador':
-            h.atributos.destreza += 5;
-            h.atributos.critico += 5;
-            h.passivaClasse = "Golpe Sombra (Foco em Agilidade e Crítico)";
-            break;
-        case 'mago':
-            h.atributos.danoMagico += 8;
-            h.passivaClasse = "Clarividência Arcana (Artilharia de Dano Mágico)";
-            break;
-        case 'clérigo':
-        case 'paladino':
-            h.atributos.resistencia += 4;
-            h.atributos.defesaFisica += 3;
-            h.passivaClasse = "Bênção Divina (Suporte e Resistência de Grupo)";
-            break;
-        default:
-            h.passivaClasse = "Aventureiro Genérico";
-            break;
-    }
-}
-    // --- RENDERIZAÇÃO DA ABA PERSONAGEM (VERSÃO ULTRA-SEGURA) ---
-function atualizarInterfacePersonagem(alvo) {
-    // Garante que apanhamos o objeto global 'hero' caso nenhum seja passado
-    let h = alvo || window.hero || {};
+    document.getElementById('modo-atual').textContent = nomes[modo];
+    document.getElementById('nome-oponente').textContent = modo === 'pve' ? 'MALAZAR' : 'Oponente';
     
-    function setElementText(id, text) {
-        let el = document.getElementById(id);
-        if (el) el.innerText = text;
-    }
-
-    setElementText('ui-nome', h.nome || h.name || 'Dimitrian');
-    setElementText('ui-genero', h.genero || h.gender || '-');
-    setElementText('ui-raca', h.raca || h.race || '-');
-    setElementText('ui-passiva-raca', h.passivaRacial ? `[${h.passivaRacial}]` : '');
-    
-    setElementText('ui-classe', h.classe || h.class || '-');
-    setElementText('ui-passiva-classe', h.passivaClasse ? `[${h.passivaClasse}]` : '');
-
-    // Verifica atributos no objeto ou usa 5 como base inicial acordada
-    let attr = h.atributos || h.attributes || h;
-    
-        let forca = h.forca ?? h.atributos?.forca ?? 5;
-    let destreza = h.destreza ?? h.atributos?.destreza ?? 5;
-    let vitalidade = h.vitalidade ?? h.atributos?.vitalidade ?? 5;
-    let defesa = h.defesa ?? h.atributos?.defesa ?? 5;
-    let resistencia = h.resistencia ?? h.atributos?.resistencia ?? 5;
-    let inteligencia = h.inteligencia ?? h.atributos?.inteligencia ?? 5;
-
-    setElementText('ui-forca', forca);
-    setElementText('ui-destreza', destreza);
-    setElementText('ui-vitalidade', vitalidade);
-    setElementText('ui-defesa', defesa);
-    setElementText('ui-resistencia', resistencia);
-    setElementText('ui-inteligencia', inteligencia);
-
-    let hpCalculado = vitalidade * 10;
-    let mpCalculado = inteligencia * 10;
-
-    if (h.hpMax !== undefined) h.hpMax = hpCalculado;
-    if (h.mpMax !== undefined) h.mpMax = mpCalculado;
-
-    setElementText('txt-hp', `${h.hp !== undefined ? h.hp : hpCalculado}/${hpCalculado}`);
-    setElementText('txt-mp', `${h.mp !== undefined ? h.mp : mpCalculado}/${mpCalculado}`);
+    console.log('🎮 Modo iniciado:', modo);
 }
-  </script>
+</script>
+
 </body>
 </html>
