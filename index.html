@@ -164,6 +164,17 @@
 <button class="botao" onclick="alert('Em breve!')">📜 A História</button>
 
         </div>
+                width: auto; margin: 0; padding: 0.8rem 1rem;" onclick="enviarMsg()">✉️</button>
+            </div>
+            <button class="botao" style="margin-top:0.5rem;" onclick="fecharTaverna()">← Voltar à Cidade</button>
+        </div>
+
+        <div id="painel-ficha" class="escondido" style="flex:1; overflow-y:auto;">
+            <h3>📊 Ficha Completa</h3>
+            <div class="divisor"></div>
+            <div id="conteudo-ficha"></div>
+            <button class="botao" onclick="fecharFicha()">← Voltar</button>
+        </div>
 
         <div id="painel-ferreiro" class="escondido" style="flex:1; overflow-y:auto;">
             <h3>🔨 Ferreiro — Melhorar Atributos</h3>
@@ -255,52 +266,46 @@ const INIMIGOS = {
     chefe: {nome:'👹 Cultista de Malazar',des:14,agi:12,for:18,int:16,con:20,sor:15,xp:500,ouro:100}
 };
 
-// =============================================
-// ESTADO GLOBAL
-// =============================================
 let jogador = null;
 let selecionado = {raca:null,classe:null,genero:null};
 let ptsAlocados = {des:0,agi:0,for:0,int:0,con:0,sor:0};
 let ptsDisponiveis = 3;
 let progresso = {
     nivel:1, xp:0, xpProx:100, sala:0, ouro:20, pocoes:2,
-    function montarCriacao() {
-    // Carrega RAÇAS
-    const racasDiv = document.getElementById('lista-racas');
-    if (!racasDiv) {
-        console.error('Elemento lista-racas NÃO ENCONTRADO!');
-        return;
-    }
-    racasDiv.innerHTML = RACAS.map(r=>`
-        <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
-            <div class="opcao-img">
-                <span class="icone-grande">${r.nome.split(' ')[0]}</span>
-                <div>
-                    <div style="font-weight:bold;">${r.nome.split(' ')[1]}</div>
-                    <div class="info">${r.desc}</div>
-                    <div style="font-size:0.75rem; color:var(--sucesso); margin-top:0.2rem;">✨ ${r.passiva.substring(0,40)}...</div>
-                </div>
-            </div>
-        </div>`).join('');
+    vidaAtual:null, manaAtual:null, ptsParaDistribuir:0,
+    masmorraConcluida:false
+};
+let inimigoAtual = null;
+let combate = {
+    turnoJog:true, habUsada:false, magiasUsadas:0, bloqueioAtivo:false,
+    passivaAtivada:{}, turnoExtra:false, log:[]
+};
+let mensagensChat = [];
+let ultimoEnvio = 0;
+let jogadoresOnline = [
+    {nome:'GuerreiroLuz',classe:'⚔️',nivel:42},
+    {nome:'LuaMística',classe:'🔮',nivel:38},
+    {nome:'FogoSagrado',classe:'🛡️',nivel:51},
+    {nome:'SombraRápida',classe:'🥷',nivel:29}
+];
 
-    // Carrega CLASSES
-    const classesDiv = document.getElementById('lista-classes');
-    if (!classesDiv) {
-        console.error('Elemento lista-classes NÃO ENCONTRADO!');
-        return;
-    }
-    classesDiv.innerHTML = CLASSES.map(c=>`
-        <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
-            <div class="opcao-img">
-                <span class="icone-grande">${c.nome.split(' ')[0]}</span>
-                <div>
-                    <div style="font-weight:bold;">${c.nome.split(' ')[1]}</div>
-                    <div class="info">DES:${c.base.des} AGI:${c.base.agi} FOR:${c.base.for} INT:${c.base.int} CON:${c.base.con} SOR:${c.base.sor}</div>
-                </div>
-            </div>
-        </div>`).join('');
-
-    montarGradePts();
+function trocarTela(id) {
+    document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
+    document.getElementById(id).classList.remove('escondido');
+}
+function salvar() {
+    localStorage.setItem('malazar_jog',JSON.stringify(jogador));
+    localStorage.setItem('malazar_prog',JSON.stringify(progresso));
+}
+function carregar() {
+    const j = localStorage.getItem('malazar_jog');
+    const p = localStorage.getItem('malazar_prog');
+    if(j && p) { jogador=JSON.parse(j); progresso=JSON.parse(p); return true; }
+    return false;
+}
+function agoraHora() {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 function iniciar() {
@@ -417,44 +422,104 @@ function voltarInicio() {
 function telaHistoria() {
     alert('Malazar foi selado há eras... mas seus cultistas espalham-se pelas masmorras. Você é a luz que deve deter a sombra antes que desperte.');
 }
-
-// =============================================
-// CÁLCULOS DE STATUS
-// =============================================
-function calcularVida() { return jogador.atr.con*6 + jogador.atr.for*2; }
-function calcularMana() { return jogador.atr.int*5 + jogador.atr.sor*2; }
-function atualizarBarrasCidade() {
-    const vd = calcularVida();
-    const mn = calcularMana();
-    document.getElementById('val-vida').textContent = `${progresso.vidaAtual||vd}/${vd}`;
-    document.getElementById('bar-vida').style.width = `${((progresso.vidaAtual||vd)/vd)*100}%`;
-    document.getElementById('val-mana').textContent = `${progresso.manaAtual||mn}/${mn}`;
-    document.getElementById('bar-mana').style.width = `${((progresso.manaAtual||mn)/mn)*100}%`;
-    document.getElementById('nivel-display').textContent = progresso.nivel;
-    document.getElementById('xp-display').textContent = progresso.xp;
-    document.getElementById('xpprox-display').textContent = progresso.xpProx;
-    document.getElementById('ouro-display').textContent = progresso.ouro;
-    if(progresso.ptsParaDistribuir>0) {
-        document.getElementById('pts-aviso').textContent = `✨ Você tem ${progresso.ptsParaDistribuir} ponto(s) para distribuir!`;
-        document.getElementById('pts-aviso').classList.remove('escondido');
-    } else {
-        document.getElementById('pts-aviso').textContent = '';
-    }
-}
-
 // =============================================
 // CIDADE
 // =============================================
 function montarCidade() {
-    document.getElementById('nome-cidade').textContent = `🏰 ${jogador.nome} — Cidade de Malazar`;
-    if(!progresso.vidaAtual) {
-        progresso.vidaAtual = calcularVida();
-        progresso.manaAtual = calcularMana();
-    }
-    atualizarBarrasCidade();
-    fecharTaverna();
-    fecharFicha();
-    fecharFerreiro();
+    document.getElementById('nm-jogador').textContent = jogador.nome;
+    document.getElementById('nvl-jogador').textContent = progresso.nivel;
+    document.getElementById('barra-xp').style.width = `${(progresso.xp/progresso.xpProx)*100}%`;
+    document.getElementById('val-xp').textContent = `${progresso.xp}/${progresso.xpProx}`;
+    document.getElementById('ouro').textContent = progresso.ouro;
+    document.getElementById('pocoes').textContent = progresso.pocoes;
+    atualizarFicha();
+}
+function atualizarFicha() {
+    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
+    document.getElementById('conteudo-ficha').innerHTML = `
+        <p><b>Raça:</b> ${jogador.raca.nome}</p>
+        <p><b>Classe:</b> ${jogador.classe.nome}</p>
+        <p><b>Passiva:</b> ${jogador.raca.passiva}</p>
+        <div class="divisor"></div>
+        ${Object.keys(nomes).map(ch=>`<p>${nomes[ch]}: <b>${jogador.atr[ch]}</b></p>`).join('')}
+        <div class="divisor"></div>
+        <p style="color:var(--ouro);">💰 Ouro: ${progresso.ouro}</p>
+        <p style="color:var(--sucesso);">🧪 Poções: ${progresso.pocoes}</p>
+        <p style="color:var(--vida);">❤️ Vida Máx: ${calcularVidaMax()}</p>
+        <p style="color:var(--mana);">💧 Mana Máx: ${calcularManaMax()}</p>
+    `;
+}
+function abrirFicha() {
+    atualizarFicha();
+    document.getElementById('painel-ficha').classList.remove('escondido');
+}
+function fecharFicha() {
+    document.getElementById('painel-ficha').classList.add('escondido');
+}
+function abrirTaverna() {
+    document.getElementById('painel-taverna').classList.remove('escondido');
+    montarChat();
+}
+function fecharTaverna() {
+    document.getElementById('painel-taverna').classList.add('escondido');
+}
+function montarChat() {
+    const caixa = document.getElementById('caixa-chat');
+    caixa.innerHTML = `<div class="msg-sistema">🗣️ Taverna — conversa com outros heróis</div>`;
+    jogadoresOnline.forEach(j=>{
+        caixa.innerHTML += `<div class="msg-heroi"><b>${j.classe} ${j.nome}</b> — Nv ${j.nivel}</div>`;
+    });
+    mensagensChat.forEach(m=>{
+        caixa.innerHTML += `<div class="${m.eu?'msg-eu':'msg-heroi'}"><small>${m.hora}</small><br><b>${m.remetente}:</b> ${m.texto}</div>`;
+    });
+    caixa.scrollTop = caixa.scrollHeight;
+}
+function enviarMsg() {
+    const agora = Date.now();
+    if(agora - ultimoEnvio < 3000) return alert('Aguarde um pouquinho antes de enviar outra mensagem!');
+    const inp = document.getElementById('entrada-chat');
+    const texto = inp.value.trim();
+    if(!texto) return;
+    ultimoEnvio = agora;
+    mensagensChat.push({
+        remetente: jogador.nome,
+        texto,
+        hora: agoraHora(),
+        eu: true
+    });
+    inp.value = '';
+    montarChat();
+}
+function abrirFerreiro() {
+    document.getElementById('painel-ferreiro').classList.remove('escondido');
+    document.getElementById('pts-ferreiro').textContent = Math.floor(progresso.ouro / 50);
+    montarGradeFerreiro();
+}
+function montarGradeFerreiro() {
+    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
+    document.getElementById('grade-ferreiro').innerHTML = Object.keys(nomes).map(ch=>`
+        <div class="atributo">
+            <span>${nomes[ch]}: ${jogador.atr[ch]}</span>
+            <button onclick="melhorarAtributo('${ch}')" ${progresso.ouro<50 || jogador.atr[ch]>=200?'disabled':''}>
+                Melhorar (50💰)
+            </button>
+        </div>`).join('');
+}
+function melhorarAtributo(ch) {
+    if(progresso.ouro < 50 || jogador.atr[ch] >= 200) return;
+    progresso.ouro -= 50;
+    jogador.atr[ch] += 1;
+    salvar();
+    montarCidade();
+    abrirFerreiro();
+}
+function fecharFerreiro() {
+    document.getElementById('painel-ferreiro').classList.add('escondido');
+}
+function entrarMasmorra() {
+    progresso.sala = 0;
+    progresso.masmorraConcluida = false;
+    iniciarCombate();
 }
 function irCidade() {
     trocarTela('tela-cidade');
@@ -462,406 +527,273 @@ function irCidade() {
 }
 
 // =============================================
-// SUBIR DE NÍVEL
+// CÁLCULOS AUXILIARES
 // =============================================
-function ganharXP(qtd) {
-    progresso.xp += qtd;
-    while(progresso.xp >= progresso.xpProx && progresso.nivel < 200) {
-        progresso.xp -= progresso.xpProx;
-        progresso.nivel++;
-        progresso.xpProx = progresso.nivel * 100;
-        progresso.ptsParaDistribuir += 3;
-        alert(`⬆️ Nível ${progresso.nivel}! +3 Pontos de Atributo disponíveis!`);
-    }
-    salvar();
+function calcularVidaMax() {
+    return 50 + jogador.atr.con * 5 + progresso.nivel * 10;
+}
+function calcularManaMax() {
+    return 30 + jogador.atr.int * 3 + progresso.nivel * 5;
+}
+function calcularDano(atacante, defensor, tipo='fisico') {
+    const base = atacante.for || atacante.atr.for;
+    const def = defensor.agilidade || defensor.atr.agi;
+    let dano = Math.floor(base * 0.8 + Math.random() * (base * 0.5));
+    if(tipo === 'magico') dano = Math.floor(atacante.int * 1.0 + Math.random() * (atacante.int * 0.4));
+    const reducao = Math.min(0.8, def / 30);
+    dano = Math.floor(dano * (1 - reducao));
+    return Math.max(1, dano);
+}
+function testarAcerto(atacante, defensor) {
+    const pre = atacante.des || atacante.atr.des;
+    const eva = defensor.agilidade || defensor.atr.agi;
+    const chance = 0.5 + (pre - eva) / 40;
+    return Math.random() < Math.max(0.1, Math.min(0.9, chance));
 }
 
 // =============================================
-// TAVERNA E CHAT
+// COMBATE
 // =============================================
-function abrirTaverna() {
-    document.getElementById('menu-cidade').classList.add('escondido');
-    document.getElementById('painel-taverna').classList.remove('escondido');
-    atualizarListaOnline();
-    renderizarChat();
-}
-function fecharTaverna() {
-    document.getElementById('painel-taverna').classList.add('escondido');
-    document.getElementById('menu-cidade').classList.remove('escondido');
-}
-function atualizarListaOnline() {
-    const div = document.getElementById('lista-online');
-    div.innerHTML = jogadoresOnline.map(j=>`<p><span class="ponto-online"></span>${j.nome} ${j.classe} — Nv ${j.nivel}</p>`).join('');
-}
-function descansarTaverna() {
-    if(progresso.ouro<10) return alert('Ouro insuficiente! Precisa de 10 Ouro.');
-    progresso.ouro -= 10;
-    progresso.vidaAtual = calcularVida();
-    progresso.manaAtual = calcularMana();
-    salvar();
-    atualizarBarrasCidade();
-    alert('🛏️ Descansou! Vida e Mana recuperadas ao máximo! ✨');
-}
-function enviarMsg() {
-    const agora = Date.now();
-    if(agora - ultimoEnvio < 3000) return alert('Aguarde um instante antes de enviar outra mensagem.');
-    const inp = document.getElementById('entrada-chat');
-    const txt = inp.value.trim();
-    if(!txt) return;
-    ultimoEnvio = agora;
-    mensagensChat.push({hora:agoraHora(),nome:jogador.nome,classe:jogador.classe.nome.split(' ')[0],texto:txt,eu:true});
-    if(mensagensChat.length>20) mensagensChat.shift();
-    inp.value='';
-    // Resposta simulada
-    setTimeout(()=>{
-        const nomes = ['GuerreiroLuz','LuaMística','FogoSagrado'];
-        const respostas = ['Boa sorte na masmorra! 💪','Alguém já enfrentou o Chefe?','Bem-vindo à cidade! 🏰','Dica: mantenha vida alta contra o Chefe!'];
-        mensagensChat.push({hora:agoraHora(),nome:nomes[Math.floor(Math.random()*nomes.length)],classe:'⚔️',texto:respostas[Math.floor(Math.random()*respostas.length)],eu:false});
-        if(mensagensChat.length>20) mensagensChat.shift();
-        renderizarChat();
-    }, 1500+Math.random()*1500);
-    renderizarChat();
-}
-function renderizarChat() {
-    const div = document.getElementById('caixa-chat');
-    div.innerHTML = mensagensChat.map(m=>`<p class="msg ${m.eu?'msg-eu':''}"><span class="horario">[${m.hora}]</span>${m.nome} ${m.classe}: ${m.texto}</p>`).join('');
-    div.scrollTop = div.scrollHeight;
-}
-
-// =============================================
-// FICHA
-// =============================================
-function abrirFicha() {
-    document.getElementById('menu-cidade').classList.add('escondido');
-    document.getElementById('painel-ficha').classList.remove('escondido');
-    const vd = calcularVida(), mn = calcularMana();
-    const atr = jogador.atr;
-    document.getElementById('conteudo-ficha').innerHTML = `
-        <p style="font-size:1.1rem;"><b>${jogador.nome}</b> — ${jogador.raca.nome} | ${jogador.classe.nome}</p>
-        <p style="font-style:italic; color:var(--sucesso); margin:0.4rem 0;">✨ ${jogador.raca.passiva}</p>
-        <p style="font-style:italic; color:var(--destaque);">⚔️ ${jogador.classe.hab}</p>
-        <div class="divisor"></div>
-        <div class="linha"><span>Nível</span><span>${progresso.nivel} | ${progresso.xp}/${progresso.xpProx} XP</span></div>
-        <div class="linha"><span>❤️ Vida Máxima</span><span>${vd}</span></div>
-        <div class="linha"><span>💧 Mana Máxima</span><span>${mn}</span></div>
-        <div class="linha"><span>⚡ Destreza</span><span>${atr.des} → Precisão</span></div>
-        <div class="linha"><span>💨 Agilidade</span><span>${atr.agi} → Evasão</span></div>
-        <div class="linha"><span>💪 Força</span><span>${atr.for} → Ataque Físico / Bloqueio</span></div>
-        <div class="linha"><span>🧠 Inteligência</span><span>${atr.int} → Ataque Mágico / Mana</span></div>
-        <div class="linha"><span>❤️ Constituição</span><span>${atr.con} → Vida / Defesa Física</span></div>
-        <div class="linha"><span>🍀 Sorte</span><span>${atr.sor} → Crítico / Defesa Mágica</span></div>
-        ${progresso.ptsParaDistribuir>0?`<p style="color:var(--sucesso); font-weight:bold; margin-top:0.5rem;">✨ ${progresso.ptsParaDistribuir} ponto(s) disponíveis no Ferreiro!</p>`:''}
-    `;
-}
-function fecharFicha() {
-    document.getElementById('painel-ficha').classList.add('escondido');
-    document.getElementById('menu-cidade').classList.remove('escondido');
-}
-
-// =============================================
-// FERREIRO — Distribuir Pontos
-// =============================================
-function abrirFerreiro() {
-    if(progresso.ptsParaDistribuir<=0 && progresso.ouro<50) {
-        alert('Sem pontos e sem ouro suficiente!'); return;
-    }
-    document.getElementById('menu-cidade').classList.add('escondido');
-    document.getElementById('painel-ferreiro').classList.remove('escondido');
-    montarGradeFerreiro();
-}
-function montarGradeFerreiro() {
-    document.getElementById('pts-ferreiro').textContent = progresso.ptsParaDistribuir + ` (Ouro: ${progresso.ouro})`;
-    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
-    document.getElementById('grade-ferreiro').innerHTML = Object.keys(nomes).map(ch=>`
-        <div class="atributo">
-            <span>${nomes[ch]} (${jogador.atr[ch]})</span>
-            <div class="ctrl">
-                <button onclick="melhorarAtributo('${ch}')" ${jogador.atr[ch]>=200?'disabled':''}>+</button>
-            </div>
-        </div>`).join('');
-}
-function melhorarAtributo(ch) {
-    if(jogador.atr[ch]>=200) return alert('Máximo atingido!');
-    if(progresso.ptsParaDistribuir>0) {
-        progresso.ptsParaDistribuir--;
-        jogador.atr[ch]++;
-        salvar(); montarGradeFerreiro(); atualizarBarrasCidade();
-    } else if(progresso.ouro>=50) {
-        if(!confirm('Gastar 50 Ouro?')) return;
-        progresso.ouro -= 50;
-        jogador.atr[ch]++;
-        salvar(); montarGradeFerreiro(); atualizarBarrasCidade();
-    }
-}
-function fecharFerreiro() {
-    document.getElementById('painel-ferreiro').classList.add('escondido');
-    document.getElementById('menu-cidade').classList.remove('escondido');
-}
-
-// =============================================
-// LOJA
-// =============================================
-function abrirLoja() {
-    alert('🛒 Loja — Poções: 15 Ouro cada\nVocê tem: '+progresso.ouro+' Ouro\nComprar?');
-    if(progresso.ouro>=15 && confirm('Comprar 1 Poção? (-15 Ouro)')) {
-        progresso.ouro -=15; progresso.pocoes++; salvar(); atualizarBarrasCidade();
-    }
-}
-// =============================================
-// MASMORRA
-// =============================================
-function irMasmorra() {
-    progresso.sala = 0; progresso.masmorraConcluida = false;
-    progresso.vidaAtual = calcularVida();
-    progresso.manaAtual = calcularMana();
-    progresso.pocoes = 2;
-    proximaSala();
-}
-function proximaSala() {
-    progresso.sala++;
-    if(progresso.sala > 10) { fimMasmorra(true); return; }
-    if(progresso.sala === 10) {
-        iniciarCombate({...INIMIGOS.chefe});
-    } else {
-        const inimigo = {...INIMIGOS.comuns[Math.floor(Math.random()*INIMIGOS.comuns.length)]};
-        iniciarCombate(inimigo);
-    }
-}
-function fimMasmorra(vitoria) {
-    trocarTela('tela-fim');
-    if(vitoria) {
-        document.getElementById('tit-fim').textContent = '🏆 VITÓRIA!';
-        document.getElementById('res-fim').innerHTML = `
-            <p style="font-size:1.1rem; font-weight:bold;">Você derrotou o Cultista de Malazar!</p>
-            <p>A luz brilha sobre a Cidade de Malazar.</p>
-            <div class="divisor"></div>
-            <div class="linha"><span>XP Ganho</span><span>+${progresso.sala===10 ? 500 : 50} XP</span></div>
-            <div class="linha"><span>Ouro Ganho</span><span>+${progresso.sala===10 ? 100 : 10} Ouro</span></div>
-        `;
-        ganharXP(progresso.sala===10 ? 500 : 50);
-        progresso.ouro += progresso.sala===10 ? 100 : 10;
-        progresso.masmorraConcluida = true;
-    } else {
-        document.getElementById('tit-fim').textContent = '💀 DERROTA';
-        document.getElementById('res-fim').innerHTML = `
-            <p>A sombra foi forte demais desta vez...</p>
-            <p>Recupere forças e tente novamente!</p>
-        `;
-    }
-    salvar();
-}
-
-// =============================================
-// COMBATE — FÓRMULAS COMPLETAS
-// =============================================
-function iniciarCombate(inimigo) {
-    inimigoAtual = {...inimigo};
-    inimigoAtual.hpMax = inimigoAtual.con*6 + inimigoAtual.for*2;
-    inimigoAtual.hp = inimigoAtual.hpMax;
-    combate = {
-        turnoJog:true, habUsada:false, magiasUsadas:0, bloqueioAtivo:false,
-        passivaAtivada:{}, turnoExtra:false, log:[]
-    };
-    // Anão: escudo de pedra
-    if(jogador.raca.id === 'anao') combate.bloqueioAtivo = true;
-    // Elfo: ataca primeiro
-    if(jogador.raca.id === 'elfo') {
-        combate.turnoJog = true;
-        log('✨ Primeiro Passo — você ataca primeiro!');
-    }
+function iniciarCombate() {
     trocarTela('tela-combate');
+    if(progresso.sala >= 4) {
+        inimigoAtual = {...INIMIGOS.chefe};
+    } else {
+        const lista = INIMIGOS.comuns;
+        inimigoAtual = {...lista[Math.floor(Math.random() * lista.length)]};
+    }
+    inimigoAtual.vidaMax = 30 + progresso.sala * 15 + (progresso.masmorraConcluida ? 30 : 0);
+    inimigoAtual.vidaAtual = inimigoAtual.vidaMax;
+
+    if(progresso.vidaAtual === null) {
+        progresso.vidaAtual = calcularVidaMax();
+        progresso.manaAtual = calcularManaMax();
+    }
+
+    combate = {
+        turnoJog: true,
+        habUsada: false,
+        magiasUsadas: 0,
+        bloqueioAtivo: false,
+        passivaAtivada: {},
+        turnoExtra: false,
+        log: []
+    };
+
+    if(jogador.raca.id === 'anao') combate.bloqueioAtivo = true;
+    if(jogador.raca.id === 'elfo') combate.turnoJog = true;
+
+    atualizarTelaCombate();
+    adicionarLog(`${inimigoAtual.nome} aparece!`);
+    if(jogador.raca.id === 'elfo') adicionarLog('🧝 Primeiro Passo — você ataca primeiro!');
+}
+function atualizarTelaCombate() {
     document.getElementById('nome-inimigo').textContent = inimigoAtual.nome;
-    document.getElementById('nm-jog').textContent = `${jogador.nome} ${jogador.classe.nome.split(' ')[0]}`;
-    log(`${inimigoAtual.nome} aparece!`);
-    atualizarBarrasCombate();
-    montarAcoesCombate();
+    document.getElementById('status-turno').textContent = combate.turnoJog ? '⚔️ Seu turno' : '⏳ Turno do inimigo';
+    
+    const vidaMaxJog = calcularVidaMax();
+    const vidaPctJog = Math.max(0, (progresso.vidaAtual / vidaMaxJog) * 100);
+    document.getElementById('nm-jog').textContent = jogador.nome;
+    document.getElementById('v-jog').textContent = `${Math.ceil(progresso.vidaAtual)}/${vidaMaxJog}`;
+    document.getElementById('bar-jog').style.width = `${vidaPctJog}%`;
+
+    const vidaPctInim = Math.max(0, (inimigoAtual.vidaAtual / inimigoAtual.vidaMax) * 100);
+    document.getElementById('v-inim').textContent = `${Math.ceil(inimigoAtual.vidaAtual)}/${inimigoAtual.vidaMax}`;
+    document.getElementById('bar-inim').style.width = `${vidaPctInim}%`;
+
+    const acoes = document.getElementById('acoes-cmb');
+    if(combate.turnoJog && progresso.vidaAtual > 0) {
+        acoes.innerHTML = `
+            <button class="botao" onclick='golpear()'>⚔️ Golpear</button>
+            <button class="botao" onclick='usarHabilidade()' ${combate.habUsada?'disabled':''}>✨ ${jogador.classe.hab.split('—')[0].trim()}</button>
+            <button class="botao" onclick='usarPocao()' ${progresso.pocoes<=0?'disabled':''}>🧪 Poção (${progresso.pocoes})</button>
+            <button class="botao" onclick='tentarFugir()'>🏃 Fugir</button>
+        `;
+    } else {
+        acoes.innerHTML = `<p style="text-align:center;">Aguardando...</p>`;
+    }
 }
-function atualizarBarrasCombate() {
-    const vd = calcularVida();
-    document.getElementById('v-jog').textContent = `${progresso.vidaAtual}/${vd}`;
-    document.getElementById('bar-jog').style.width = `${(progresso.vidaAtual/vd)*100}%`;
-    document.getElementById('v-inim').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
-    document.getElementById('bar-inim').style.width = `${(inimigoAtual.hp/inimigoAtual.hpMax)*100}%`;
+function adicionarLog(texto) {
+    combate.log.push(texto);
+    const caixa = document.getElementById('log-cmb');
+    caixa.innerHTML = combate.log.map(l=>`<p>• ${l}</p>`).join('');
+    caixa.scrollTop = caixa.scrollHeight;
 }
-function log(msg) {
-    combate.log.push(msg);
-    if(combate.log.length > 8) combate.log.shift();
-    document.getElementById('log-cmb').innerHTML = combate.log.map(m=>`<p>${m}</p>`).join('');
-}
-function montarAcoesCombate() {
-    if(!combate.turnoJog) {
-        document.getElementById('status-turno').textContent = 'Turno do inimigo...';
-        document.getElementById('acoes-cmb').innerHTML = '';
-        setTimeout(ataqueInimigo, 1200);
+function golpear() {
+    if(!combate.turnoJog) return;
+    combate.turnoJog = false;
+    if(!testarAcerto(jogador, inimigoAtual)) {
+        adicionarLog('Seu golpe ERROU!');
+        setTimeout(turnoInimigo, 1000);
         return;
     }
-    document.getElementById('status-turno').textContent = 'Seu turno!';
-    const temUsoMagia = jogador.classe.id==='mago' && combate.magiasUsadas < 2;
-    document.getElementById('acoes-cmb').innerHTML = `
-        <button class="botao" onclick="ataqueFisico()">⚔️ Ataque Físico</button>
-        <button class="botao" onclick="ataqueMagico()">🔮 Ataque Mágico</button>
-        <button class="botao" onclick="usarHabilidade()" ${combate.habUsada?'disabled':''}>✨ ${jogador.classe.hab.split(' — ')[0]}</button>
-        <button class="botao" onclick="usarPocao()" ${progresso.pocoes<=0?'disabled':''}>🧪 Poção (${progresso.pocoes})</button>
-        <button class="botao" onclick="tentarFugir()">🏃 Fugir</button>
-    `;
-}
-
-// --- Ataques do Jogador ---
-function calcularBonus() {
-    let mult = 1;
-    // Humano: +20% abaixo de 50% vida
-    if(jogador.raca.id === 'humano' && progresso.vidaAtual < calcularVida()*0.5) {
-        mult = 1.2;
-        if(!combate.passivaAtivada.humano) {
-            log('✨ Vontade de Ferro — +20% em todos os atributos!');
-            combate.passivaAtivada.humano = true;
-        }
+    let dano = calcularDano(jogador, inimigoAtual);
+    if(jogador.raca.id === 'draconato' && progresso.vidaAtual / calcularVidaMax() < 0.3) {
+        dano += Math.floor(0.1 * calcularVidaMax());
+        adicionarLog('🔥 Sangue de Chama ativa! Dano extra!');
     }
-    return mult;
-}
-function ataqueFisico() {
-    const b = calcularBonus();
-    const dano = Math.floor(jogador.atr.for * b * (0.8 + Math.random()*0.6));
-    inimigoAtual.hp -= dano;
-    log(`⚔️ Golpe físico! ${dano} de dano.`);
-    verificarFimTurno();
-}
-function ataqueMagico() {
-    const b = calcularBonus();
-    const dano = Math.floor(jogador.atr.int * b * (0.8 + Math.random()*0.6));
-    inimigoAtual.hp -= dano;
-    log(`🔮 Ataque mágico! ${dano} de dano.`);
-    verificarFimTurno();
+    inimigoAtual.vidaAtual -= dano;
+    adicionarLog(`Você golpeou causando ${dano} de dano!`);
+    verificarFimCombate() || setTimeout(turnoInimigo, 1000);
 }
 function usarHabilidade() {
-    if(combate.habUsada) return;
+    if(combate.habUsada || !combate.turnoJog) return;
     combate.habUsada = true;
-    const b = calcularBonus();
-    switch(jogador.classe.id) {
-        case 'guerreiro': {
-            const dano = Math.floor(jogador.atr.for * b * 1.5);
-            inimigoAtual.hp -= dano;
-            log(`✨ FÚRIA! ${dano} de dano!`);
+    combate.turnoJog = false;
+    const cls = jogador.classe.id;
+    let dano = 0;
+    switch(cls) {
+        case 'guerreiro':
+            dano = Math.floor(calcularDano(jogador, inimigoAtual) * 1.5);
+            inimigoAtual.vidaAtual -= dano;
+            adicionarLog(`⚔️ FÚRIA! Golpeou com ${dano} de dano!`);
             break;
-        }
-        case 'mago': {
-            if(combate.magiasUsadas >= 2) return;
-            combate.magiasUsadas++;
-            const dano = Math.floor(jogador.atr.int * b * 1.3);
-            inimigoAtual.hp -= dano;
-            progresso.vidaAtual = Math.min(calcularVida(), progresso.vidaAtual + 15);
-            log(`✨ Chama Arcana! ${dano} dano + 15 de vida!`);
+        case 'mago':
+            dano = Math.floor(calcularDano(jogador, inimigoAtual, 'magico') * 1.3);
+            inimigoAtual.vidaAtual -= dano;
+            progresso.vidaAtual = Math.min(calcularVidaMax(), progresso.vidaAtual + 15);
+            adicionarLog(`🔮 CHAMA ARCANA! ${dano} de dano + cura 15!`);
             break;
-        }
-        case 'paladino': {
-            log(`✨ Aura Sagrada ativada — dano recebido -40%!`);
-            combate.passivaAtivada.paladino = true;
+        case 'paladino':
+            adicionarLog('🛡️ AURA SAGRADA! Dano recebido reduzido em 40%!');
             break;
-        }
-        case 'patrulheiro': {
-            const dano = Math.floor(jogador.atr.des * b * 1.5);
-            inimigoAtual.hp -= dano;
-            log(`✨ PRECISÃO! ${dano} de dano crítico!`);
+        case 'patrulheiro':
+            dano = Math.floor(calcularDano(jogador, inimigoAtual) * 1.5);
+            inimigoAtual.vidaAtual -= dano;
+            adicionarLog(`🏹 PRECISÃO! Acerto garantido com ${dano} de dano!`);
             break;
-        }
-        case 'batedor': {
-            log(`✨ Sombra — evasão +30% por 2 turnos!`);
-            combate.passivaAtivada.batedor = true;
+        case 'batedor':
+            adicionarLog('🥷 SOMBRA! Evasão +30% por 2 turnos!');
             break;
-        }
     }
-    verificarFimTurno();
+    verificarFimCombate() || setTimeout(turnoInimigo, 1000);
 }
 function usarPocao() {
-    if(progresso.pocoes <= 0) return;
+    if(progresso.pocoes <= 0 || !combate.turnoJog) return;
     progresso.pocoes--;
-    const cura = Math.floor(calcularVida() * 0.35);
-    progresso.vidaAtual = Math.min(calcularVida(), progresso.vidaAtual + cura);
-    log(`🧪 Poção! +${cura} de vida!`);
-    verificarFimTurno();
+    const cura = Math.floor(calcularVidaMax() * 0.35);
+    progresso.vidaAtual = Math.min(calcularVidaMax(), progresso.vidaAtual + cura);
+    adicionarLog(`🧪 Usou poção! Recuperou ${cura} de vida!`);
+    atualizarTelaCombate();
 }
 function tentarFugir() {
+    if(!combate.turnoJog) return;
     if(Math.random() < 0.4) {
-        log('🏃 Fuga bem-sucedida!');
-        setTimeout(()=>{ progresso.sala--; irCidade(); }, 800);
+        adicionarLog('🏃 Conseguiu fugir!');
+        setTimeout(irCidade, 1200);
     } else {
-        log('❌ Não conseguiu fugir!');
+        adicionarLog('Não conseguiu fugir!');
         combate.turnoJog = false;
-        montarAcoesCombate();
+        setTimeout(turnoInimigo, 1000);
     }
 }
-
-// --- Ataque do Inimigo ---
-function ataqueInimigo() {
-    if(inimigoAtual.hp <= 0) return;
-    // Anão bloqueia 1º golpe
+function turnoInimigo() {
+    atualizarTelaCombate();
+    if(inimigoAtual.vidaAtual <= 0) return;
     if(combate.bloqueioAtivo) {
         combate.bloqueioAtivo = false;
-        log(`🛡️ Coração de Pedra — bloqueou o ataque!`);
-        fimTurnoInimigo();
+        adicionarLog('🏔️ Coração de Pedra bloqueou o ataque!');
+        combate.turnoJog = true;
+        atualizarTelaCombate();
         return;
     }
-    // Batedor: evasão extra
-    if(combate.passivaAtivada.batedor && Math.random() < 0.3) {
-        log(`💨 Esquivou-se!`);
-        fimTurnoInimigo();
+    if(!testarAcerto(inimigoAtual, jogador)) {
+        adicionarLog(`${inimigoAtual.nome} ERROU o golpe!`);
+        combate.turnoJog = true;
+        atualizarTelaCombate();
         return;
     }
-    // Calcular dano
-    let dano = Math.floor(inimigoAtual.for * (0.7 + Math.random()*0.6));
-    // Paladino reduz dano
-    if(combate.passivaAtivada.paladino) dano = Math.floor(dano * 0.6);
+    let dano = calcularDano(inimigoAtual, jogador);
+    if(jogador.classe.id === 'paladino') dano = Math.floor(dano * 0.6);
+    if(jogador.classe.id === 'batedor' && Math.random() < 0.3) {
+        adicionarLog('🥷 Esquivou-se!');
+        combate.turnoJog = true;
+        atualizarTelaCombate();
+        return;
+    }
     progresso.vidaAtual -= dano;
-    log(`👊 ${inimigoAtual.nome} ataca! ${dano} de dano!`);
-    verificarDerrotaJogador();
-    fimTurnoInimigo();
-}
-function fimTurnoInimigo() {
-    atualizarBarrasCombate();
+    adicionarLog(`${inimigoAtual.nome} causou ${dano} de dano!`);
+    if(progresso.vidaAtual <= 0) {
+        progresso.vidaAtual = 0;
+        if(jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
+            combate.passivaAtivada.tiefling = true;
+            progresso.vidaAtual = Math.floor(calcularVidaMax() * 0.25);
+            combate.turnoExtra = true;
+            adicionarLog('🔥 Pacto das Sombras — retornou à luta!');
+            combate.turnoJog = true;
+            atualizarTelaCombate();
+            return;
+        }
+        verificarFimCombate();
+        return;
+    }
     combate.turnoJog = true;
-    montarAcoesCombate();
+    atualizarTelaCombate();
 }
-
-// --- Verificações ---
-function verificarFimTurno() {
-    atualizarBarrasCombate();
-    if(inimigoAtual.hp <= 0) {
-        log(`💀 ${inimigoAtual.nome} derrotado!`);
-        setTimeout(()=>{
-            ganharXP(inimigoAtual.xp);
-            progresso.ouro += inimigoAtual.ouro;
-            salvar();
-            if(combate.turnoExtra) {
-                log('✨ Pacto das Sombras — turno extra!');
-                combate.turnoExtra = false;
-                combate.turnoJog = true;
-                montarAcoesCombate();
-            } else {
-                proximaSala();
-            }
-        }, 1000);
-        return;
+function verificarFimCombate() {
+    if(inimigoAtual.vidaAtual <= 0) {
+        ganharCombate();
+        return true;
     }
-    combate.turnoJog = false;
-    montarAcoesCombate();
+    if(progresso.vidaAtual <= 0) {
+        perderCombate();
+        return true;
+    }
+    return false;
 }
-function verificarDerrotaJogador() {
-    if (progresso.vidaAtual > 0) return;
-
-    // Tiefling: reviver uma vez
-    if (jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
-        combate.passivaAtivada.tiefling = true;
-        progresso.vidaAtual = Math.floor(calcularVida() * 0.25);
-        combate.turnoExtra = true;
-        log('🔥 Pacto das Sombras — retornou com 25% de vida!');
-        atualizarBarrasCombate();
-        return;
+function ganharCombate() {
+    progresso.sala++;
+    progresso.xp += inimigoAtual.xp;
+    progresso.ouro += inimigoAtual.ouro;
+    let subiu = false;
+    while(progresso.xp >= progresso.xpProx) {
+        progresso.xp -= progresso.xpProx;
+        progresso.nivel++;
+        progresso.xpProx = Math.floor(progresso.xpProx * 1.4);
+        progresso.ptsParaDistribuir = (progresso.ptsParaDistribuir || 0) + 1;
+        subiu = true;
     }
-
-    log('💀 Você foi derrotado...');
-    setTimeout(() => fimMasmorra(false), 1200);
+    salvar();
+    if(progresso.sala >= 5) {
+        progresso.masmorraConcluida = true;
+        telaFim('vitória', `
+            <h3>🏆 MASMORRA CONCLUÍDA!</h3>
+            <p>Derrotou ${inimigoAtual.nome}!</p>
+            <p>XP: +${inimigoAtual.xp} | Ouro: +${inimigoAtual.ouro}</p>
+            ${subiu?'<p style="color:gold;">✨ Subiu de nível!</p>':''}
+        `);
+    } else {
+        telaFim('vitória', `
+            <p>Derrotou ${inimigoAtual.nome}!</p>
+            <p>XP: +${inimigoAtual.xp} | Ouro: +${inimigoAtual.ouro}</p>
+            ${subiu?'<p style="color:gold;">✨ Subiu de nível!</p>':''}
+            <p>Salas restantes: ${5 - progresso.sala}</p>
+            <button class="botao" onclick="continuarMasmorra()">⚔️ Continuar Masmorra</button>
+        `);
+    }
+}
+function continuarMasmorra() {
+    trocarTela('tela-combate');
+    iniciarCombate();
+}
+function perderCombate() {
+    salvar();
+    telaFim('derrota', `
+        <p>Você caiu em combate...</p>
+        <p>O culto ganha força, mas não desista!</p>
+        <p>Retorne à cidade e recupere forças.</p>
+    `);
+}
+function telaFim(tipo, conteudo) {
+    trocarTela('tela-fim');
+    document.getElementById('tit-fim').textContent = tipo==='vitória'?'🎉 Vitória!':'💀 Derrota';
+    document.getElementById('res-fim').innerHTML = conteudo;
 }
 
 </script>
 </body>
 </html>
+
+              
+                    
+                    
