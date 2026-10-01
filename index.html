@@ -330,28 +330,18 @@ function montarCriacao() {
     const racasDiv = document.getElementById('lista-racas');
     racasDiv.innerHTML = RACAS.map(r=>`
         <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
-            <div class="opcao-img">
-                <span class="icone-grande">${r.nome.split(' ')[0]}</span>
-                <div>
-                    <div style="font-weight:bold;">${r.nome.split(' ')[1]}</div>
-                    <div class="info">${r.desc}</div>
-                    <div style="font-size:0.75rem; color:var(--sucesso); margin-top:0.2rem;">✨ ${r.passiva.substring(0,40)}...</div>
-                </div>
-            </div>
+            <strong>${r.nome}</strong><br>
+            <span style="font-size:0.85rem; color:var(--texto-suave);">${r.desc}</span>
         </div>`).join('');
+
     const classesDiv = document.getElementById('lista-classes');
     classesDiv.innerHTML = CLASSES.map(c=>`
         <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
-            <div class="opcao-img">
-                <span class="icone-grande">${c.nome.split(' ')[0]}</span>
-                <div>
-                    <div style="font-weight:bold;">${c.nome.split(' ')[1]}</div>
-                    <div class="info">DES:${c.base.des} AGI:${c.base.agi} FOR:${c.base.for} INT:${c.base.int} CON:${c.base.con} SOR:${c.base.sor}</div>
-                </div>
-            </div>
+            <strong>${c.nome}</strong><br>
+            <span style="font-size:0.85rem; color:var(--texto-suave);">Habilidade: ${c.hab.split('—')[0]}</span>
         </div>`).join('');
-    montarGradePts();
 }
+
 function montarGradePts() {
     const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
     document.getElementById('grade-pts').innerHTML = Object.keys(nomes).map(ch=>`
@@ -363,7 +353,6 @@ function montarGradePts() {
                 <button onclick="alterarPts('${ch}',1)" ${ptsDisponiveis<=0?'disabled':''}>+</button>
             </div>
         </div>`).join('');
-}
 function alterarPts(ch, qtd) {
     if(qtd>0 && ptsDisponiveis<=0) return;
     if(qtd<0 && ptsAlocados[ch]<=0) return;
@@ -371,6 +360,7 @@ function alterarPts(ch, qtd) {
     ptsDisponiveis -= qtd;
     montarGradePts();
 }
+
 function selGen(g) {
     selecionado.genero = g;
     document.querySelectorAll('[data-gen]').forEach(el=>el.classList.toggle('selecionada',el.dataset.gen===g));
@@ -389,21 +379,21 @@ function confirmarHeroi() {
     if(!selecionado.genero) return alert('Escolha o gênero!');
     if(!selecionado.raca) return alert('Escolha a raça!');
     if(!selecionado.classe) return alert('Escolha a classe!');
-    if(ptsDisponiveis>0 && !confirm(`Faltam ${ptsDisponiveis} pontos. Confirmar assim mesmo?`)) return;
+    const atr = {};
+['des','agi','for','int','con','sor'].forEach(ch=>{
+    atr[ch] = 5 + raca.bonus[ch];
+});
 
     const raca = RACAS.find(r=>r.id===selecionado.raca);
     const classe = CLASSES.find(c=>c.id===selecionado.classe);
 
     const atr = {};
-    ['des','agi','for','int','con','sor'].forEach(ch=>{
-        atr[ch] = classe.base[ch] + raca.bonus[ch] + ptsAlocados[ch];
-        if(atr[ch]<1) atr[ch]=1;
-        if(atr[ch]>200) atr[ch]=200;
-    });
+
 
     jogador = {
         nome, genero:selecionado.genero, raca, classe,
-        atr, ptsTotal: {...ptsAlocados}
+        atr,
+
     };
     progresso = {
         nivel:1, xp:0, xpProx:100, sala:0, ouro:20, pocoes:2,
