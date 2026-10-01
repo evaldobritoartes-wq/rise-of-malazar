@@ -73,39 +73,40 @@
         </div>
     </div>
 </div>
-
 <div id="tela-criar" class="tela escondido">
     <div class="pergaminho">
         <h2>Criar Seu Herói</h2>
         <div class="divisor"></div>
-        <label>Nome do Herói:</label>
-        <input type="text" id="nome" placeholder="Digite seu nome..." maxlength="15">
 
-        <h3 style="margin-top:0.8rem;">Gênero</h3>
-        <div style="display:flex; gap:0.5rem;">
-            <label class="opcao" style="flex:1; text-align:center; padding:0.6rem; cursor:pointer;" data-gen="M" onclick="selGen('M')">♂️ Masculino</label>
-            <label class="opcao" style="flex:1; text-align:center; padding:0.6rem; cursor:pointer;" data-gen="F" onclick="selGen('F')">♀️ Feminino</label>
-            <label class="opcao" style="flex:1; text-align:center; padding:0.6rem; cursor:pointer;" data-gen="O" onclick="selGen('O')">⚙️ Neutro</label>
+        <label>Nome do Herói:</label>
+        <input type="text" id="nome" placeholder="Digite o nome..." maxlength="20">
+
+        <h3>Gênero</h3>
+        <div class="botoes-genero">
+            <button data-gen="masc" onclick="selGen('masc')">♂ Masculino</button>
+            <button data-gen="fem" onclick="selGen('fem')">♀ Feminino</button>
+            <button data-gen="neut" onclick="selGen('neut')">⚙️ Neutro</button>
         </div>
 
-        <h3 style="margin-top:0.8rem;">Raça</h3>
-        <div id="lista-racas" style="max-height:160px; overflow-y:auto;"></div>
+        <h3>Raça</h3>
+        <div class="lista-opcoes" id="lista-racas"></div>
 
-        <h3 style="margin-top:0.8rem;">Classe</h3>
-        <div id="lista-classes" style="max-height:160px; overflow-y:auto;"></div>
+        <h3>Classe</h3>
+        <div class="lista-opcoes" id="lista-classes"></div>
 
-        <h3 style="margin-top:0.8rem;">Distribuir Pontos — 3 disponíveis ✨</h3>
-        <div class="grade-atributos" id="grade-pts"></div>
-        <p style="font-size:0.8rem; color:var(--tinta-suave); text-align:center;">
-            ⚡DES=Precisão | 💨AGI=Evasão | 💪FOR=ATK Físico | 🧠INT=ATK Mágico | ❤️CON=Vida | 🍀SOR=Crítico
+        <div class="divisor"></div>
+        <p style="text-align:center; color:var(--texto-suave); font-size:0.9rem;">
+            Atributos iniciais: 5 em cada<br>
+            <small>DES | AGI | FOR | INT | CON | SOR</small>
         </p>
 
         <div class="botoes">
-            <button class="botao" onclick="confirmarHeroi()">✅ Confirmar e Entrar</button>
-            <button class="botao" onclick="voltarInicio()">← Voltar</button>
+            <button class="botao-secundario" onclick="voltarInicio()">← Voltar</button>
+            <button class="botao" onclick="confirmarHeroi()">✓ Confirmar e Entrar</button>
         </div>
     </div>
 </div>
+
 <div id="tela-cidade" class="tela escondido">
     <div class="pergaminho">
         <h2 id="nome-cidade">🏰 Cidade de Malazar</h2>
