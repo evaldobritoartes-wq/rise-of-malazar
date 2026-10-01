@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rise of Malazar — Crônicas Antigas 📜</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
         
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 
@@ -21,6 +21,8 @@
             --borda: #8b7355;
             --sombra: rgba(58, 47, 31, 0.35);
             --dourado-brilho: rgba(200, 169, 81, 0.4);
+            --heroi: #4a90d9;
+            --malazar: #7b2d8f;
         }
 
         body {
@@ -31,7 +33,6 @@
             overflow: hidden;
         }
 
-        /* === TELA DE INÍCIO — ESTILO LIVRO ANTIGO === */
         #tela-inicio {
             position: absolute;
             inset: 0;
@@ -46,12 +47,9 @@
         .livro-capa {
             background: linear-gradient(145deg, var(--papel) 0%, var(--papel-escuro) 100%);
             border: 4px solid var(--borda);
-            box-shadow: 
-                inset 0 0 40px var(--sombra),
-                0 0 30px rgba(0,0,0,0.5),
-                0 10px 40px rgba(0,0,0,0.4);
-            padding: 4rem 5rem;
-            max-width: 650px;
+            box-shadow: inset 0 0 40px var(--sombra), 0 0 30px rgba(0,0,0,0.5), 0 10px 40px rgba(0,0,0,0.4);
+            padding: 2.5rem 2rem;
+            max-width: 90%;
             text-align: center;
             position: relative;
         }
@@ -66,7 +64,7 @@
 
         .titulo-jogo {
             font-family: 'Cinzel', serif;
-            font-size: clamp(2.2rem, 8vw, 3.8rem);
+            font-size: clamp(2rem, 12vw, 3.5rem);
             color: var(--tinta);
             font-weight: 700;
             letter-spacing: 5px;
@@ -76,10 +74,10 @@
 
         .subtitulo {
             font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--tinta-suave);
             letter-spacing: 3px;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             font-style: italic;
         }
 
@@ -92,181 +90,200 @@
 
         .botao {
             font-family: 'Cinzel', serif;
-            padding: 1rem 2.5rem;
+            padding: 1rem 2rem;
             font-size: 1rem;
             background: linear-gradient(180deg, var(--ouro) 0%, var(--ouro-escuro) 100%);
             border: 2px solid var(--borda);
             color: #fff;
-            border-radius: 2px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin: 0.5rem;
-            min-width: 240px;
+            min-width: 220px;
             letter-spacing: 2px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
         }
 
-        .botao:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--dourado-brilho);
-            background: linear-gradient(180deg, #d4b65c, #a88c42);
-        }
+        .botao:active { transform: scale(0.97); }
 
-        .botoes {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
+        .botoes { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+        .rodape { margin-top: 2rem; color: var(--envelhecido); font-size: 0.8rem; letter-spacing: 1px; }
 
-        .rodape {
-            margin-top: 2.5rem;
-            color: var(--envelhecido);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-        }
-
-        /* === TELA DE HISTÓRIA — PERGAMINHO === */
         .pergaminho {
             background: linear-gradient(to right, var(--papel-escuro) 0%, var(--papel) 15%, var(--papel) 85%, var(--papel-escuro) 100%);
             border: 3px solid var(--borda);
             box-shadow: inset 0 0 30px var(--sombra), 0 10px 30px rgba(0,0,0,0.4);
-            padding: 3rem 4rem;
-            max-width: 750px;
-            line-height: 1.9;
+            padding: 2rem 1.5rem;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            line-height: 1.8;
             color: var(--tinta);
-            position: relative;
         }
 
         .pergaminho h2 {
             font-family: 'Cinzel', serif;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             color: var(--tinta);
             border-bottom: 1px solid var(--ouro);
             padding-bottom: 1rem;
         }
 
-        .pergaminho p {
-            font-size: 1.05rem;
-            text-align: justify;
-        }
+        .destaque { font-weight: 600; color: var(--ouro-escuro); }
 
-        .destaque {
-            font-weight: 600;
-            color: var(--ouro-escuro);
-        }
-
-        /* === TELA DE MODO DE JOGO === */
         .modos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .modo-card {
             background: var(--papel);
             border: 2px solid var(--borda);
-            padding: 1.5rem;
+            padding: 1.2rem 0.8rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        .modo-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px var(--sombra);
-            border-color: var(--ouro);
-        }
+        .modo-card:active { transform: scale(0.97); border-color: var(--ouro); }
+        .modo-titulo { font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 0.3rem; color: var(--tinta); font-size: 1rem; }
+        .modo-desc { font-size: 0.8rem; color: var(--tinta-suave); }
 
-        .modo-titulo {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--tinta);
-        }
-
-        .modo-desc {
-            font-size: 0.9rem;
-            color: var(--tinta-suave);
-        }
-
-        /* === ÁREA DO JOGO === */
-        #jogo {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
+        #jogo { display: none; width: 100vw; height: 100vh; position: relative; }
 
         .painel-topo {
             position: absolute;
             top: 0; left: 0;
             width: 100%;
-            padding: 1rem 2rem;
+            padding: 0.8rem 1rem;
             background: linear-gradient(to bottom, rgba(44,36,24,0.95), transparent);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-family: 'Cinzel', serif;
             z-index: 10;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .quadro-status {
             background: var(--papel);
             border: 2px solid var(--borda);
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 0.8rem;
             box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+            font-size: 0.85rem;
         }
 
-        .barra-vida {
-            width: 200px; height: 20px;
-            background: var(--papel-escuro);
-            border: 1px solid var(--borda);
-            margin-top: 0.5rem;
-        }
-
-        .vida {
-            height: 100%;
-            background: linear-gradient(90deg, #5a8f5a, #74b874);
-            width: 100%;
-            transition: width 0.4s ease;
-        }
-
-        .nome-chefe {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--tinta);
-        }
+        .linha-vida { display: flex; align-items: center; gap: 0.4rem; margin: 0.4rem 0; }
+        .barra-vida { flex: 1; height: 14px; background: var(--papel-escuro); border: 1px solid var(--borda); overflow: hidden; border-radius: 2px; }
+        .vida-jogador { height: 100%; background: linear-gradient(90deg, #3a7bd5, #6ab0f3); width: 100%; transition: width 0.3s ease; }
+        .vida-malazar { height: 100%; background: linear-gradient(90deg, #6b2a91, #a04fd4); width: 100%; transition: width 0.3s ease; }
+        .valor-vida { font-size: 0.75rem; min-width: 24px; text-align: right; }
 
         .caixa-info {
             background: rgba(244, 228, 193, 0.9);
             border: 2px solid var(--borda);
-            padding: 0.8rem 1.2rem;
+            padding: 0.6rem 0.8rem;
             box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+            font-size: 0.8rem;
         }
 
         .tela-campo {
             width: 100%;
             height: 100%;
-            background: radial-gradient(ellipse at center, #3a3020 0%, #1f1a12 100%);
+            background: radial-gradient(ellipse at center, #2a2218 0%, #1a1410 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .campo {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 94%;
+            height: 65%;
+            border: 3px solid var(--borda);
+            background: rgba(60, 50, 35, 0.4);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3);
+            cursor: crosshair;
+        }
+
+        .linha-divisoria {
+            position: absolute;
+            top: 50%; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+            opacity: 0.4;
+        }
+
+        .personagem {
+            position: absolute;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            transition: none;
+            box-shadow: 0 0 12px currentColor;
+            z-index: 5;
+        }
+
+        .heroi {
+            background: radial-gradient(circle at 30% 30%, #6ab0f3, #2a5ea5);
+            border: 3px solid #94c5ff;
+            color: #94c5ff;
+        }
+
+        .malazar {
+            background: radial-gradient(circle at 30% 30%, #a04fd4, #5a2a85);
+            border: 3px solid #c084f0;
+            color: #c084f0;
+        }
+
+        /* === BOTÃO DE ATAQUE — TELA INFERIOR === */
+        .area-ataque {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+
+        .botao-ataque {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #d4a040, #8a6520);
+            border: 3px solid #ffd060;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(212, 160, 64, 0.5);
+            transition: all 0.15s ease;
+        }
+
+        .botao-ataque:active {
+            transform: scale(0.9);
+            box-shadow: 0 0 25px rgba(255, 210, 96, 0.8);
         }
 
         .comandos {
             position: absolute;
-            bottom: 1.5rem; right: 1.5rem;
+            bottom: 1.5rem;
+            right: 1rem;
             background: rgba(244, 228, 193, 0.9);
             border: 2px solid var(--borda);
-            padding: 1rem 1.2rem;
-            font-size: 0.9rem;
+            padding: 0.8rem;
+            font-size: 0.75rem;
             color: var(--tinta-suave);
             box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+            z-index: 10;
+            max-width: 120px;
         }
 
         .escondido { display: none !important; }
         .voltar { background: linear-gradient(180deg, var(--envelhecido), #9a8060); }
-        .voltar:hover { background: linear-gradient(180deg, #c0a070, #a08050); }
     </style>
 </head>
 <body>
@@ -277,37 +294,31 @@
             <h1 class="titulo-jogo">MALAZAR</h1>
             <p class="subtitulo">Crônicas de uma Era Esquecida</p>
             <div class="divisor"></div>
-            
             <div class="botoes">
                 <button class="botao" onclick="mostrarModos()">⚔️ INICIAR AVENTURA</button>
                 <button class="botao" onclick="mostrarHistoria()">📜 O Pergaminho</button>
             </div>
-
-            <p class="rodape">Rise of Malazar © 2026 — Todos os Direitos Reservados</p>
+            <p class="rodape">Rise of Malazar © 2026</p>
         </div>
     </div>
 
     <!-- TELA DE HISTÓRIA -->
-    <div id="tela-historia" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:101;background:rgba(20,16,10,0.9);padding:2rem;">
+    <div id="tela-historia" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:101;background:rgba(20,16,10,0.9);padding:1rem;">
         <div class="pergaminho">
             <h2>O Despertar de Malazar</h2>
-            <p>
-                Nos tempos antigos, quando o mundo ainda era jovem, foi selado sob a terra profunda um poder que nenhum reino ousava nomear: <span class="destaque">Malazar</span>.<br><br>
-                Uma entidade nascida da sombra e da ambição, que outrora desafiou os próprios deuses e foi banida para além do véu. Mas as correntes estão se rompendo...<br><br>
-                Agora, herói, cabe a ti — sozinho ou ao lado de aliados — enfrentar a escuridão que desperta. A lenda não será escrita nas estrelas, mas na coragem daqueles que ousam lutar.
-            </p>
-            <div style="text-align:center;margin-top:2rem;">
+            <p>Nos tempos antigos, foi selado sob a terra profunda um poder que nenhum reino ousava nomear: <span class="destaque">Malazar</span>.<br><br>
+            Agora as correntes se rompem... Cabe a ti enfrentar a escuridão que desperta.</p>
+            <div style="text-align:center;margin-top:1.5rem;">
                 <button class="botao voltar" onclick="voltarInicio()">← Retornar</button>
             </div>
         </div>
     </div>
 
-    <!-- TELA DE SELEÇÃO DE MODOS -->
-    <div id="tela-modos" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:102;background:rgba(20,16,10,0.95);padding:2rem;">
-        <div class="livro-capa" style="max-width:700px;">
-            <h2 style="font-family:'Cinzel',serif;margin-bottom:1rem;">Escolha seu Caminho</h2>
-            <p style="color:var(--tinta-suave);margin-bottom:0.5rem;">Como enfrentarás a ameaça de Malazar?</p>
-            
+    <!-- TELA DE MODOS -->
+    <div id="tela-modos" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:102;background:rgba(20,16,10,0.95);padding:1rem;">
+        <div class="livro-capa" style="max-width:90%;">
+            <h2 style="font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1.3rem;">Escolha seu Caminho</h2>
+            <p style="color:var(--tinta-suave);margin-bottom:0.5rem;font-size:0.9rem;">Como enfrentarás a ameaça?</p>
             <div class="modos-grid">
                 <div class="modo-card" onclick="iniciarJogo('pvp1')">
                     <div class="modo-titulo">⚔️ Duelo 1×1</div>
@@ -315,15 +326,14 @@
                 </div>
                 <div class="modo-card" onclick="iniciarJogo('pvp3')">
                     <div class="modo-titulo">🛡️ Batalha 3×3</div>
-                    <div class="modo-desc">Equipes em confronto</div>
+                    <div class="modo-desc">Equipes</div>
                 </div>
                 <div class="modo-card" onclick="iniciarJogo('pve')">
                     <div class="modo-titulo">👹 Crônicas PvE</div>
-                    <div class="modo-desc">Enfrente as forças de Malazar</div>
+                    <div class="modo-desc">Enfrente Malazar</div>
                 </div>
             </div>
-            
-            <button class="botao voltar" style="margin-top:2rem;" onclick="voltarInicio()">← Voltar</button>
+            <button class="botao voltar" style="margin-top:1.5rem;" onclick="voltarInicio()">← Voltar</button>
         </div>
     </div>
 
@@ -331,56 +341,204 @@
     <div id="jogo">
         <div class="painel-topo">
             <div class="quadro-status">
-                <div class="nome-chefe" id="nome-oponente">—</div>
-                <div class="barra-vida"><div class="vida" id="barra-vida"></div></div>
+                <div style="font-weight:bold;">Herói</div>
+                <div class="linha-vida">
+                    <div class="barra-vida"><div class="vida-jogador" id="vida-jogador"></div></div>
+                    <span class="valor-vida" id="valor-vida-jogador">100</span>
+                </div>
             </div>
             <div class="caixa-info">
-                <strong>Modo:</strong> <span id="modo-atual">—</span><br>
-                <strong>Fase:</strong> <span id="fase">1</span>
+                <strong>Modo:</strong><span id="modo-atual">—</span><br>
+                <strong>Fase:</strong><span id="fase">1</span>
+            </div>
+            <div class="quadro-status">
+                <div style="font-weight:bold; color:var(--malazar);">MALAZAR</div>
+                <div class="linha-vida">
+                    <span class="valor-vida" id="valor-vida-malazar">100</span>
+                    <div class="barra-vida"><div class="vida-malazar" id="vida-malazar"></div></div>
+                </div>
             </div>
         </div>
 
-        <div class="tela-campo" id="tela-campo"></div>
+        <div class="tela-campo">
+            <div class="campo" id="campo">
+                <div class="linha-divisoria"></div>
+                <div class="personagem heroi" id="heroi">⚔️</div>
+                <div class="personagem malazar" id="malazar">👹</div>
+            </div>
+        </div>
+
+        <div class="area-ataque">
+            <button class="botao-ataque" id="btn-ataque" onclick="atacar()">⚔️</button>
+        </div>
 
         <div class="comandos">
-            ⌨️ Setas = Mover<br>
-            ⚔️ Espaço = Ataque<br>
-            🛡️ Shift = Defesa<br>
-            ✨ 1–4 = Habilidades
+            📱 Toque para mover<br>
+            ⚔️ Botão para atacar
         </div>
     </div>
 
 <script>
+// === TELAS ===
 function mostrarHistoria() {
     document.getElementById('tela-inicio').classList.add('escondido');
     document.getElementById('tela-historia').classList.remove('escondido');
 }
-
 function mostrarModos() {
     document.getElementById('tela-inicio').classList.add('escondido');
     document.getElementById('tela-modos').classList.remove('escondido');
 }
-
 function voltarInicio() {
     document.querySelectorAll('#tela-historia, #tela-modos').forEach(el => el.classList.add('escondido'));
     document.getElementById('tela-inicio').classList.remove('escondido');
 }
 
+// === JOGO ===
+let jogoAtivo = false;
+let modoAtual = '';
+
+const heroi = {
+    el: null,
+    x: 40, y: 150,
+    alvoX: 40, alvoY: 150,
+    velocidade: 3.5,
+    vida: 100,
+    vidaMax: 100
+};
+
+const malazar = {
+    el: null,
+    x: 500, y: 150,
+    vida: 100,
+    vidaMax: 100
+};
+
+const campo = { el: null, largura: 0, altura: 0, offsetX: 0, offsetY: 0 };
+
 function iniciarJogo(modo) {
+    modoAtual = modo;
+    jogoAtivo = true;
+    
     document.getElementById('tela-modos').classList.add('escondido');
     document.getElementById('jogo').style.display = 'block';
     
-    const nomes = {
-        pvp1: 'Duelo 1×1',
-        pvp3: 'Batalha 3×3',
-        pve: 'Crônicas PvE — Malazar'
-    };
-    
+    const nomes = { pvp1: 'Duelo 1×1', pvp3: 'Batalha 3×3', pve: 'Crônicas PvE' };
     document.getElementById('modo-atual').textContent = nomes[modo];
-    document.getElementById('nome-oponente').textContent = modo === 'pve' ? 'MALAZAR' : 'Oponente';
     
-    console.log('🎮 Modo iniciado:', modo);
+    heroi.el = document.getElementById('heroi');
+    malazar.el = document.getElementById('malazar');
+    campo.el = document.getElementById('campo');
+    
+    // Posicionamento inicial
+    atualizarDimensoesCampo();
+    heroi.x = heroi.alvoX = campo.largura * 0.1;
+    heroi.y = heroi.alvoY = campo.altura * 0.5;
+    malazar.x = campo.largura * 0.8;
+    malazar.y = campo.altura * 0.5;
+    
+    atualizarPosicoes();
+    atualizarBarrasVida();
+    
+    loopJogo();
 }
+
+function atualizarDimensoesCampo() {
+    const rect = campo.el.getBoundingClientRect();
+    campo.largura = rect.width;
+    campo.altura = rect.height;
+    campo.offsetX = rect.left;
+    campo.offsetY = rect.top;
+}
+
+// === TOQUE / CLIQUE PARA MOVER ===
+function irPara(alvoX, alvoY) {
+    if (!jogoAtivo) return;
+    // Limites dentro do campo
+    heroi.alvoX = Math.max(0, Math.min(campo.largura - 50, alvoX - 25));
+    heroi.alvoY = Math.max(0, Math.min(campo.altura - 50, alvoY - 25));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', e => {
+        if (!jogoAtivo || !campo.el) return;
+        const rect = campo.el.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            irPara(e.clientX - rect.left, e.clientY - rect.top);
+        }
+    });
+    // Suporte a toque
+    document.addEventListener('touchstart', e => {
+        if (!jogoAtivo || !campo.el) return;
+        const touch = e.touches[0];
+        const rect = campo.el.getBoundingClientRect();
+        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+            e.preventDefault();
+            irPara(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
+    }, { passive: false });
+});
+
+function atualizarPosicoes() {
+    heroi.el.style.left = heroi.x + 'px';
+    heroi.el.style.top = heroi.y + 'px';
+    malazar.el.style.left = malazar.x + 'px';
+    malazar.el.style.top = malazar.y + 'px';
+}
+
+function atualizarBarrasVida() {
+    document.getElementById('vida-jogador').style.width = (heroi.vida / heroi.vidaMax * 100) + '%';
+    document.getElementById('valor-vida-jogador').textContent = Math.round(heroi.vida);
+    document.getElementById('vida-malazar').style.width = (malazar.vida / malazar.vidaMax * 100) + '%';
+    document.getElementById('valor-vida-malazar').textContent = Math.round(malazar.vida);
+}
+
+function atacar() {
+    if (!jogoAtivo) return;
+    
+    // Distância até Malazar
+    const dx = malazar.x - heroi.x;
+    const dy = malazar.y - heroi.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist < 110) {
+        const dano = 15;
+        malazar.vida = Math.max(0, malazar.vida - dano);
+        atualizarBarrasVida();
+        
+        if (malazar.vida <= 0) {
+            jogoAtivo = false;
+            setTimeout(() => {
+                alert('🏆 VITÓRIA! Malazar foi derrotado!');
+            }, 100);
+        }
+    } else {
+        alert('Aproxime-se de Malazar para atacar! ⚔️');
+    }
+}
+
+function loopJogo() {
+    if (!jogoAtivo) return;
+    
+    // Movimento suave até o ponto tocado/clicado
+    const dx = heroi.alvoX - heroi.x;
+    const dy = heroi.alvoY - heroi.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist > 5) {
+        heroi.x += (dx / dist) * heroi.velocidade;
+        heroi.y += (dy / dist) * heroi.velocidade;
+    }
+    
+    atualizarPosicoes();
+    requestAnimationFrame(loopJogo);
+}
+
+// Redimensiona no celular
+window.addEventListener('resize', () => {
+    if (jogoAtivo) atualizarDimensoesCampo();
+});
 </script>
 
 </body>
