@@ -851,10 +851,10 @@ function verificarFimTurno() {
     montarAcoesCombate();
 }
 function verificarDerrotaJogador() {
-    if(progresso.vidaAtual > 0) return;
-    
+    if (progresso.vidaAtual > 0) return;
+
     // Tiefling: reviver uma vez
-    if(jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
+    if (jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
         combate.passivaAtivada.tiefling = true;
         progresso.vidaAtual = Math.floor(calcularVida() * 0.25);
         combate.turnoExtra = true;
@@ -862,26 +862,11 @@ function verificarDerrotaJogador() {
         atualizarBarrasCombate();
         return;
     }
-    
+
     log('💀 Você foi derrotado...');
     setTimeout(() => fimMasmorra(false), 1200);
 }
-function verificarDerrotaJogador() {
-     if(progresso.vidaAtual > 0) return;
-     
-     // Tiefling: reviver uma vez
-     if(jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
-         combate.passivaAtivada.tiefling = true;
-         progresso.vidaAtual = Math.floor(calcularVida() * 0.25);
-         combate.turnoExtra = true;
-         log('🔥 Pacto das Sombras — retornou com 25% de vida!');
-         atualizarBarrasCombate();
-         return;
-     }
-     
-     log('💀 Você foi derrotado...');
-     setTimeout(() => fimMasmorra(false), 1200);
- }
+
 </script>
 </body>
 </html>
