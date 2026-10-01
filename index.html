@@ -264,50 +264,45 @@ let ptsAlocados = {des:0,agi:0,for:0,int:0,con:0,sor:0};
 let ptsDisponiveis = 3;
 let progresso = {
     nivel:1, xp:0, xpProx:100, sala:0, ouro:20, pocoes:2,
-    vidaAtual:null, manaAtual:null, ptsParaDistribuir:0,
-    masmorraConcluida:false
-};
-let inimigoAtual = null;
-let combate = {
-    turnoJog:true, habUsada:false, magiasUsadas:0, bloqueioAtivo:false,
-    passivaAtivada:{}, turnoExtra:false, log:[]
-};
-let mensagensChat = [];
-let ultimoEnvio = 0;
+    function montarCriacao() {
+    // Carrega RAÇAS
+    const racasDiv = document.getElementById('lista-racas');
+    if (!racasDiv) {
+        console.error('Elemento lista-racas NÃO ENCONTRADO!');
+        return;
+    }
+    racasDiv.innerHTML = RACAS.map(r=>`
+        <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
+            <div class="opcao-img">
+                <span class="icone-grande">${r.nome.split(' ')[0]}</span>
+                <div>
+                    <div style="font-weight:bold;">${r.nome.split(' ')[1]}</div>
+                    <div class="info">${r.desc}</div>
+                    <div style="font-size:0.75rem; color:var(--sucesso); margin-top:0.2rem;">✨ ${r.passiva.substring(0,40)}...</div>
+                </div>
+            </div>
+        </div>`).join('');
 
-// Jogadores online simulados
-let jogadoresOnline = [
-    {nome:'GuerreiroLuz',classe:'⚔️',nivel:42},
-    {nome:'LuaMística',classe:'🔮',nivel:38},
-    {nome:'FogoSagrado',classe:'🛡️',nivel:51},
-    {nome:'SombraRápida',classe:'🥷',nivel:29}
-];
+    // Carrega CLASSES
+    const classesDiv = document.getElementById('lista-classes');
+    if (!classesDiv) {
+        console.error('Elemento lista-classes NÃO ENCONTRADO!');
+        return;
+    }
+    classesDiv.innerHTML = CLASSES.map(c=>`
+        <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
+            <div class="opcao-img">
+                <span class="icone-grande">${c.nome.split(' ')[0]}</span>
+                <div>
+                    <div style="font-weight:bold;">${c.nome.split(' ')[1]}</div>
+                    <div class="info">DES:${c.base.des} AGI:${c.base.agi} FOR:${c.base.for} INT:${c.base.int} CON:${c.base.con} SOR:${c.base.sor}</div>
+                </div>
+            </div>
+        </div>`).join('');
 
-// =============================================
-// UTILITÁRIAS
-// =============================================
-function trocarTela(id) {
-    document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
-    document.getElementById(id).classList.remove('escondido');
-}
-function salvar() {
-    localStorage.setItem('malazar_jog',JSON.stringify(jogador));
-    localStorage.setItem('malazar_prog',JSON.stringify(progresso));
-}
-function carregar() {
-    const j = localStorage.getItem('malazar_jog');
-    const p = localStorage.getItem('malazar_prog');
-    if(j && p) { jogador=JSON.parse(j); progresso=JSON.parse(p); return true; }
-    return false;
-}
-function agoraHora() {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    montarGradePts();
 }
 
-// =============================================
-// CRIAÇÃO DE PERSONAGEM
-// =============================================
 function iniciar() {
     if(carregar()) {
         if(confirm(`Retomar com ${jogador.nome} (Nv ${progresso.nivel})?`)) {
