@@ -331,6 +331,8 @@ function resetarSelecao() {
     selecionado={raca:null,classe:null,genero:null};
     ptsAlocados={des:0,agi:0,for:0,int:0,con:0,sor:0};
     ptsDisponiveis=3;
+    localStorage.removeItem('jogador');
+
 }
 function montarCriacao() {
     const racasDiv = document.getElementById('lista-racas');
