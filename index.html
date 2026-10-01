@@ -359,12 +359,7 @@ function montarGradePts() {
                 <button onclick="alterarPts('${ch}',1)" ${ptsDisponiveis<=0?'disabled':''}>+</button>
             </div>
         </div>`).join('');
-function alterarPts(ch, qtd) {
-    if(qtd>0 && ptsDisponiveis<=0) return;
-    if(qtd<0 && ptsAlocados[ch]<=0) return;
-    ptsAlocados[ch] += qtd;
-    ptsDisponiveis -= qtd;
-    montarGradePts();
+
 }
 
 function selGen(g) {
@@ -419,6 +414,12 @@ function voltarInicio() {
 function telaHistoria() {
     alert('Malazar foi selado há eras... mas seus cultistas espalham-se pelas masmorras. Você é a luz que deve deter a sombra antes que desperte.');
 }
+    function iniciar() {
+    resetarSelecao();
+    montarCriacao();
+    trocarTela('tela-criar');
+}
+
 // =============================================
 // CIDADE
 // =============================================
