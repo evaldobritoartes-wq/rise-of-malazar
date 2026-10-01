@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rise of Malazar — Crônicas Antigas 📜</title>
+    <title>Rise of Malazar — Crônicas de uma Era Esquecida 📜</title>
     <link rel="manifest" href="manifest.json">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
@@ -20,9 +20,9 @@
             --tinta-suave: #5c4a32;
             --borda: #8b7355;
             --sombra: rgba(58, 47, 31, 0.35);
-            --dourado-brilho: rgba(200, 169, 81, 0.4);
-            --heroi: #4a90d9;
-            --malazar: #7b2d8f;
+            --sucesso: #4a9a67;
+            --perigo: #a84444;
+            --alerta: #d4a040;
         }
 
         body {
@@ -30,515 +30,689 @@
             min-height: 100vh;
             font-family: 'Playfair Display', serif;
             color: var(--tinta);
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        #tela-inicio {
-            position: absolute;
-            inset: 0;
+        .contador-online {
+            position: fixed;
+            top: 0.8rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 0.5rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            color: #9f9;
+            z-index: 9999;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            background: radial-gradient(ellipse at center, rgba(44,36,24,0.9) 0%, rgba(26,21,14,0.98) 100%);
+            gap: 0.4rem;
+        }
+        .ponto {
+            width: 10px; height: 10px;
+            background: #4f4; border-radius: 50%;
+            animation: pulsar 2s infinite;
+        }
+        @keyframes pulsar {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
-        .livro-capa {
-            background: linear-gradient(145deg, var(--papel) 0%, var(--papel-escuro) 100%);
-            border: 4px solid var(--borda);
-            box-shadow: inset 0 0 40px var(--sombra), 0 0 30px rgba(0,0,0,0.5), 0 10px 40px rgba(0,0,0,0.4);
-            padding: 2.5rem 2rem;
-            max-width: 90%;
-            text-align: center;
-            position: relative;
+        .tela {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2rem 1rem;
+            transition: opacity 0.3s;
         }
-
-        .livro-capa::before, .livro-capa::after {
-            content: '';
-            position: absolute;
-            inset: 8px;
-            border: 1px solid var(--ouro);
-            pointer-events: none;
-        }
-
-        .titulo-jogo {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2rem, 12vw, 3.5rem);
-            color: var(--tinta);
-            font-weight: 700;
-            letter-spacing: 5px;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px var(--sombra);
-        }
-
-        .subtitulo {
-            font-family: 'Cinzel', serif;
-            font-size: 1rem;
-            color: var(--tinta-suave);
-            letter-spacing: 3px;
-            margin-bottom: 2rem;
-            font-style: italic;
-        }
-
-        .divisor {
-            width: 60%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--ouro), transparent);
-            margin: 1rem auto 2rem;
-        }
-
-        .botao {
-            font-family: 'Cinzel', serif;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            background: linear-gradient(180deg, var(--ouro) 0%, var(--ouro-escuro) 100%);
-            border: 2px solid var(--borda);
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 0.5rem;
-            min-width: 220px;
-            letter-spacing: 2px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-        }
-
-        .botao:active { transform: scale(0.97); }
-
-        .botoes { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
-        .rodape { margin-top: 2rem; color: var(--envelhecido); font-size: 0.8rem; letter-spacing: 1px; }
+        .escondido { display: none !important; }
 
         .pergaminho {
-            background: linear-gradient(to right, var(--papel-escuro) 0%, var(--papel) 15%, var(--papel) 85%, var(--papel-escuro) 100%);
-            border: 3px solid var(--borda);
-            box-shadow: inset 0 0 30px var(--sombra), 0 10px 30px rgba(0,0,0,0.4);
+            background: linear-gradient(to right, var(--papel-escuro) 0%, var(--papel) 10%, var(--papel) 90%, var(--papel-escuro) 100%);
+            border: 4px solid var(--borda);
+            box-shadow: inset 0 0 40px var(--sombra), 0 0 30px rgba(0,0,0,0.4);
             padding: 2rem 1.5rem;
-            max-width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            line-height: 1.8;
-            color: var(--tinta);
+            max-width: 92%;
+            max-height: 90vh; overflow-y: auto;
+            border-radius: 4px;
+            width: 100%; max-width: 500px;
         }
 
-        .pergaminho h2 {
-            font-family: 'Cinzel', serif;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: var(--tinta);
-            border-bottom: 1px solid var(--ouro);
-            padding-bottom: 1rem;
-        }
+        h1, h2, h3 { font-family: 'Cinzel', serif; text-align: center; margin-bottom: 1rem; }
+        h1 { font-size: clamp(1.8rem, 6vw, 2.5rem); letter-spacing: 3px; }
+        h2 { font-size: clamp(1.3rem, 4vw, 1.8rem); }
+        .subtitulo { text-align: center; color: var(--tinta-suave); margin-bottom: 1.5rem; font-style: italic; }
+        .divisor { height: 2px; background: linear-gradient(90deg, transparent, var(--ouro), transparent); margin: 1rem 0 1.5rem; }
 
-        .destaque { font-weight: 600; color: var(--ouro-escuro); }
-
-        .modos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .modo-card {
-            background: var(--papel);
-            border: 2px solid var(--borda);
-            padding: 1.2rem 0.8rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modo-card:active { transform: scale(0.97); border-color: var(--ouro); }
-        .modo-titulo { font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 0.3rem; color: var(--tinta); font-size: 1rem; }
-        .modo-desc { font-size: 0.8rem; color: var(--tinta-suave); }
-
-        #jogo { display: none; width: 100vw; height: 100vh; position: relative; }
-
-        .painel-topo {
-            position: absolute;
-            top: 0; left: 0;
+        .botao {
+            font-family: 'Cinzel', serif; font-size: 1rem;
+            padding: 0.9rem 1.5rem; margin: 0.4rem 0;
+            background: linear-gradient(180deg, var(--ouro) 0%, var(--ouro-escuro) 100%);
+            border: 2px solid var(--borda); border-radius: 4px;
+            color: #fff; cursor: pointer;
+            transition: all 0.15s;
             width: 100%;
-            padding: 0.8rem 1rem;
-            background: linear-gradient(to bottom, rgba(44,36,24,0.95), transparent);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Cinzel', serif;
-            z-index: 10;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            letter-spacing: 1px;
         }
+        .botao:active { transform: scale(0.97); }
+        .botao-pequeno { padding: 0.6rem 1rem; font-size: 0.9rem; max-width: 140px; }
+        .botoes { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+        .botoes-lado { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 
-        .quadro-status {
-            background: var(--papel);
+        input, select {
+            width: 100%; padding: 0.8rem; margin: 0.5rem 0;
             border: 2px solid var(--borda);
-            padding: 0.6rem 0.8rem;
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
-            font-size: 0.85rem;
+            background: rgba(255,255,255,0.6);
+            font-size: 1rem; border-radius: 4px;
+            font-family: inherit;
         }
 
-        .linha-vida { display: flex; align-items: center; gap: 0.4rem; margin: 0.4rem 0; }
-        .barra-vida { flex: 1; height: 14px; background: var(--papel-escuro); border: 1px solid var(--borda); overflow: hidden; border-radius: 2px; }
-        .vida-jogador { height: 100%; background: linear-gradient(90deg, #3a7bd5, #6ab0f3); width: 100%; transition: width 0.3s ease; }
-        .vida-malazar { height: 100%; background: linear-gradient(90deg, #6b2a91, #a04fd4); width: 100%; transition: width 0.3s ease; }
-        .valor-vida { font-size: 0.75rem; min-width: 24px; text-align: right; }
-
-        .caixa-info {
-            background: rgba(244, 228, 193, 0.9);
-            border: 2px solid var(--borda);
-            padding: 0.6rem 0.8rem;
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
-            font-size: 0.8rem;
+        .opcao {
+            border: 2px solid var(--borda); padding: 1rem; margin: 0.6rem 0;
+            border-radius: 4px; cursor: pointer; transition: all 0.2s;
+            background: rgba(255,255,255,0.3);
         }
-
-        .tela-campo {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, #2a2218 0%, #1a1410 100%);
-            position: relative;
-            overflow: hidden;
+        .opcao:hover, .opcao.selecionada {
+            border-color: var(--ouro); background: rgba(200,169,81,0.2);
         }
+        .opcao-titulo { font-weight: bold; font-family: 'Cinzel', serif; margin-bottom: 0.3rem; }
+        .opcao-detalhe { font-size: 0.85rem; color: var(--tinta-suave); }
 
-        .campo {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 94%;
-            height: 65%;
-            border: 3px solid var(--borda);
-            background: rgba(60, 50, 35, 0.4);
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3);
-            cursor: crosshair;
+        .barras-vida { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+        .bloco-vida { flex: 1; min-width: 140px; }
+        .etiqueta { font-weight: bold; margin-bottom: 0.3rem; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .barra { height: 18px; background: var(--papel-escuro); border: 1px solid var(--borda); border-radius: 2px; overflow: hidden; }
+        .barra-interna { height: 100%; transition: width 0.3s; }
+        .vida-jogador { background: linear-gradient(90deg, #3a7bd5, #6ab0f3); }
+        .vida-inimigo { background: linear-gradient(90deg, #8b2a2a, #d44); }
+
+        .caixa-texto {
+            background: rgba(255,255,255,0.4); border: 2px solid var(--borda);
+            padding: 1rem; margin: 1rem 0; border-radius: 4px;
+            min-height: 80px;
         }
+        .dado { display: inline-block; background: var(--ouro); color: #fff; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: bold; margin: 0 0.2rem; }
 
-        .linha-divisoria {
-            position: absolute;
-            top: 50%; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--ouro), transparent);
-            opacity: 0.4;
-        }
-
-        .personagem {
-            position: absolute;
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem;
-            transition: none;
-            box-shadow: 0 0 12px currentColor;
-            z-index: 5;
-        }
-
-        .heroi {
-            background: radial-gradient(circle at 30% 30%, #6ab0f3, #2a5ea5);
-            border: 3px solid #94c5ff;
-            color: #94c5ff;
-        }
-
-        .malazar {
-            background: radial-gradient(circle at 30% 30%, #a04fd4, #5a2a85);
-            border: 3px solid #c084f0;
-            color: #c084f0;
-        }
-
-        /* === BOTÃO DE ATAQUE — TELA INFERIOR === */
-        .area-ataque {
-            position: absolute;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-        }
-
-        .botao-ataque {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(180deg, #d4a040, #8a6520);
-            border: 3px solid #ffd060;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(212, 160, 64, 0.5);
-            transition: all 0.15s ease;
-        }
-
-        .botao-ataque:active {
-            transform: scale(0.9);
-            box-shadow: 0 0 25px rgba(255, 210, 96, 0.8);
-        }
-
-        .comandos {
-            position: absolute;
-            bottom: 1.5rem;
-            right: 1rem;
-            background: rgba(244, 228, 193, 0.9);
-            border: 2px solid var(--borda);
-            padding: 0.8rem;
-            font-size: 0.75rem;
-            color: var(--tinta-suave);
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.25);
-            z-index: 10;
-            max-width: 120px;
-        }
-
-        .escondido { display: none !important; }
-        .voltar { background: linear-gradient(180deg, var(--envelhecido), #9a8060); }
+        .resumo { background: rgba(255,255,255,0.4); padding: 1rem; border-radius: 4px; margin: 1rem 0; }
+        .linha { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px dashed var(--borda); }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE INÍCIO -->
-    <div id="tela-inicio">
-        <div class="livro-capa">
-            <h1 class="titulo-jogo">MALAZAR</h1>
-            <p class="subtitulo">Crônicas de uma Era Esquecida</p>
-            <div class="divisor"></div>
-            <div class="botoes">
-                <button class="botao" onclick="mostrarModos()">⚔️ INICIAR AVENTURA</button>
-                <button class="botao" onclick="mostrarHistoria()">📜 O Pergaminho</button>
-            </div>
-            <p class="rodape">Rise of Malazar © 2026</p>
+<div class="contador-online">
+    <span class="ponto"></span>
+    <span>Jogadores: <span id="contador-num">1</span></span>
+</div>
+
+<!-- TELA INÍCIO -->
+<div id="tela-inicio" class="tela">
+    <div class="pergaminho" style="text-align:center;">
+        <h1>MALAZAR</h1>
+        <p class="subtitulo">Crônicas de uma Era Esquecida</p>
+        <div class="divisor"></div>
+        <p style="margin-bottom:1.5rem;">As sombras despertaram. Cabe a ti enfrentar a cultura que cresce na escuridão...</p>
+        <div class="botoes">
+            <button class="botao" onclick="iniciarJogo()">⚔️ Iniciar Jornada</button>
+            <button class="botao" onclick="telaHistoria()">📜 A História</button>
         </div>
     </div>
+</div>
 
-    <!-- TELA DE HISTÓRIA -->
-    <div id="tela-historia" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:101;background:rgba(20,16,10,0.9);padding:1rem;">
-        <div class="pergaminho">
-            <h2>O Despertar de Malazar</h2>
-            <p>Nos tempos antigos, foi selado sob a terra profunda um poder que nenhum reino ousava nomear: <span class="destaque">Malazar</span>.<br><br>
-            Agora as correntes se rompem... Cabe a ti enfrentar a escuridão que desperta.</p>
-            <div style="text-align:center;margin-top:1.5rem;">
-                <button class="botao voltar" onclick="voltarInicio()">← Retornar</button>
-            </div>
+<!-- TELA CRIAÇÃO PERSONAGEM -->
+<div id="tela-criar" class="tela escondido">
+    <div class="pergaminho">
+        <h2>Criar Seu Herói</h2>
+        <div class="divisor"></div>
+        
+        <label>Nome do Herói:</label>
+        <input type="text" id="nome-heroi" placeholder="Digite seu nome..." maxlength="15">
+
+        <h3 style="margin-top:1.5rem;">Raça</h3>
+        <div id="lista-racas"></div>
+
+        <h3 style="margin-top:1.5rem;">Classe</h3>
+        <div id="lista-classes"></div>
+
+        <div class="botoes">
+            <button class="botao" onclick="confirmarPersonagem()">✅ Confirmar e Entrar</button>
+            <button class="botao" onclick="voltarInicio()">← Voltar</button>
         </div>
     </div>
+</div>
 
-    <!-- TELA DE MODOS -->
-    <div id="tela-modos" class="escondido" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:102;background:rgba(20,16,10,0.95);padding:1rem;">
-        <div class="livro-capa" style="max-width:90%;">
-            <h2 style="font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1.3rem;">Escolha seu Caminho</h2>
-            <p style="color:var(--tinta-suave);margin-bottom:0.5rem;font-size:0.9rem;">Como enfrentarás a ameaça?</p>
-            <div class="modos-grid">
-                <div class="modo-card" onclick="iniciarJogo('pvp1')">
-                    <div class="modo-titulo">⚔️ Duelo 1×1</div>
-                    <div class="modo-desc">Jogador vs Jogador</div>
-                </div>
-                <div class="modo-card" onclick="iniciarJogo('pvp3')">
-                    <div class="modo-titulo">🛡️ Batalha 3×3</div>
-                    <div class="modo-desc">Equipes</div>
-                </div>
-                <div class="modo-card" onclick="iniciarJogo('pve')">
-                    <div class="modo-titulo">👹 Crônicas PvE</div>
-                    <div class="modo-desc">Enfrente Malazar</div>
-                </div>
+<!-- TELA EXPLORAÇÃO -->
+<div id="tela-masmorra" class="tela escondido">
+    <div class="pergaminho">
+        <h2 id="titulo-sala">Sala 1</h2>
+        <p class="subtitulo" id="subtitulo-sala">Explorando...</p>
+        <div class="divisor"></div>
+
+        <div class="barras-vida">
+            <div class="bloco-vida">
+                <div class="etiqueta"><span id="nome-jogador">Herói</span><span id="val-vida-jog">30/30</span></div>
+                <div class="barra"><div id="barra-vida-jog" class="barra-interna vida-jogador"></div></div>
             </div>
-            <button class="botao voltar" style="margin-top:1.5rem;" onclick="voltarInicio()">← Voltar</button>
+            <div class="bloco-vida">
+                <div class="etiqueta">🎒 Poções: <span id="qtd-pocoes">2</span></div>
+            </div>
+        </div>
+
+        <div class="caixa-texto" id="texto-sala">
+            Você adentra a masmorra...
+        </div>
+
+        <div class="botoes" id="botoes-acoes"></div>
+    </div>
+</div>
+
+<!-- TELA COMBATE -->
+<div id="tela-combate" class="tela escondido">
+    <div class="pergaminho">
+        <h2 id="nome-inimigo">Inimigo</h2>
+        <p class="subtitulo" id="status-turno">Seu turno — escolha uma ação</p>
+        <div class="divisor"></div>
+
+        <div class="barras-vida">
+            <div class="bloco-vida">
+                <div class="etiqueta"><span id="nome-jog-cmb">Herói</span><span id="val-v-jog-cmb">30/30</span></div>
+                <div class="barra"><div id="bar-v-jog-cmb" class="barra-interna vida-jogador"></div></div>
+            </div>
+            <div class="bloco-vida">
+                <div class="etiqueta"><span id="nome-inim-cmb">Inimigo</span><span id="val-v-inim-cmb">20/20</span></div>
+                <div class="barra"><div id="bar-v-inim-cmb" class="barra-interna vida-inimigo"></div></div>
+            </div>
+        </div>
+
+        <div class="caixa-texto" id="log-combate"></div>
+
+        <div class="botoes" id="acoes-combate"></div>
+    </div>
+</div>
+
+<!-- TELA RESUMO -->
+<div id="tela-resumo" class="tela escondido">
+    <div class="pergaminho" style="text-align:center;">
+        <h2 id="titulo-resumo">Jornada Concluída</h2>
+        <div class="divisor"></div>
+        <div class="resumo" id="conteudo-resumo"></div>
+        <div class="botoes">
+            <button class="botao" onclick="voltarInicio()">🏠 Início</button>
         </div>
     </div>
-
-    <!-- ÁREA DO JOGO -->
-    <div id="jogo">
-        <div class="painel-topo">
-            <div class="quadro-status">
-                <div style="font-weight:bold;">Herói</div>
-                <div class="linha-vida">
-                    <div class="barra-vida"><div class="vida-jogador" id="vida-jogador"></div></div>
-                    <span class="valor-vida" id="valor-vida-jogador">100</span>
-                </div>
-            </div>
-            <div class="caixa-info">
-                <strong>Modo:</strong><span id="modo-atual">—</span><br>
-                <strong>Fase:</strong><span id="fase">1</span>
-            </div>
-            <div class="quadro-status">
-                <div style="font-weight:bold; color:var(--malazar);">MALAZAR</div>
-                <div class="linha-vida">
-                    <span class="valor-vida" id="valor-vida-malazar">100</span>
-                    <div class="barra-vida"><div class="vida-malazar" id="vida-malazar"></div></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tela-campo">
-            <div class="campo" id="campo">
-                <div class="linha-divisoria"></div>
-                <div class="personagem heroi" id="heroi">⚔️</div>
-                <div class="personagem malazar" id="malazar">👹</div>
-            </div>
-        </div>
-
-        <div class="area-ataque">
-            <button class="botao-ataque" id="btn-ataque" onclick="atacar()">⚔️</button>
-        </div>
-
-        <div class="comandos">
-            📱 Toque para mover<br>
-            ⚔️ Botão para atacar
-        </div>
-    </div>
+</div>
 
 <script>
-// === TELAS ===
-function mostrarHistoria() {
-    document.getElementById('tela-inicio').classList.add('escondido');
-    document.getElementById('tela-historia').classList.remove('escondido');
+// =============================================
+// DADOS DO JOGO
+// =============================================
+const RACAS = [
+    { id: 'draconato', nome: '🐉 Draconato', desc: '+5 Vida Máxima; Resistência Elemental', passiva: 'vida+5' },
+    { id: 'tiefling', nome: '🔥 Tiefling', desc: 'Resistência a Fogo/Sombrio; +2 Dano', passiva: 'dano+2' },
+    { id: 'halfling', nome: '🍀 Halfling', desc: 'Sorte: 1 vira 2 no dado; 15% evitar perigo', passiva: 'sorte' },
+    { id: 'elfo', nome: '🧝 Elfo', desc: 'Sempre ataca primeiro', passiva: 'primeiro' },
+    { id: 'anao', nome: '🏔️ Anão', desc: '+5 Vida; -25% dano de armadilhas', passiva: 'vida+5, armadilha-25' },
+    { id: 'humano', nome: '🧑 Humano', desc: '+1 Poção; Recompensas curam +5', passiva: 'pocao+1, cura+5' }
+];
+
+const CLASSES = [
+    { id: 'guerreiro', nome: '🗡️ Guerreiro', hp: 35, dadoAtaque: '1d8', modAtaque: 3, hab: 'Ataque Poderoso: dano ×1.5 (1x/confronto)' },
+    { id: 'mago', nome: '🔮 Mago', hp: 25, dadoAtaque: '1d6', modAtaque: 4, hab: 'Lançar Magia: dano + cura 5 (2x/masmorra)' },
+    { id: 'paladino', nome: '🛡️ Paladino', hp: 32, dadoAtaque: '1d8', modAtaque: 2, hab: 'Toque Curativo: defender cura 3 de vida' },
+    { id: 'patrulheiro', nome: '🏹 Patrulheiro', hp: 28, dadoAtaque: '1d10', modAtaque: 3, hab: 'Tiro Preciso: acerto garantido (1x/confronto)' }
+];
+
+const INIMIGOS = {
+    comuns: [
+        { nome: '🦇 Enxame de Morcegos', hp: 22, dano: '1d4', modDano: 0 },
+        { nome: '💀 Esqueleto', hp: 13, dano: '1d6', modDano: 2 },
+        { nome: '🐺 Lobo Sombrio', hp: 11, dano: '2d4', modDano: 0 },
+        { nome: '🕯️ Cultista Iniciado', hp: 9, dano: '1d6', modDano: 0 },
+        { nome: '🕷️ Aranha Escura', hp: 4, dano: '1d4', modDano: 0 }
+    ],
+    chefe: { nome: '👹 Cultista de Malazar', hp: 55, dano: '1d6', modDano: 3, dano2: '2d6', modDano2: 0 }
+};
+
+// =============================================
+// ESTADO GLOBAL
+// =============================================
+let jogador = null;
+let progresso = { salaAtual: 0, ultimoCheckpoint: 0, salasVisitadas: [], recompensasColetadas: [], semanal: null };
+let inimigoAtual = null;
+let estadoCombate = { turnoJogador: true, defesaAtiva: false, habUsada: false, magiasUsadas: 0, preciasoUsado: false };
+
+// Contador jogadores (simulado)
+setInterval(() => {
+    const num = Math.floor(Math.random() * 8) + 1;
+    document.getElementById('contador-num').textContent = num;
+}, 8000);
+
+// =============================================
+// FUNÇÕES UTILITÁRIAS
+// =============================================
+function rolarDado(texto) {
+    const match = texto.match(/(\d+)d(\d+)([+-]\d+)?/);
+    if (!match) return [0, 0];
+    const qtd = parseInt(match[1]), lados = parseInt(match[2]), mod = parseInt(match[3] || 0);
+    let total = 0, detalhes = [];
+    for (let i = 0; i < qtd; i++) {
+        let r = Math.floor(Math.random() * lados) + 1;
+        // Passiva Halfling
+        if (jogador?.raca?.passiva.includes('sorte') && r === 1) r = 2;
+        total += r; detalhes.push(r);
+    }
+    return [total + mod, detalhes];
 }
-function mostrarModos() {
-    document.getElementById('tela-inicio').classList.add('escondido');
-    document.getElementById('tela-modos').classList.remove('escondido');
+
+function salvarProgresso() {
+    localStorage.setItem('malazar_jogador', JSON.stringify(jogador));
+    localStorage.setItem('malazar_progresso', JSON.stringify(progresso));
 }
+
+function carregarProgresso() {
+    jogador = JSON.parse(localStorage.getItem('malazar_jogador') || 'null');
+    progresso = JSON.parse(localStorage.getItem('malazar_progresso') || '{"salaAtual":0,"ultimoCheckpoint":0,"salasVisitadas":[],"recompensasColetadas":[],"semanal":null}');
+    
+    const agora = new Date();
+    const ultima = progresso.semanal ? new Date(progresso.semanal) : new Date(0);
+    const dias = (agora - ultima) / (1000 * 60 * 60 * 24);
+    if (dias >= 7 && progresso.semanal) {
+        progresso.salaAtual = 0;
+        progresso.ultimoCheckpoint = 0;
+        progresso.salasVisitadas = [];
+        progresso.recompensasColetadas = [];
+        progresso.semanal = agora.toISOString();
+        salvarProgresso();
+    }
+}
+
+function trocarTela(id) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.add('escondido'));
+    document.getElementById(id).classList.remove('escondido');
+}
+
+// =============================================
+// TELAS INICIAIS
+// =============================================
+function iniciarJogo() {
+    carregarProgresso();
+    if (jogador && jogador.nome) {
+        if (progresso.salaAtual > 0) {
+            if (confirm(`Retomar jornada — Sala ${progresso.salaAtual}?\nOu começar novo herói?`)) {
+                trocarTela('tela-masmorra');
+                proximaSala();
+                return;
+            }
+        }
+    }
+    montarCriacao();
+    trocarTela('tela-criar');
+}
+
 function voltarInicio() {
-    document.querySelectorAll('#tela-historia, #tela-modos').forEach(el => el.classList.add('escondido'));
-    document.getElementById('tela-inicio').classList.remove('escondido');
+    jogador = null;
+    progresso = { salaAtual:0, ultimoCheckpoint:0, salasVisitadas:[], recompensasColetadas:[], semanal: new Date().toISOString() };
+    localStorage.removeItem('malazar_jogador');
+    localStorage.removeItem('malazar_progresso');
+    trocarTela('tela-inicio');
 }
 
-// === JOGO ===
-let jogoAtivo = false;
-let modoAtual = '';
-
-const heroi = {
-    el: null,
-    x: 40, y: 150,
-    alvoX: 40, alvoY: 150,
-    velocidade: 3.5,
-    vida: 100,
-    vidaMax: 100
-};
-
-const malazar = {
-    el: null,
-    x: 500, y: 150,
-    vida: 100,
-    vidaMax: 100
-};
-
-const campo = { el: null, largura: 0, altura: 0, offsetX: 0, offsetY: 0 };
-
-function iniciarJogo(modo) {
-    modoAtual = modo;
-    jogoAtivo = true;
-    
-    document.getElementById('tela-modos').classList.add('escondido');
-    document.getElementById('jogo').style.display = 'block';
-    
-    const nomes = { pvp1: 'Duelo 1×1', pvp3: 'Batalha 3×3', pve: 'Crônicas PvE' };
-    document.getElementById('modo-atual').textContent = nomes[modo];
-    
-    heroi.el = document.getElementById('heroi');
-    malazar.el = document.getElementById('malazar');
-    campo.el = document.getElementById('campo');
-    
-    // Posicionamento inicial
-    atualizarDimensoesCampo();
-    heroi.x = heroi.alvoX = campo.largura * 0.1;
-    heroi.y = heroi.alvoY = campo.altura * 0.5;
-    malazar.x = campo.largura * 0.8;
-    malazar.y = campo.altura * 0.5;
-    
-    atualizarPosicoes();
-    atualizarBarrasVida();
-    
-    loopJogo();
+function telaHistoria() {
+    alert('No princípio, Malazar foi selado. Mas as eras passam...\nSeus cultistas espalham-se pelas masmorras, fortalecendo o retorno do Mestre.\nVocê é a luz que deve deter a sombra antes que desperte.');
 }
 
-function atualizarDimensoesCampo() {
-    const rect = campo.el.getBoundingClientRect();
-    campo.largura = rect.width;
-    campo.altura = rect.height;
-    campo.offsetX = rect.left;
-    campo.offsetY = rect.top;
+// =============================================
+// CRIAÇÃO DE PERSONAGEM
+// =============================================
+function montarCriacao() {
+    const racasDiv = document.getElementById('lista-racas');
+    racasDiv.innerHTML = RACAS.map(r => `
+        <div class="opcao" data-tipo="raca" data-id="${r.id}" onclick="selecionarOpcao('raca','${r.id}')">
+            <div class="opcao-titulo">${r.nome}</div>
+            <div class="opcao-detalhe">${r.desc}</div>
+        </div>`).join('');
+
+    const classesDiv = document.getElementById('lista-classes');
+    classesDiv.innerHTML = CLASSES.map(c => `
+        <div class="opcao" data-tipo="classe" data-id="${c.id}" onclick="selecionarOpcao('classe','${c.id}')">
+            <div class="opcao-titulo">${c.nome}</div>
+            <div class="opcao-detalhe">HP: ${c.hp} | Ataque: ${c.dadoAtaque}${c.modAtaque>0?`+${c.modAtaque}`:''}</div>
+            <div class="opcao-detalhe">✨ ${c.hab}</div>
+        </div>`).join('');
 }
 
-// === TOQUE / CLIQUE PARA MOVER ===
-function irPara(alvoX, alvoY) {
-    if (!jogoAtivo) return;
-    // Limites dentro do campo
-    heroi.alvoX = Math.max(0, Math.min(campo.largura - 50, alvoX - 25));
-    heroi.alvoY = Math.max(0, Math.min(campo.altura - 50, alvoY - 25));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.addEventListener('click', e => {
-        if (!jogoAtivo || !campo.el) return;
-        const rect = campo.el.getBoundingClientRect();
-        if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            irPara(e.clientX - rect.left, e.clientY - rect.top);
-        }
+let selecionado = { raca: null, classe: null };
+function selecionarOpcao(tipo, id) {
+    selecionado[tipo] = id;
+    document.querySelectorAll(`[data-tipo="${tipo}"]`).forEach(el => {
+        el.classList.toggle('selecionada', el.dataset.id === id);
     });
-    // Suporte a toque
-    document.addEventListener('touchstart', e => {
-        if (!jogoAtivo || !campo.el) return;
-        const touch = e.touches[0];
-        const rect = campo.el.getBoundingClientRect();
-        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-            e.preventDefault();
-            irPara(touch.clientX - rect.left, touch.clientY - rect.top);
-        }
-    }, { passive: false });
-});
-
-function atualizarPosicoes() {
-    heroi.el.style.left = heroi.x + 'px';
-    heroi.el.style.top = heroi.y + 'px';
-    malazar.el.style.left = malazar.x + 'px';
-    malazar.el.style.top = malazar.y + 'px';
 }
 
-function atualizarBarrasVida() {
-    document.getElementById('vida-jogador').style.width = (heroi.vida / heroi.vidaMax * 100) + '%';
-    document.getElementById('valor-vida-jogador').textContent = Math.round(heroi.vida);
-    document.getElementById('vida-malazar').style.width = (malazar.vida / malazar.vidaMax * 100) + '%';
-    document.getElementById('valor-vida-malazar').textContent = Math.round(malazar.vida);
+function confirmarPersonagem() {
+    const nome = document.getElementById('nome-heroi').value.trim();
+    if (!nome) return alert('Digite um nome para o herói!');
+    if (!selecionado.raca) return alert('Escolha uma raça!');
+    if (!selecionado.classe) return alert('Escolha uma classe!');
+
+    const raca = RACAS.find(r => r.id === selecionado.raca);
+    const classe = CLASSES.find(c => c.id === selecionado.classe);
+    
+    let hpMax = classe.hp;
+    let pocoes = 2;
+    if (raca.passiva.includes('vida+5')) hpMax += 5;
+    if (raca.passiva.includes('pocao+1')) pocoes += 1;
+
+    jogador = {
+        nome, raca, classe,
+        hp: hpMax, hpMax,
+        pocoes,
+        danoExtra: raca.passiva.includes('dano+2') ? 2 : 0,
+        semprePrimeiro: raca.passiva.includes('primeiro'),
+        armadilhaReduz: raca.passiva.includes('armadilha-25') ? 0.75 : 1,
+        curaExtra: raca.passiva.includes('cura+5') ? 5 : 0
+    };
+
+    progresso.semanal = new Date().toISOString();
+    salvarProgresso();
+    trocarTela('tela-masmorra');
+    proximaSala();
 }
 
-function atacar() {
-    if (!jogoAtivo) return;
-    
-    // Distância até Malazar
-    const dx = malazar.x - heroi.x;
-    const dy = malazar.y - heroi.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    
-    if (dist < 110) {
-        const dano = 15;
-        malazar.vida = Math.max(0, malazar.vida - dano);
-        atualizarBarrasVida();
-        
-        if (malazar.vida <= 0) {
-            jogoAtivo = false;
-            setTimeout(() => {
-                alert('🏆 VITÓRIA! Malazar foi derrotado!');
-            }, 100);
-        }
+// =============================================
+// MASMORRA — EXPLORAÇÃO
+// =============================================
+function proximaSala() {
+    progresso.salaAtual++;
+    const num = progresso.salaAtual;
+    document.getElementById('titulo-sala').textContent = num === 10 ? '⚔️ SALA DO CHEFE' : `Sala ${num}`;
+    document.getElementById('nome-jogador').textContent = jogador.nome;
+    atualizarBarrasExploracao();
+
+    // Checkpoints
+    if (num === 5 || num === 10) {
+        progresso.ultimoCheckpoint = num;
+        document.getElementById('subtitulo-sala').textContent = '✅ CHECKPOINT ALCANÇADO';
     } else {
-        alert('Aproxime-se de Malazar para atacar! ⚔️');
+        document.getElementById('subtitulo-sala').textContent = 'Explorando...';
+    }
+
+    // Sala 10 = Chefe
+    if (num === 10) {
+        document.getElementById('texto-sala').innerHTML = `
+            A sala é ampla, iluminada por tochas de chama negra. No centro, um devoto de Malazar vira-se lentamente...<br><br>
+            <strong>"Ninguém detém o despertar do Mestre!"</strong>
+        `;
+        montarBotoes([{ texto: '⚔️ Enfrentar Cultista', acao: () => iniciarCombateChefe() }]);
+        return;
+    }
+
+    // Salas 1-9
+    if (!progresso.salasVisitadas.includes(num)) progresso.salasVisitadas.push(num);
+    const jaVisitada = progresso.recompensasColetadas.includes(num);
+
+    let conteudo, tipo;
+    const rolo = Math.random();
+    if (rolo < 0.40) tipo = 'inimigo';
+    else if (rolo < 0.60 && !jaVisitada) tipo = 'recompensa';
+    else if (rolo < 0.85) tipo = 'vazio';
+    else tipo = 'armadilha';
+
+    if (jaVisitada && tipo === 'recompensa') tipo = Math.random() < 0.5 ? 'inimigo' : 'vazio';
+
+    switch (tipo) {
+        case 'inimigo':
+            conteudo = 'Você ouve passos... uma criatura emerge das sombras!';
+            montarBotoes([{ texto: '⚔️ Combater', acao: () => iniciarCombateComum() }]);
+            break;
+        case 'recompensa':
+            const cura = Math.floor(Math.random() * 8) + 6 + jogador.curaExtra;
+            jogador.hp = Math.min(jogador.hpMax, jogador.hp + cura);
+            progresso.recompensasColetadas.push(num);
+            conteudo = `Você encontra um antigo depósito de suprimentos! Recupera ${cura} pontos de vida.`;
+            montarBotoes([{ texto: '➡️ Seguir adiante', acao: proximaSala }]);
+            break;
+        case 'vazio':
+            conteudo = 'Silêncio absoluto. Apenas o eco de seus passos ressoa...';
+            montarBotoes([{ texto: '➡️ Seguir adiante', acao: proximaSala }]);
+            break;
+        case 'armadilha':
+            const dano = Math.floor((Math.random() * 10 + 5) * jogador.armadilhaReduz);
+            jogador.hp -= dano;
+            conteudo = `Uma armadilha oculta é acionada! Sofre ${dano} de dano!`;
+            if (jogador.hp <= 0) return derrota();
+            montarBotoes([{ texto: '➡️ Recuperar e seguir', acao: proximaSala }]);
+            break;
+    }
+
+    document.getElementById('texto-sala').textContent = conteudo;
+    salvarProgresso();
+}
+
+function atualizarBarrasExploracao() {
+    const pct = jogador.hp / jogador.hpMax * 100;
+    document.getElementById('barra-vida-jog').style.width = pct + '%';
+    document.getElementById('val-vida-jog').textContent = `${jogador.hp}/${jogador.hpMax}`;
+    document.getElementById('qtd-pocoes').textContent = jogador.pocoes;
+}
+
+function montarBotoes(lista) {
+    const div = document.getElementById('botoes-acoes');
+    div.innerHTML = '';
+    lista.forEach(b => {
+        const btn = document.createElement('button');
+        btn.className = 'botao';
+        btn.textContent = b.texto;
+        btn.onclick = b.acao;
+        div.appendChild(btn);
+    });
+}
+
+// =============================================
+// COMBATE
+// =============================================
+function iniciarCombateComum() {
+    const base = INIMIGOS.comuns[Math.floor(Math.random() * INIMIGOS.comuns.length)];
+    iniciarCombate({ ...base, hpAtual: base.hp, maxHp: base.hp });
+}
+function iniciarCombateChefe() {
+    const c = INIMIGOS.chefe;
+    iniciarCombate({ ...c, hpAtual: c.hp, maxHp: c.hp, fase2: false });
+}
+function iniciarCombate(inimigo) {
+    inimigoAtual = inimigo;
+    estadoCombate = { turnoJogador: true, defesaAtiva: false, habUsada: false, magiasUsadas: 0, preciasoUsado: false };
+    
+    document.getElementById('nome-inimigo').textContent = inimigo.nome;
+    document.getElementById('nome-jog-cmb').textContent = jogador.nome;
+    trocarTela('tela-combate');
+    atualizarBarrasCombate();
+    document.getElementById('log-combate').textContent = `${inimigo.nome} se aproxima!`;
+    montarAcoes();
+}
+
+function atualizarBarrasCombate() {
+    const pj = jogador.hp / jogador.hpMax * 100;
+    const pi = inimigoAtual.hpAtual / inimigoAtual.maxHp * 100;
+    document.getElementById('bar-v-jog-cmb').style.width = pj + '%';
+    document.getElementById('val-v-jog-cmb').textContent = `${jogador.hp}/${jogador.hpMax}`;
+    document.getElementById('bar-v-inim-cmb').style.width = pi + '%';
+    document.getElementById('val-v-inim-cmb').textContent = `${inimigoAtual.hpAtual}/${inimigoAtual.maxHp}`;
+}
+
+function montarAcoes() {
+    if (!estadoCombate.turnoJogador) {
+        document.getElementById('acoes-combate').innerHTML = '<p style="text-align:center;">Aguardando ação inimiga...</p>';
+        return;
+    }
+    const div = document.getElementById('acoes-combate');
+    div.innerHTML = '';
+    const acoes = [
+        { texto: '⚔️ Atacar', fn: acaoAtacar },
+        { texto: '🛡️ Defender', fn: acaoDefender },
+    ];
+    if (!estadoCombate.habUsada) acoes.push({ texto: '✨ Habilidade', fn: acaoHabilidade });
+    if (jogador.pocoes > 0) acoes.push({ texto: '🧪 Poção ('+jogador.pocoes+')', fn: acaoPocao });
+    acoes.push({ texto: '🏃 Tentar Fugir', fn: acaoFugir });
+
+    acoes.forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = 'botao';
+        btn.textContent = a.texto;
+        btn.onclick = a.fn;
+        div.appendChild(btn);
+    });
+    document.getElementById('status-turno').textContent = 'Seu turno';
+}
+
+function log(msg) { document.getElementById('log-combate').innerHTML += `<br>• ${msg}`; }
+
+// --- AÇÕES ---
+function acaoAtacar() {
+    const [dado, detalhes] = rolarDado(jogador.classe.dadoAtaque);
+    let dano = dado + jogador.classe.modAtaque + jogador.danoExtra;
+    inimigoAtual.hpAtual = Math.max(0, inimigoAtual.hpAtual - dano);
+    log(`Você ataca → rola [${detalhes.join(',')}] = ${dano}! Causa ${dano} de dano.`);
+    fimTurnoJogador();
+}
+
+function acaoDefender() {
+    estadoCombate.defesaAtiva = true;
+    log('Você levanta a guarda! Dano recebido reduzido.');
+    if (jogador.classe.id === 'paladino') {
+        jogador.hp = Math.min(jogador.hpMax, jogador.hp + 3);
+        log('Aura sagrada cura 3 de vida!');
+    }
+    fimTurnoJogador();
+}
+
+function acaoHabilidade() {
+    estadoCombate.habUsada = true;
+    if (jogador.classe.id === 'guerreiro') {
+        const [dado, detalhes] = rolarDado(jogador.classe.dadoAtaque);
+        let dano = Math.floor((dado + jogador.classe.modAtaque) * 1.5) + jogador.danoExtra;
+        inimigoAtual.hpAtual = Math.max(0, inimigoAtual.hpAtual - dano);
+        log(`⚔️ FÚRIA! Rola [${detalhes.join(',')}] → ${dano} de dano!`);
+    } else if (jogador.classe.id === 'mago') {
+        estadoCombate.magiasUsadas++;
+        const [dado, detalhes] = rolarDado('2d6');
+        const dano = dado + 4;
+        inimigoAtual.hpAtual = Math.max(0, inimigoAtual.hpAtual - dano);
+        jogador.hp = Math.min(jogador.hpMax, jogador.hp + 5);
+        log(`✨ MAGIA! Causa ${dano} de dano e cura 5 de vida!`);
+    } else if (jogador.classe.id === 'patrulheiro') {
+        const dano = 15 + jogador.danoExtra;
+        inimigoAtual.hpAtual = Math.max(0, inimigoAtual.hpAtual - dano);
+        log(`🏹 PRECISÃO! Acerto garantido — ${dano} de dano!`);
+    }
+    fimTurnoJogador();
+}
+
+function acaoPocao() {
+    jogador.pocoes--;
+    const [cura, detalhes] = rolarDado('2d4+2');
+    const total = cura + jogador.curaExtra;
+    jogador.hp = Math.min(jogador.hpMax, jogador.hp + total);
+    log(`🧪 Poção: rola [${detalhes.join(',')}] = ${total} pontos de vida restaurados!`);
+    fimTurnoJogador();
+}
+
+function acaoFugir() {
+    if (Math.random() < 0.35) {
+        log('🏃 Você consegue escapar!');
+        setTimeout(() => { trocarTela('tela-masmorra'); proximaSala(); }, 1000);
+    } else {
+        log('Não consegue fugir! O inimigo bloqueia o caminho!');
+        fimTurnoJogador();
     }
 }
 
-function loopJogo() {
-    if (!jogoAtivo) return;
-    
-    // Movimento suave até o ponto tocado/clicado
-    const dx = heroi.alvoX - heroi.x;
-    const dy = heroi.alvoY - heroi.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    
-    if (dist > 5) {
-        heroi.x += (dx / dist) * heroi.velocidade;
-        heroi.y += (dy / dist) * heroi.velocidade;
+function fimTurnoJogador() {
+    atualizarBarrasCombate();
+    if (inimigoAtual.hpAtual <= 0) {
+        log(`🏆 ${inimigoAtual.nome} foi derrotado!`);
+        setTimeout(() => {
+            if (progresso.salaAtual === 10) {
+                progresso.semanal = new Date().toISOString();
+                salvarProgresso();
+                telaVitoria();
+            } else {
+                trocarTela('tela-masmorra');
+                proximaSala();
+            }
+        }, 1200);
+        return;
     }
-    
-    atualizarPosicoes();
-    requestAnimationFrame(loopJogo);
+    estadoCombate.turnoJogador = false;
+    montarAcoes();
+    setTimeout(turnoInimigo, 1200);
 }
 
-// Redimensiona no celular
-window.addEventListener('resize', () => {
-    if (jogoAtivo) atualizarDimensoesCampo();
-});
+function turnoInimigo() {
+    if (inimigoAtual.hpAtual <= 0) return;
+    
+    // Fase 2 do Chefe
+    let bonus = 0;
+    if (inimigoAtual.fase2 === false && inimigoAtual.hpAtual <= 25) {
+        inimigoAtual.fase2 = true;
+        log('⚠️ O Cultista entra em fúria sombria!');
+        bonus = 5;
+    }
+
+    const ataque = (inimigoAtual.hpAtual <= 25 && inimigoAtual.dano2) ? 'dano2' : 'dano';
+    const [dado, detalhes] = rolarDado(inimigoAtual[ataque]);
+    let dano = dado + inimigoAtual['mod' + ataque] + bonus;
+    
+    if (estadoCombate.defesaAtiva) {
+        dano = Math.floor(dano * 0.5);
+        estadoCombate.defesaAtiva = false;
+    }
+
+    jogador.hp -= dano;
+    log(`${inimigoAtual.nome} ataca → ${dano} de dano recebido!`);
+    
+    atualizarBarrasCombate();
+    if (jogador.hp <= 0) {
+        log('💀 Você caiu em combate...');
+        setTimeout(derrota, 1500);
+        return;
+    }
+    estadoCombate.turnoJogador = true;
+    montarAcoes();
+}
+
+// =============================================
+// FIM DE JOGO
+// =============================================
+function derrota() {
+    if (progresso.ultimoCheckpoint === 10) {
+        progresso.ultimoCheckpoint = 5;
+    }
+    if (progresso.ultimoCheckpoint === 0) {
+        jogador.hp = jogador.hpMax;
+        jogador.pocoes = jogador.pocoes >= 2 ? 2 : jogador.pocoes + 1;
+        progresso.salaAtual = 0;
+        alert('Você retorna à entrada... Masmorra reiniciada.');
+    } else {
+        jogador.hp = Math.floor(jogador.hpMax * 0.6);
+        progresso.salaAtual = progresso.ultimoCheckpoint - 1;
+        alert(`Retomando da Sala ${progresso.ultimoCheckpoint}...`);
+    }
+    salvarProgresso();
+    trocarTela('tela-masmorra');
+    proximaSala();
+}
+
+function telaVitoria() {
+    document.getElementById('titulo-resumo').textContent = '🏆 MASMORRA CONCLUÍDA!';
+    document.getElementById('conteudo-resumo').innerHTML = `
+        <p style="font-size:1.2rem; margin-bottom:1rem;">O Cultista de Malazar foi derrotado!</p>
+        <p>Você rompeu a primeira barreira da cultura sombria.</p>
+        <p style="margin:1rem 0;">Mas Malazar desperta... Novos desafios aguardam.</p>
+        <div class="linha"><span>Jornada reinicia em:</span><span>7 dias</span></div>
+        <div class="linha"><span>Herói:</span><span>${jogador.nome} — ${jogador.raca.nome} ${jogador.classe.nome}</span></div>
+        <p style="margin-top:1rem; font-style:italic;">Seu herói permanecerá para a próxima batalha.</p>
+    `;
+    trocarTela('tela-resumo');
+}
 </script>
 
 </body>
