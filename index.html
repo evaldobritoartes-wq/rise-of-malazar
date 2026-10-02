@@ -138,11 +138,11 @@ h1{color:var(--ouro);font-size:2rem;}
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v6';
+const CHAVE_SALVO = 'malazar_heroi_v7';
 
 const REGRAS = {
-    valorBase: 5,           // ✅ Todos atributos começam com 5
-    pontosPorNivel: 3,      // ✅ Só ganha +3 ao SUBIR de nível
+    valorBase: 5,
+    pontosPorNivel: 3,
     atributos: {
         for: {nome:'Força', icone:'⚔️', desc:'Dano Físico', porPonto:2},
         des: {nome:'Destreza', icone:'🤸', desc:'Precisão', porPonto:4},
@@ -178,11 +178,10 @@ const EMBOISCADAS = [
 
 let heroi = {
     nome:'', nivel:1, xp:0, ouro:10, vidaAtual:100, manaAtual:80,
-    ptsParaAlocar:0,        // ✅ Nível 1 = 0 pontos extras
-    atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}  // ✅ Todos = 5
+    ptsParaAlocar:0,
+    atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
 };
 
-// SALVAMENTO
 function salvar() {
     localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
     const m = document.getElementById('salvo-mensagem');
@@ -194,7 +193,6 @@ function carregar() {
     return !!s;
 }
 
-// TROCA DE TELA
 function trocaTela(id) {
     document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
     document.getElementById(id).classList.remove('escondido');
@@ -209,10 +207,10 @@ function novaJornada() {
     heroi = {
         nome:'', nivel:1, xp:0, ouro:10, 
         vidaAtual:100, manaAtual:80, 
-        ptsParaAlocar:0,  // ✅ NENHUM ponto extra no início
-        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}  // ✅ Todos = 5
+        ptsParaAlocar:0,
+        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
     };
-    trocaTela('nomear'); // ✅ Tela de nome antes de distribuir
+    trocaTela('nomear');
 }
 
 function confirmarNome() {
@@ -226,7 +224,6 @@ function confirmarNome() {
 
 function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
-// DISTRIBUIÇÃO
 let distTemp = {};
 
 function abrirDistribuicao() {
@@ -247,6 +244,14 @@ function renderDistribuicao() {
     document.getElementById('pts-restantes').textContent = heroi.ptsParaAlocar;
     const c = document.getElementById('lista-atributos'); 
     c.innerHTML = '';
+    
+    // ✅ CORREÇÃO GARANTIDA: Carrega os valores antes de exibir
+    distTemp.for = heroi.atr.for;
+    distTemp.des = heroi.atr.des;
+    distTemp.agi = heroi.atr.agi;
+    distTemp.vit = heroi.atr.vit;
+    distTemp.int = heroi.atr.int;
+    distTemp.esp = heroi.atr.esp;
     
     const ordem = ['for','des','agi','vit','int','esp'];
     for(const k of ordem) {
@@ -288,7 +293,6 @@ function confirmarDistribuicao() {
     trocaTela('principal');
 }
 
-// CÁLCULOS
 function calcularStatus() {
     const a = heroi.atr;
     return {
@@ -301,14 +305,13 @@ function calcularStatus() {
     };
 }
 
-// XP E SUBIDA DE NÍVEL — SEM BOTÃO, SÓ JOGANDO
 function ganharXP(qtd) {
     heroi.xp += qtd;
     let subiu = false;
     while(heroi.xp >= REGRAS.xpPorNivel(heroi.nivel)) {
         heroi.xp -= REGRAS.xpPorNivel(heroi.nivel);
         heroi.nivel++;
-        heroi.ptsParaAlocar += REGRAS.pontosPorNivel; // ✅ Só ganha +3 ao subir
+        heroi.ptsParaAlocar += REGRAS.pontosPorNivel;
         subiu = true;
     }
     if(subiu) {
@@ -318,7 +321,6 @@ function ganharXP(qtd) {
     salvar(); atualizarPrincipal();
 }
 
-// TELA PRINCIPAL
 function atualizarPrincipal() {
     const st = calcularStatus();
     const xpNec = REGRAS.xpPorNivel(heroi.nivel);
@@ -357,7 +359,6 @@ function atualizarPrincipal() {
         : '🌑 Explorar Floresta Negra';
 }
 
-// ========= FLORESTA NEGRA =========
 function entrarFloresta() {
     if(heroi.nivel > REGRAS.nivelMaxFloresta) return alert('Você já superou esta área!');
     trocaTela('floresta');
@@ -581,7 +582,6 @@ function encontroTesouro() {
     `;
 }
 
-// INÍCIO
 verificaRetomar();
 </script>
 </body>
