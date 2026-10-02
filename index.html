@@ -23,10 +23,10 @@ h1{color:var(--ouro);font-size:2rem;}
 .botao-voltar{background:linear-gradient(#7a5c3a,#5c442e);}
 .botao-perigo{background:linear-gradient(#8b0000,#5c0000);}
 .botao-tesouro{background:linear-gradient(#d4a017,#b8860b);}
-.botao-ponto{width:40px;height:40px;padding:0;font-size:1.2rem;margin:0.1rem;}
+.botao-ponto{width:50px;height:50px;padding:0;font-size:1.3rem;margin:0.1rem;}
 .campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
-.atributo{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px dashed #d4b896;}
-.nome-atr{flex:2;} .val-atr{flex:1;text-align:center;font-weight:bold;} .controle{display:flex;gap:0.3rem;}
+.atributo{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 0;border-bottom:1px dashed #d4b896;}
+.nome-atr{flex:2;} .val-atr{flex:0.8;text-align:center;font-weight:bold;font-size:1.2rem;} .controle{display:flex;gap:0.4rem;}
 .barras,.xp-bar{margin:1rem 0;}
 .bloco{flex:1;min-width:120px;}
 .etiqueta{font-weight:bold;display:flex;justify-content:space-between;margin-bottom:0.25rem;font-size:0.9rem;}
@@ -39,7 +39,7 @@ h1{color:var(--ouro);font-size:2rem;}
 .aviso-nivel{background:#fff3cd;border:2px solid #f59e0b;padding:0.8rem;border-radius:6px;text-align:center;margin:1rem 0;animation:pulse 1s infinite alternate;}
 @keyframes pulse {from{box-shadow:0 0 0 transparent;}to{box-shadow:0 0 10px #f59e0b50;}}
 .area-texto{background:rgba(0,0,0,0.1);padding:1rem;border-radius:6px;margin:1rem 0;line-height:1.6;}
-.pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;}
+.pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;font-size:1.2rem;font-weight:bold;}
 .salvo-ok{text-align:center;color:#4a7c59;font-size:0.85rem;margin-top:0.5rem;}
 .log{max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.05);padding:0.8rem;border-radius:4px;margin:0.5rem 0;font-size:0.9rem;}
 </style>
@@ -60,8 +60,8 @@ h1{color:var(--ouro);font-size:2rem;}
 <!-- TELA DISTRIBUIÇÃO -->
 <div id="distribuir" class="tela escondido">
     <div class="pergaminho">
-        <h2 id="titulo-nivel">Distribuir Pontos</h2>
-        <div class="pontos-disponiveis"><strong>Pontos: <span id="pts-restantes">0</span></strong></div>
+        <h2 id="titulo-nivel">Distribuir — Nível 1</h2>
+        <div class="pontos-disponiveis">Pontos: <span id="pts-restantes">3</span></div>
         <div id="lista-atributos"></div>
         <button class="botao" onclick="confirmarDistribuicao()">✅ Confirmar</button>
         <button class="botao botao-voltar" onclick="sair()">🚪 Sair</button>
@@ -127,7 +127,7 @@ h1{color:var(--ouro);font-size:2rem;}
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v4';
+const CHAVE_SALVO = 'malazar_heroi_v5';
 
 const REGRAS = {
     basePontos: 5,
@@ -193,7 +193,12 @@ function verificaRetomar() {
 }
 function retomar() { carregar(); atualizarPrincipal(); trocaTela('principal'); }
 function novaJornada() {
-    heroi = {nome:'',nivel:1,xp:0,ouro:10,vidaAtual:100,manaAtual:80,ptsParaAlocar:3,atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}};
+    heroi = {
+        nome:'', nivel:1, xp:0, ouro:10, 
+        vidaAtual:100, manaAtual:80, 
+        ptsParaAlocar:3, 
+        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
+    };
     trocaTela('distribuir');
     document.getElementById('titulo-nivel').textContent = 'Distribuir — Nível 1';
     renderDistribuicao();
@@ -202,35 +207,66 @@ function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
 // DISTRIBUIÇÃO
 let distTemp = {};
+
 function abrirDistribuicao() {
-    distTemp = {...heroi.atr};
+    // ✅ CORREÇÃO: Inicializa corretamente com os valores atuais
+    distTemp = {
+        for: heroi.atr.for,
+        des: heroi.atr.des,
+        agi: heroi.atr.agi,
+        vit: heroi.atr.vit,
+        int: heroi.atr.int,
+        esp: heroi.atr.esp
+    };
     trocaTela('distribuir');
     document.getElementById('titulo-nivel').textContent = `Distribuir — Nível ${heroi.nivel}`;
     renderDistribuicao();
 }
+
 function renderDistribuicao() {
     document.getElementById('pts-restantes').textContent = heroi.ptsParaAlocar;
-    const c = document.getElementById('lista-atributos'); c.innerHTML='';
-    for(const [k,r] of Object.entries(REGRAS.atributos)) {
+    const c = document.getElementById('lista-atributos'); 
+    c.innerHTML = '';
+    
+    // ✅ CORREÇÃO: Percorre as chaves corretamente
+    const ordem = ['for','des','agi','vit','int','esp'];
+    for(const k of ordem) {
+        const r = REGRAS.atributos[k];
         const v = distTemp[k];
         c.innerHTML += `<div class="atributo">
-            <div class="nome-atr"><strong>${r.icone} ${r.nome}</strong><br><small>+${r.porPonto} ${r.desc}</small></div>
+            <div class="nome-atr">
+                <strong>${r.icone} ${r.nome}</strong><br>
+                <small>+${r.porPonto} ${r.desc}</small>
+            </div>
             <div class="val-atr">${v}</div>
             <div class="controle">
-                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=5?'disabled':''}>−</button>
+                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=REGRAS.basePontos?'disabled':''}>−</button>
                 <button class="botao botao-ponto" onclick="aumentar('${k}')" ${heroi.ptsParaAlocar<=0?'disabled':''}>+</button>
             </div>
         </div>`;
     }
 }
-function aumentar(k) { if(heroi.ptsParaAlocar<=0) return; distTemp[k]++; heroi.ptsParaAlocar--; renderDistribuicao(); }
-function diminuir(k) { if(distTemp[k]<=5) return; distTemp[k]--; heroi.ptsParaAlocar++; renderDistribuicao(); }
+
+function aumentar(k) { 
+    if(heroi.ptsParaAlocar <= 0) return; 
+    distTemp[k]++; 
+    heroi.ptsParaAlocar--; 
+    renderDistribuicao(); 
+}
+function diminuir(k) { 
+    if(distTemp[k] <= REGRAS.basePontos) return; 
+    distTemp[k]--; 
+    heroi.ptsParaAlocar++; 
+    renderDistribuicao(); 
+}
 function confirmarDistribuicao() {
     heroi.atr = {...distTemp};
     const st = calcularStatus();
     heroi.vidaAtual = st.vidaMax;
     heroi.manaAtual = st.manaMax;
-    salvar(); atualizarPrincipal(); trocaTela('principal');
+    salvar(); 
+    atualizarPrincipal(); 
+    trocaTela('principal');
 }
 
 // CÁLCULOS
@@ -278,7 +314,7 @@ function atualizarPrincipal() {
     document.getElementById('bar-xp').style.width = `${Math.min(100,(heroi.xp/xpNec)*100)}%`;
     
     const aviso = document.getElementById('aviso-pts');
-    aviso.style.display = heroi.ptsParaAlocar>0 ? 'block' : 'none';
+    aviso.style.display = heroi.ptsParaAlocar > 0 ? 'block' : 'none';
     document.getElementById('pts-disponiveis').textContent = heroi.ptsParaAlocar;
     
     document.getElementById('status-geral').innerHTML = `
@@ -313,7 +349,7 @@ function entrarFloresta() {
 function sairFloresta() { salvar(); atualizarPrincipal(); trocaTela('principal'); }
 
 function proximoPasso() {
-    const tipo = Math.floor(Math.random()*3); // 0=Monstro, 1=Emboscada, 2=Tesouro
+    const tipo = Math.floor(Math.random()*3);
     if(tipo===0) encontroMonstro();
     else if(tipo===1) encontroEmboscada();
     else encontroTesouro();
@@ -333,8 +369,8 @@ function encontroMonstro() {
         <p><strong>Vida:</strong> ${m.vida} | <strong>Dano:</strong> ${m.dano}</p>
     `;
     document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Ataque Físico</button>
-        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Ataque Mágico</button>
+        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Ataque Físico</button>
+        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Ataque Mágico</button>
         <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Tentar Fugir</button>
     `;
 }
@@ -342,26 +378,29 @@ function encontroMonstro() {
 function batalhaFisico(m) {
     const st = calcularStatus();
     const dano = st.danoFisico;
-    const acertou = st.precisao >= 50; // Sem dados = comparação direta
+    const acertou = Math.random()*100 < st.precisao;
+    
     if(!acertou) {
         addLog(`⚔️ Contra ${m.nome}: Errou o golpe!`);
         ataqueInimigo(m);
         return;
     }
-    const vidaRestante = m.vida - dano;
+    
+    m.vida -= dano;
     addLog(`⚔️ Contra ${m.nome}: Acertou! ${dano} de dano!`);
-    if(vidaRestante <= 0) {
+    
+    if(m.vida <= 0) {
         vitoria(m);
         return;
     }
-    m.vida = vidaRestante;
+    
     document.getElementById('flor-cena').innerHTML = `
         <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
-        <p>O inimigo resiste! Vida restante: ${vidaRestante}</p>
+        <p>O inimigo resiste! Vida restante: ${m.vida}</p>
     `;
     document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Ataque Físico</button>
-        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Ataque Mágico</button>
+        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Ataque Físico</button>
+        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Ataque Mágico</button>
         <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
     `;
     ataqueInimigo(m);
@@ -376,20 +415,22 @@ function batalhaMagico(m) {
     heroi.manaAtual -= 10;
     const st = calcularStatus();
     const dano = st.danoMagico;
-    const vidaRestante = m.vida - dano;
+    
+    m.vida -= dano;
     addLog(`✨ Contra ${m.nome}: Magia! ${dano} de dano! (-10 mana)`);
-    if(vidaRestante <= 0) {
+    
+    if(m.vida <= 0) {
         vitoria(m);
         return;
     }
-    m.vida = vidaRestante;
+    
     document.getElementById('flor-cena').innerHTML = `
         <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
-        <p>Resiste! Vida: ${vidaRestante}</p>
+        <p>Resiste! Vida: ${m.vida}</p>
     `;
     document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Físico</button>
-        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Mágico</button>
+        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Físico</button>
+        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Mágico</button>
         <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
     `;
     ataqueInimigo(m);
@@ -397,21 +438,30 @@ function batalhaMagico(m) {
 
 function ataqueInimigo(m) {
     const st = calcularStatus();
-    if(st.esquiva >= 25) { // Limite fixo de precisão inimiga
+    if(Math.random()*100 < st.esquiva) {
         addLog(`🏃 Desviou do ataque de ${m.nome}!`);
-        salvar(); proximoPasso();
+        salvar();
+        setTimeout(proximoPasso, 800);
         return;
     }
-    const danoRecebido = Math.max(1, m.dano - Math.floor(heroi.atr.vit/5));
+    
+    const reducao = Math.floor(heroi.atr.vit / 5);
+    const danoRecebido = Math.max(1, m.dano - reducao);
     heroi.vidaAtual -= danoRecebido;
     addLog(`💥 ${m.nome} ataca! ${danoRecebido} de dano recebido!`);
+    
     if(heroi.vidaAtual <= 0) {
-        heroi.vidaAtual = Math.floor(calcularStatus().vidaMax * 0.25);
+        const st = calcularStatus();
+        heroi.vidaAtual = Math.floor(st.vidaMax * 0.25);
         addLog('💚 Você caiu! Recupera forças com 25% de vida...');
-        salvar(); atualizarPrincipal(); trocaTela('principal');
+        salvar();
+        atualizarPrincipal();
+        trocaTela('principal');
         return;
     }
+    
     salvar();
+    setTimeout(proximoPasso, 800);
 }
 
 function vitoria(m) {
@@ -431,22 +481,22 @@ function vitoria(m) {
 
 function tentarFugir() {
     const st = calcularStatus();
-    if(st.esquiva >= 15) {
+    if(Math.random()*100 < st.esquiva) {
         addLog('🏃 Fugiu com sucesso!');
-        salvar(); proximoPasso();
+        salvar();
+        setTimeout(proximoPasso, 600);
     } else {
         addLog('🏃 Tentou fugir mas foi alcançado!');
-        // Pegar dano de quem estava lutando
         document.getElementById('flor-cena').innerHTML = `<p>Foi alcançado! Prepare-se!</p>`;
-        // Recarrega o último monstro se houver
-        proximoPasso();
+        setTimeout(proximoPasso, 600);
     }
 }
 
 function encontroEmboscada() {
     const e = EMBOISCADAS[Math.floor(Math.random()*EMBOISCADAS.length)];
     const st = calcularStatus();
-    if(st.esquiva >= 20) {
+    
+    if(Math.random()*100 < st.esquiva) {
         addLog(`🛡️ Emboscada: ${e.nome} — Você antecipou e desviou!`);
         document.getElementById('flor-cena').innerHTML = `
             <h3 style="color:#ffd700;">⚠️ ${e.nome}</h3>
@@ -458,22 +508,29 @@ function encontroEmboscada() {
         danoReal = Math.max(1, danoReal);
         heroi.vidaAtual -= danoReal;
         addLog(`⚠️ ${e.nome}: -${danoReal} vida`);
+        
         if(e.mana) {
             heroi.manaAtual = Math.max(0, heroi.manaAtual + e.mana);
             addLog(`⚠️ Também afetou sua energia: ${e.mana} mana`);
         }
+        
         document.getElementById('flor-cena').innerHTML = `
             <h3 style="color:#ff6b6b;">⚠️ ${e.nome}</h3>
             <p>${e.texto}</p>
             <p><strong>Recebeu ${danoReal} de dano!</strong></p>
         `;
+        
         if(heroi.vidaAtual <= 0) {
-            heroi.vidaAtual = Math.floor(calcularStatus().vidaMax * 0.25);
+            const st = calcularStatus();
+            heroi.vidaAtual = Math.floor(st.vidaMax * 0.25);
             addLog('💚 Recupera com 25% de vida...');
-            salvar(); atualizarPrincipal(); trocaTela('principal');
+            salvar();
+            atualizarPrincipal();
+            trocaTela('principal');
             return;
         }
     }
+    
     salvar();
     document.getElementById('flor-acoes').innerHTML = `
         <button class="botao" onclick="proximoPasso()">🌲 Seguir Caminho</button>
@@ -484,12 +541,15 @@ function encontroEmboscada() {
 function encontroTesouro() {
     const t = TESOUROS[Math.floor(Math.random()*TESOUROS.length)];
     let ganhos = [];
+    
     if(t.ouro) { heroi.ouro += t.ouro; ganhos.push(`+${t.ouro} ouro`); }
     if(t.cura) { 
-        heroi.vidaAtual = Math.min(calcularStatus().vidaMax, heroi.vidaAtual + t.cura); 
+        const st = calcularStatus();
+        heroi.vidaAtual = Math.min(st.vidaMax, heroi.vidaAtual + t.cura); 
         ganhos.push(`+${t.cura} vida`);
     }
     if(t.xp) { ganharXP(t.xp); ganhos.push(`+${t.xp} XP`); }
+    
     addLog(`💰 ${t.nome}: ${ganhos.join(' • ')}`);
     document.getElementById('flor-cena').innerHTML = `
         <h3 style="color:#ffd700;">💰 ${t.nome}</h3>
