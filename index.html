@@ -2,702 +2,714 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MALAZAR — Floresta Negra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rise of Malazar — Arredores da Cidade</title>
 <style>
-:root {
-    --ouro:#b8860b; --ouro-claro:#d4a017; --fundo:#f8f0dc;
-    --tinta:#2c1810; --vida:#ef4444; --mana:#6366f1; --destaque:#4a7c59;
-    --floresta:#1a2f1a; --perigo:#8b0000; --tesouro:#ffd700;
-    --taverna:#3d2914; --madeira:#6b4423; --lareira:#ff9500;
+:root{
+  --escuro:#0f1115;
+  --fundo:#1a1d23;
+  --painel:#242830;
+  --destaque:#353a45;
+  --ouro:#b8860b;
+  --sangue:#992222;
+  --magia:#4488dd;
+  --texto:#d0d0c8;
+  --textoFraco:#888888;
+  --borda:#444444;
+  --vida:#aa3333;
+  --mana:#3366cc;
+  --xp:#228844;
+  --sombra:0 4px 12px rgba(0,0,0,.6);
+  --brilhoOuro:0 0 8px rgba(184,134,11,.4);
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
-body{background:var(--fundo);color:var(--tinta);padding:1rem;max-width:540px;margin:0 auto;min-height:100vh;}
-.tela{display:block;} .escondido{display:none !important;}
-.pergaminho{background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:1.5rem;margin-bottom:1rem;}
-h1,h2,h3{text-align:center;margin-bottom:1rem;}
-h1{color:var(--ouro);font-size:2rem;}
-.subtitulo{text-align:center;font-style:italic;color:#5a4538;margin-bottom:1.5rem;}
-.botao{width:100%;padding:0.9rem;margin:0.4rem 0;font-size:1rem;background:linear-gradient(var(--ouro-claro),var(--ouro));color:#fff;border:none;border-radius:6px;cursor:pointer;transition:transform 0.15s;}
-.botao:active{transform:scale(0.97);}
-.botao:disabled{opacity:0.5;cursor:not-allowed;}
-.botao-voltar{background:linear-gradient(#7a5c3a,#5c442e);}
-.botao-perigo{background:linear-gradient(#8b0000,#5c0000);}
-.botao-tesouro{background:linear-gradient(#d4a017,#b8860b);}
-.botao-taverna{background:linear-gradient(#8b5a2b,#654321);}
-.botao-ponto{width:50px;height:50px;padding:0;font-size:1.3rem;margin:0.1rem;}
-.campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
-.atributo{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 0;border-bottom:1px dashed #d4b896;}
-.nome-atr{flex:2;} .val-atr{flex:0.8;text-align:center;font-weight:bold;font-size:1.2rem;} .controle{display:flex;gap:0.4rem;}
-.barras,.xp-bar{margin:1rem 0;}
-.bloco{flex:1;min-width:120px;}
-.etiqueta{font-weight:bold;display:flex;justify-content:space-between;margin-bottom:0.25rem;font-size:0.9rem;}
-.barra{height:16px;background:#e6d9b8;border:1px solid #b89a5b;border-radius:4px;overflow:hidden;}
-.barra-int{height:100%;transition:width 0.3s;}
-.vida{background:linear-gradient(90deg,#ef4444,#fca5a5);}
-.mana{background:linear-gradient(90deg,#6366f1,#a5b4fc);}
-.xp{background:linear-gradient(90deg,#4ade80,#86efac);}
-.floresta{background:linear-gradient(135deg,#233523,#2c422c);color:#e0e0e0;border:3px solid #3a5f3a;}
-.taverna{background:linear-gradient(135deg,#4a3520,#3d2914);color:#f5e9d0;border:3px solid #8b5a2b;}
-.aviso-nivel{background:#fff3cd;border:2px solid #f59e0b;padding:0.8rem;border-radius:6px;text-align:center;margin:1rem 0;animation:pulse 1s infinite alternate;}
-@keyframes pulse {from{box-shadow:0 0 0 transparent;}to{box-shadow:0 0 10px #f59e0b50;}}
-.area-texto{background:rgba(0,0,0,0.1);padding:1rem;border-radius:6px;margin:1rem 0;line-height:1.6;}
-.pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;font-size:1.2rem;font-weight:bold;}
-.salvo-ok{text-align:center;color:#4a7c59;font-size:0.85rem;margin-top:0.5rem;}
-.log{max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.05);padding:0.8rem;border-radius:4px;margin:0.5rem 0;font-size:0.9rem;}
-.chat-area{height:250px;overflow-y:auto;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:6px;margin:0.5rem 0;}
-.chat-msg{margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px dashed rgba(255,255,255,0.15);}
-.chat-nome{font-weight:bold;color:#ffd700;}
-.chat-hora{font-size:0.75rem;color:#999;}
-.chat-texto{margin-top:0.2rem;}
-.curou-ok{background:#4ade8033;border:1px solid #4ade80;padding:0.6rem;border-radius:4px;text-align:center;margin:0.5rem 0;display:none;}
-.contador-online{text-align:right;font-size:0.85rem;color:#999;margin-bottom:0.5rem;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif;}
+body{
+  background:linear-gradient(160deg,var(--escuro),#171a1f);
+  color:var(--texto);
+  min-height:100vh;
+  padding:10px;
+}
+.tela{display:none;max-width:540px;margin:0 auto;}
+.tela.ativa{display:block;}
+h1,h2,h3{text-align:center;margin-bottom:12px;letter-spacing:1px;}
+h1{color:var(--ouro);text-shadow:var(--brilhoOuro);font-size:1.7rem;}
+h2{font-size:1.2rem;color:#b09860;}
+.subtitulo{text-align:center;color:var(--textoFraco);font-style:italic;margin-bottom:15px;}
+
+.painel{
+  background:var(--painel);
+  border:1px solid var(--borda);
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:var(--sombra);
+}
+.painel-titulo{
+  color:var(--ouro);
+  border-bottom:1px solid #3a3a3a;
+  padding-bottom:6px;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+.fichas{display:flex;gap:10px;flex-wrap:wrap;}
+.ficha{flex:1;min-width:240px;}
+.ficha.esquerda{border-right:1px dashed #3a3a3a;}
+.ficha.direita{background:#2a2e36;border-radius:8px;min-height:220px;}
+.ficha.direita.vazia{display:flex;align-items:center;justify-content:center;color:var(--textoFraco);font-style:italic;}
+
+.linha{display:flex;justify-content:space-between;padding:3px 0;font-size:.92rem;}
+.linha.destaque{color:var(--ouro);font-weight:bold;}
+
+.barra{
+  height:16px;
+  background:#333;
+  border-radius:8px;
+  overflow:hidden;
+  margin:4px 0 8px;
+}
+.barra span{
+  display:block;height:100%;transition:width .4s ease;
+}
+.vida-bar{background:linear-gradient(90deg,#771111,var(--vida));}
+.mana-bar{background:linear-gradient(90deg,#224499,var(--mana));}
+.xp-bar{background:linear-gradient(90deg,#116633,var(--xp));}
+
+.atributos{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin-top:8px;}
+.atr{font-size:.85rem;}
+.atr-nome{color:#888;}
+.atr-valor{font-weight:bold;color:#ccc;}
+
+.vs{
+  text-align:center;
+  color:var(--ouro);
+  font-size:1.1rem;
+  font-weight:bold;
+  margin:8px 0;
+  text-shadow:0 0 6px rgba(184,134,11,.3);
+}
+.confronto{
+  display:flex;justify-content:space-around;
+  background:#2a2e36;border-radius:8px;padding:10px;margin:10px 0;
+  font-size:.88rem;
+}
+.confronto div{text-align:center;}
+.confronto .rotulo{color:#888;font-size:.8rem;}
+
+.botoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;}
+button{
+  padding:12px 10px;
+  border:none;border-radius:8px;
+  font-size:1rem;font-weight:bold;cursor:pointer;
+  transition:all .2s ease;
+}
+button:hover{transform:translateY(-1px);}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-ouro{background:linear-gradient(180deg,#b8860b,#886500);color:#fff;}
+.btn-vermelho{background:linear-gradient(180deg,#772222,#551111);color:#fff;}
+.btn-azul{background:linear-gradient(180deg,#225599,#113366);color:#fff;}
+.btn-cinza{background:linear-gradient(180deg,#444,#333);color:#ddd;}
+.btn-verde{background:linear-gradient(180deg,#226633,#114422);color:#fff;}
+.btn-escuro{background:linear-gradient(180deg,#333840,#22262c);color:#ccc;}
+
+.aviso{
+  background:rgba(184,134,11,.1);
+  border:1px solid rgba(184,134,11,.3);
+  border-radius:6px;
+  padding:8px 10px;
+  margin:10px 0;
+  text-align:center;
+  color:#e0c070;
+  font-weight:bold;
+}
+.aviso-perigo{
+  background:rgba(120,20,20,.2);
+  border:1px solid rgba(180,40,40,.4);
+  color:#f07070;
+}
+.aviso-elite{
+  background:rgba(160,120,20,.25);
+  border:1px solid rgba(200,150,30,.5);
+  color:#f0c040;
+  animation:piscar 1s infinite alternate;
+}
+@keyframes piscar{from{opacity:.7;}to{opacity:1;}}
+
+.log{
+  background:#1f2228;
+  border-radius:6px;
+  padding:10px;
+  margin-top:10px;
+  max-height:140px;
+  overflow-y:auto;
+  font-size:.85rem;
+  color:#999;
+}
+.log p{margin:4px 0;}
+.log .destaque{color:#ccc;}
+
+.oculto{display:none !important;}
 </style>
 </head>
 <body>
 
-<div id="inicio" class="tela">
-    <div class="pergaminho">
-        <h1>MALAZAR</h1>
-        <p class="subtitulo">Crônicas de uma Era Esquecida</p>
-        <button id="btn-retomar" class="botao" style="display:none" onclick="retomar()">🔄 Retomar Jornada</button>
-        <button class="botao" onclick="novaJornada()">⚔️ Nova Jornada</button>
-        <button class="botao" onclick="alert('História em breve...')">📜 A História</button>
-    </div>
+<!-- TELA INÍCIO -->
+<div id="tela-inicio" class="tela ativa">
+  <h1>⚔️ RISE OF MALAZAR ⚔️</h1>
+  <p class="subtitulo">A escuridão ronda os caminhos da cidade...</p>
+  <div class="painel">
+    <button class="btn-ouro" style="width:100%;margin-bottom:10px;" onclick="novaJornada()">🌑 Nova Jornada</button>
+    <button class="btn-cinza" style="width:100%;" onclick="carregarJornada()" id="btn-retomar">🔄 Retomar Jornada</button>
+  </div>
 </div>
 
-<div id="nomear" class="tela escondido">
-    <div class="pergaminho">
-        <h2>📝 Nome do Herói</h2>
-        <p class="subtitulo">Como deseja ser chamado?</p>
-        <input type="text" id="campo-nome" class="campo" placeholder="Digite seu nome..." maxlength="15">
-        <button class="botao" onclick="confirmarNome()">✅ Confirmar</button>
-        <button class="botao botao-voltar" onclick="trocaTela('inicio')">🚪 Voltar</button>
-    </div>
+<!-- TELA NOME -->
+<div id="tela-nome" class="tela">
+  <h2>📝 Nome do Herói</h2>
+  <div class="painel">
+    <input type="text" id="campo-nome" placeholder="Digite seu nome..." maxlength="15" style="width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#2a2e36;color:#fff;font-size:1rem;">
+    <button class="btn-ouro" style="width:100%;margin-top:12px;" onclick="confirmarNome()">✅ Confirmar</button>
+  </div>
 </div>
 
-<div id="distribuir" class="tela escondido">
-    <div class="pergaminho">
-        <h2 id="titulo-nivel">Distribuir — Nível 1</h2>
-        <div class="pontos-disponiveis">Pontos: <span id="pts-restantes">0</span></div>
-        <div id="lista-atributos"></div>
-        <button class="botao" onclick="confirmarDistribuicao()">✅ Confirmar</button>
-        <button class="botao botao-voltar" onclick="sair()">🚪 Sair</button>
+<!-- TELA PRINCIPAL -->
+<div id="tela-principal" class="tela">
+  <h1 id="titulo-pagina">Arredores da Cidade</h1>
+  
+  <div class="fichas">
+    <!-- FICHA HERÓI -->
+    <div class="painel ficha esquerda">
+      <div class="painel-titulo" id="ficha-nome">Herói</div>
+      <div class="linha destaque">
+        <span>Nível <span id="heroi-nivel">1</span></span>
+        <span>💰 <span id="heroi-ouro">0</span></span>
+      </div>
+      
+      <div>
+        <div class="linha"><span>❤️ Vida</span><span id="vida-txt">--/--</span></div>
+        <div class="barra"><span id="vida-bar" class="vida-bar"></span></div>
+      </div>
+      <div>
+        <div class="linha"><span>💧 Mana</span><span id="mana-txt">--/--</span></div>
+        <div class="barra"><span id="mana-bar" class="mana-bar"></span></div>
+      </div>
+      <div>
+        <div class="linha"><span>⭐ Experiência</span><span id="xp-txt">0/100</span></div>
+        <div class="barra"><span id="xp-bar" class="xp-bar"></span></div>
+      </div>
+      
+      <div class="atributos">
+        <div class="atr"><span class="atr-nome">FOR</span> <span class="atr-valor" id="atr-for">5</span></div>
+        <div class="atr"><span class="atr-nome">DES</span> <span class="atr-valor" id="atr-des">5</span></div>
+        <div class="atr"><span class="atr-nome">AGI</span> <span class="atr-valor" id="atr-agi">5</span></div>
+        <div class="atr"><span class="atr-nome">VIT</span> <span class="atr-valor" id="atr-vit">5</span></div>
+        <div class="atr"><span class="atr-nome">INT</span> <span class="atr-valor" id="atr-int">5</span></div>
+        <div class="atr"><span class="atr-nome">ESP</span> <span class="atr-valor" id="atr-esp">5</span></div>
+      </div>
+      <div class="linha" style="margin-top:8px;font-size:.8rem;color:#888;">
+        <span>Dano Fís: <span id="dano-fis">10</span></span>
+        <span>Dano Mág: <span id="dano-mag">12.5</span></span>
+      </div>
+      <div class="linha" style="font-size:.8rem;color:#888;">
+        <span>Prec: <span id="precisao">70%</span></span>
+        <span>Esqu: <span id="esquiva">15%</span></span>
+      </div>
+      <div class="linha" style="font-size:.8rem;color:#888;margin-top:4px;">
+        <span>Pontos: <span id="pts-disponiveis" style="color:var(--ouro);font-weight:bold;">3</span></span>
+      </div>
     </div>
+
+    <!-- FICHA OPONENTE -->
+    <div class="painel ficha direita" id="ficha-oponente">
+      <div class="vazia" id="oponente-vazio">Explorando...<br>A névoa esconde segredos</div>
+      <div id="oponente-dados" class="oculto">
+        <div class="painel-titulo" id="op-nome">Oponente</div>
+        <div class="linha destaque" id="op-tipo">Inimigo</div>
+        <div class="linha"><span>❤️ Vida</span><span id="op-vida-txt">--/--</span></div>
+        <div class="barra"><span id="op-vida-bar" class="vida-bar"></span></div>
+        <div class="linha" id="op-dano-linha"><span>⚔️ Dano</span><span id="op-dano-txt">--</span></div>
+        <div class="linha"><span>🎯 Precisão</span><span id="op-prec-txt">--%</span></div>
+        <div class="linha"><span>💨 Esquiva</span><span id="op-esq-txt">--%</span></div>
+        <div class="linha destaque" id="op-elite-aviso" style="color:#f0c040;display:none;">⚡ ELITE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFRONTO -->
+  <div id="area-confronto" class="oculto">
+    <div class="vs">⚔️ CONFRONTO ⚔️</div>
+    <div class="confronto">
+      <div>
+        <div class="rotulo">Seu Ataque</div>
+        <div id="seu-dano">10 Fís / 12 Mág</div>
+      </div>
+      <div>
+        <div class="rotulo">Sua Defesa</div>
+        <div id="sua-esquiva">15%</div>
+      </div>
+      <div>
+        <div class="rotulo">Oponente</div>
+        <div id="op-defesa">Esq: 20%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVISOS -->
+  <div id="aviso-area"></div>
+
+  <!-- LOG -->
+  <div class="log" id="caixa-log">
+    <p>🌲 A névoa cobre os caminhos ao redor da cidade...</p>
+    <p>Explore com cuidado — nem tudo está visível.</p>
+  </div>
+
+  <!-- BOTÕES -->
+  <div class="botoes" id="botoes-explorar">
+    <button class="btn-verde" onclick="explorar()">🔍 Explorar</button>
+    <button class="btn-escuro" onclick="abrirDistribuir()">📝 Distribuir</button>
+    <button class="btn-cinza" onclick="voltarCidade()">🏠 Voltar à Cidade</button>
+  </div>
+  <div class="botoes oculto" id="botoes-combate">
+    <button class="btn-vermelho" onclick="atacarFisico()">⚔️ Físico</button>
+    <button class="btn-azul" onclick="atacarMagico()">✨ Mágico</button>
+    <button class="btn-cinza" onclick="tentarFugir()">🏃 Retirar</button>
+  </div>
 </div>
 
-<div id="principal" class="tela escondido">
-    <div class="pergaminho">
-        <h2 id="nome-personagem">Herói</h2>
-        <p style="text-align:center;">Nível <span id="exibir-nivel">1</span> • Ouro: <span id="exibir-ouro">10</span> 💰</p>
-        <div id="aviso-subida" class="aviso-nivel escondido">🎉 Subiu de Nível! +3 pontos disponíveis!</div>
-        
-        <div class="barras">
-            <div class="bloco">
-                <div class="etiqueta"><span>❤️ Vida</span><span id="val-vida">--</span></div>
-                <div class="barra"><div id="bar-vida" class="barra-int vida" style="width:100%"></div></div>
-            </div>
-            <div class="bloco">
-                <div class="etiqueta"><span>💧 Mana</span><span id="val-mana">--</span></div>
-                <div class="barra"><div id="bar-mana" class="barra-int mana" style="width:100%"></div></div>
-            </div>
-        </div>
-        <div class="xp-bar">
-            <div class="etiqueta"><span>⭐ Experiência</span><span id="val-xp">0/100</span></div>
-            <div class="barra"><div id="bar-xp" class="barra-int xp" style="width:0%"></div></div>
-        </div>
-        
-        <div id="aviso-pts" class="pontos-disponiveis" style="display:none;">
-            ⬆️ Você tem <strong id="pts-disponiveis">0</strong> pontos para alocar!
-            <button class="botao" style="margin:0.5rem 0 0 0;padding:0.5rem;" onclick="abrirDistribuicao()">📝 Alocar Agora</button>
-        </div>
-
-        <h3>📊 Status</h3>
-        <div id="status-geral" style="background:rgba(255,255,255,0.5);padding:1rem;border-radius:6px;margin:1rem 0;"></div>
-
-        <button class="botao botao-taverna" onclick="entrarTaverna()">🏠 Taverna do Caminho</button>
-        <button class="botao" id="btn-floresta" onclick="entrarFloresta()">🌑 Explorar Floresta Negra</button>
-        <button class="botao" onclick="abrirDistribuicao()">📝 Distribuir Pontos</button>
-        <button class="botao botao-voltar" onclick="sair()">🚪 Salvar e Sair</button>
-        <p class="salvo-ok" id="salvo-mensagem" style="display:none;">✅ Salvo automaticamente</p>
+<!-- TELA DISTRIBUIR -->
+<div id="tela-distribuir" class="tela">
+  <h2>📝 Distribuir Pontos</h2>
+  <div class="painel">
+    <p style="text-align:center;margin-bottom:15px;">Pontos disponíveis: <span id="disp-pts" style="color:var(--ouro);font-weight:bold;font-size:1.2rem;">3</span></p>
+    <div id="dist-linhas"></div>
+    <div class="botoes">
+      <button class="btn-ouro" onclick="salvarDistribuicao()">✅ Salvar</button>
+      <button class="btn-cinza" onclick="fecharDistribuir()">↩️ Voltar</button>
     </div>
-</div>
-
-<div id="taverna" class="tela escondido">
-    <div class="pergaminho taverna">
-        <h2>🏠 Taverna do Caminho</h2>
-        <p class="subtitulo" style="color:#d4b896;">O fogo da lareira aquece o coração e o corpo...</p>
-        
-        <div id="curou-vida" class="curou-ok">❤️ Vida restaurada ao máximo!</div>
-        <div id="curou-mana" class="curou-ok">💧 Mana restaurada ao máximo!</div>
-        
-        <div style="display:flex;gap:0.5rem;margin:1rem 0;">
-            <button class="botao" style="flex:1;background:linear-gradient(#ef4444,#dc2626);" onclick="recuperarVida()">❤️ Descansar</button>
-            <button class="botao" style="flex:1;background:linear-gradient(#6366f1,#4f46e5);" onclick="recuperarMana()">💧 Meditar</button>
-        </div>
-        
-        <hr style="border:none;border-top:1px solid #6b4423;margin:1rem 0;">
-        
-        <h3>🍺 Conversa da Taverna</h3>
-        <p class="contador-online" id="contador-online">🟢 Jogadores: 1</p>
-        <div class="chat-area" id="caixa-chat">
-            <div style="color:#999;font-style:italic;">Bem-vindo à Taverna! Converse com outros aventureiros...</div>
-        </div>
-        
-        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-            <input type="text" id="mensagem-chat" class="campo" style="flex:1;margin:0;" placeholder="Sua mensagem..." maxlength="80">
-            <button class="botao" style="width:auto;padding:0.8rem 1rem;margin:0;" onclick="enviarMensagem()">➤</button>
-        </div>
-        
-        <button class="botao botao-voltar" style="margin-top:1rem;" onclick="sairTaverna()">🚪 Voltar à Cidade</button>
-    </div>
-</div>
-
-<div id="floresta" class="tela escondido">
-    <div class="pergaminho floresta">
-        <h2>🌑 Floresta Negra</h2>
-        <p style="text-align:center;font-style:italic;">Nuvens baixas cobrem a copa das árvores. O ar é frio e silencioso...</p>
-        <p style="text-align:center;margin:0.5rem 0;">📍 Nível: <strong id="flor-nivel">1</strong> / 5</p>
-        
-        <div class="area-texto" id="flor-cena">
-            Escolha explorar. Cada passo pode trazer perigo... ou riqueza.
-        </div>
-        
-        <div id="flor-acoes"></div>
-        
-        <div class="log" id="flor-log">
-            <em>Histórico da exploração:</em><br>
-        </div>
-        
-        <button class="botao botao-voltar" style="margin-top:1rem;" onclick="sairFloresta()">🚪 Sair da Floresta</button>
-    </div>
+  </div>
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v9';
-const CHAVE_CHAT = 'malazar_chat_global';
-const LIMITE_MSG = 30;
+const CHAVE = 'malazar_v2';
 
 const REGRAS = {
-    valorBase: 5,
-    pontosPorNivel: 3,
-    atributos: {
-        for: {nome:'Força', icone:'⚔️', desc:'Dano Físico', porPonto:2},
-        des: {nome:'Destreza', icone:'🤸', desc:'Precisão', porPonto:4},
-        agi: {nome:'Agilidade', icone:'🏃', desc:'Esquiva', porPonto:3},
-        vit: {nome:'Vitalidade', icone:'❤️', desc:'Vida', porPonto:15},
-        int: {nome:'Inteligência', icone:'🧠', desc:'Dano Mágico', porPonto:2.5},
-        esp: {nome:'Espírito', icone:'💎', desc:'Mana', porPonto:12}
-    },
-    vidaBase: 25, manaBase: 20, precisaoBase: 50,
-    xpPorNivel: n => Math.floor(100 * Math.pow(1.2, n - 1)),
-    nivelMaxFloresta: 5
+  valorBase:5,
+  pontosPorNivel:3,
+  nivelMax:200,
+  vidaBase:25,
+  manaBase:20,
+  precisaoBase:50,
+  xpPorNivel:n=>Math.floor(100*Math.pow(1.2,n-1))
 };
 
-const MONSTROS = [
-    {nome:'Lobo Sombrio', vida:40, dano:8, xp:25, ouro:12, minNivel:1},
-    {nome:'Cultista Errante', vida:55, dano:10, xp:35, ouro:18, minNivel:2},
-    {nome:'Aranha Gigante', vida:70, dano:12, xp:45, ouro:25, minNivel:3},
-    {nome:'Guardião da Floresta', vida:100, dano:15, xp:80, ouro:50, minNivel:4}
-];
-
-const TESOUROS = [
-    {nome:'Bolsa de Moedas', ouro:15, texto:'Você encontra uma bolsa abandonada entre as raízes.'},
-    {nome:'Poção de Vida', cura:30, ouro:5, texto:'Um frasco brilha sob a luz fraca.'},
-    {nome:'Gema Escura', ouro:40, texto:'Uma pedra preciosa, fria e cintilante.'},
-    {nome:'Pergaminho Antigo', xp:20, ouro:10, texto:'Você lê conhecimentos esquecidos inscritos em pergaminho.'}
-];
-
-const EMBOISCADAS = [
-    {nome:'Raízes Armadilha', dano:15, texto:'O chão se move! Vinhas grossas tentam te prender.'},
-    {nome:'Cova Escondida', dano:20, texto:'Você pisa em falso e despenca numa cova oculta.'},
-    {nome:'Névoa Venenosa', dano:12, mana:-10, texto:'Uma névoa densa e ácida toma conta do caminho.'}
-];
-
-let heroi = {
-    nome:'', nivel:1, xp:0, ouro:10, vidaAtual:100, manaAtual:80,
-    ptsParaAlocar:0,
-    atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
+let jogador = {
+  nome:'',
+  nivel:1,
+  xp:0,
+  ouro:10,
+  ptsDisponiveis:3,
+  atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5},
+  vidaAtual:100,
+  manaAtual:80
 };
 
-function salvar() {
-    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
-    const m = document.getElementById('salvo-mensagem');
-    m.style.display='block'; setTimeout(()=>m.style.display='none', 2000);
+let oponente = null;
+let turnoElite = 0;
+
+const inimigos = {
+  lobo:{
+    nome:'Lobo Sombrio',
+    vida:40,
+    dano:8,
+    danoMag:0,
+    prec:65,
+    esquiva:20,
+    xp:25,
+    ouro:12,
+    elite:false
+  },
+  cultista:{
+    nome:'Cultista Errante',
+    vida:55,
+    dano:10,
+    danoMag:12,
+    prec:70,
+    esquiva:15,
+    xp:35,
+    ouro:18,
+    elite:false
+  },
+  loboAlfa:{
+    nome:'🐺 Lobo Alfa',
+    vida:80,
+    dano:14,
+    danoMag:0,
+    prec:72,
+    esquiva:28,
+    xp:60,
+    ouro:40,
+    elite:true,
+    especial:'Ataque Duplo'
+  }
+};
+
+// UTIL
+function trocarTela(id){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  document.getElementById(id).classList.add('ativa');
 }
-function carregar() {
-    const s = localStorage.getItem(CHAVE_SALVO);
-    if(s) heroi = JSON.parse(s);
-    return !!s;
+function logar(texto,classe=''){
+  const caixa = document.getElementById('caixa-log');
+  const p = document.createElement('p');
+  p.className = classe;
+  p.textContent = texto;
+  caixa.appendChild(p);
+  caixa.scrollTop = caixa.scrollHeight;
+}
+function limparLog(){document.getElementById('caixa-log').innerHTML='';}
+
+// CÁLCULOS
+function calcularStatus(atr){
+  return {
+    vidaMax: REGRAS.vidaBase + atr.vit*15,
+    manaMax: REGRAS.manaBase + atr.esp*12,
+    danoFis: atr.for*2,
+    danoMag: +(atr.int*2.5).toFixed(1),
+    precisao: REGRAS.precisaoBase + atr.des*4,
+    esquiva: atr.agi*3
+  };
 }
 
-function trocaTela(id) {
-    document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
-    document.getElementById(id).classList.remove('escondido');
+// SALVAR/CARREGAR
+function salvar(){
+  localStorage.setItem(CHAVE,JSON.stringify(jogador));
 }
-function verificaRetomar() {
-    const t = carregar();
-    document.getElementById('btn-retomar').style.display = t ? 'block' : 'none';
-}
-function retomar() { carregar(); atualizarPrincipal(); trocaTela('principal'); }
-
-function novaJornada() {
-    heroi = {
-        nome:'', nivel:1, xp:0, ouro:10, 
-        vidaAtual:100, manaAtual:80, 
-        ptsParaAlocar:0,
-        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
-    };
-    trocaTela('nomear');
+function carregar(){
+  const d = localStorage.getItem(CHAVE);
+  if(d){jogador = JSON.parse(d); return true;}
+  return false;
 }
 
-function confirmarNome() {
-    const nome = document.getElementById('campo-nome').value.trim();
-    if(!nome) return alert('Por favor, digite um nome!');
-    heroi.nome = nome;
-    trocaTela('distribuir');
-    document.getElementById('titulo-nivel').textContent = 'Distribuir — Nível 1';
-    renderDistribuicao();
+// INÍCIO
+function novaJornada(){
+  jogador = {nome:'',nivel:1,xp:0,ouro:10,ptsDisponiveis:3,
+    atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5},
+    vidaAtual:100,manaAtual:80};
+  localStorage.removeItem(CHAVE);
+  trocarTela('tela-nome');
+}
+function carregarJornada(){
+  if(carregar()){
+    atualizarTela();
+    trocarTela('tela-principal');
+    logar('🔄 Jornada retomada!');
+  }else{
+    alert('Nenhuma jornada salva!');
+  }
+}
+function confirmarNome(){
+  const n = document.getElementById('campo-nome').value.trim();
+  if(!n) return alert('Digite um nome!');
+  jogador.nome = n;
+  const st = calcularStatus(jogador.atr);
+  jogador.vidaAtual = st.vidaMax;
+  jogador.manaAtual = st.manaMax;
+  salvar();
+  atualizarTela();
+  trocarTela('tela-principal');
+  logar(`🌑 Bem-vindo, ${n}!`);
+  logar('Você chega aos arredores da cidade...');
 }
 
-function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
-
-let distTemp = {};
-
-function abrirDistribuicao() {
-    distTemp = {
-        for: heroi.atr.for,
-        des: heroi.atr.des,
-        agi: heroi.atr.agi,
-        vit: heroi.atr.vit,
-        int: heroi.atr.int,
-        esp: heroi.atr.esp
-    };
-    trocaTela('distribuir');
-    document.getElementById('titulo-nivel').textContent = `Distribuir — Nível ${heroi.nivel}`;
-    renderDistribuicao();
-}
-
-function renderDistribuicao() {
-    document.getElementById('pts-restantes').textContent = heroi.ptsParaAlocar;
-    const c = document.getElementById('lista-atributos'); 
-    c.innerHTML = '';
+// ATUALIZAR TELA
+function atualizarTela(){
+  const st = calcularStatus(jogador.atr);
+  const xpNec = REGRAS.xpPorNivel(jogador.nivel);
+  
+  document.getElementById('ficha-nome').textContent = jogador.nome;
+  document.getElementById('heroi-nivel').textContent = jogador.nivel;
+  document.getElementById('heroi-ouro').textContent = jogador.ouro;
+  
+  document.getElementById('vida-txt').textContent = `${jogador.vidaAtual}/${st.vidaMax}`;
+  document.getElementById('vida-bar').style.width = `${jogador.vidaAtual/st.vidaMax*100}%`;
+  document.getElementById('mana-txt').textContent = `${jogador.manaAtual}/${st.manaMax}`;
+  document.getElementById('mana-bar').style.width = `${jogador.manaAtual/st.manaMax*100}%`;
+  document.getElementById('xp-txt').textContent = `${jogador.xp}/${xpNec}`;
+  document.getElementById('xp-bar').style.width = `${jogador.xp/xpNec*100}%`;
+  
+  ['for','des','agi','vit','int','esp'].forEach(a=>{
+    document.getElementById(`atr-${a}`).textContent = jogador.atr[a];
+  });
+  
+  document.getElementById('dano-fis').textContent = st.danoFis;
+  document.getElementById('dano-mag').textContent = st.danoMag;
+  document.getElementById('precisao').textContent = st.precisao+'%';
+  document.getElementById('esquiva').textContent = st.esquiva+'%';
+  document.getElementById('pts-disponiveis').textContent = jogador.ptsDisponiveis;
+  
+  // oponente
+  if(oponente){
+    document.getElementById('oponente-vazio').style.display='none';
+    document.getElementById('oponente-dados').classList.remove('oculto');
+    document.getElementById('op-nome').textContent = oponente.nome;
+    document.getElementById('op-tipo').textContent = oponente.elite ? '⚡ ELITE' : 'Inimigo';
+    document.getElementById('op-vida-txt').textContent = `${oponente.vidaAtual}/${oponente.vida}`;
+    document.getElementById('op-vida-bar').style.width = `${oponente.vidaAtual/oponente.vida*100}%`;
+    document.getElementById('op-dano-txt').textContent = oponente.dano + (oponente.danoMag?` / ${oponente.danoMag}`:'');
+    document.getElementById('op-prec-txt').textContent = oponente.prec+'%';
+    document.getElementById('op-esq-txt').textContent = oponente.esquiva+'%';
+    document.getElementById('op-elite-aviso').style.display = oponente.elite ? 'block' : 'none';
     
-    distTemp.for = heroi.atr.for;
-    distTemp.des = heroi.atr.des;
-    distTemp.agi = heroi.atr.agi;
-    distTemp.vit = heroi.atr.vit;
-    distTemp.int = heroi.atr.int;
-    distTemp.esp = heroi.atr.esp;
+    document.getElementById('area-confronto').classList.remove('oculto');
+    document.getElementById('seu-dano').textContent = `${st.danoFis} Fís / ${st.danoMag} Mág`;
+    document.getElementById('sua-esquiva').textContent = st.esquiva+'%';
+    document.getElementById('op-defesa').textContent = `Esq: ${oponente.esquiva}%`;
     
-    const ordem = ['for','des','agi','vit','int','esp'];
-    for(const k of ordem) {
-        const r = REGRAS.atributos[k];
-        const v = distTemp[k];
-        c.innerHTML += `<div class="atributo">
-            <div class="nome-atr">
-                <strong>${r.icone} ${r.nome}</strong><br>
-                <small>+${r.porPonto} ${r.desc}</small>
-            </div>
-            <div class="val-atr">${v}</div>
-            <div class="controle">
-                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=REGRAS.valorBase?'disabled':''}>−</button>
-                <button class="botao botao-ponto" onclick="aumentar('${k}')" ${heroi.ptsParaAlocar<=0?'disabled':''}>+</button>
-            </div>
-        </div>`;
-    }
+    document.getElementById('botoes-explorar').classList.add('oculto');
+    document.getElementById('botoes-combate').classList.remove('oculto');
+  }else{
+    document.getElementById('oponente-vazio').style.display='flex';
+    document.getElementById('oponente-dados').classList.add('oculto');
+    document.getElementById('area-confronto').classList.add('oculto');
+    document.getElementById('botoes-explorar').classList.remove('oculto');
+    document.getElementById('botoes-combate').classList.add('oculto');
+  }
 }
 
-function aumentar(k) { 
-    if(heroi.ptsParaAlocar <= 0) return; 
-    distTemp[k]++; 
-    heroi.ptsParaAlocar--; 
-    renderDistribuicao(); 
-}
-function diminuir(k) { 
-    if(distTemp[k] <= REGRAS.valorBase) return; 
-    distTemp[k]--; 
-    heroi.ptsParaAlocar++; 
-    renderDistribuicao(); 
-}
-function confirmarDistribuicao() {
-    heroi.atr = {...distTemp};
-    const st = calcularStatus();
-    heroi.vidaAtual = st.vidaMax;
-    heroi.manaAtual = st.manaMax;
-    salvar(); 
-    atualizarPrincipal(); 
-    trocaTela('principal');
+// SUBIR NÍVEL
+function ganharXP(qtd){
+  jogador.xp += qtd;
+  while(jogador.xp >= REGRAS.xpPorNivel(jogador.nivel) && jogador.nivel < REGRAS.nivelMax){
+    jogador.xp -= REGRAS.xpPorNivel(jogador.nivel);
+    jogador.nivel++;
+    jogador.ptsDisponiveis += REGRAS.pontosPorNivel;
+    logar(`🎉 Subiu para o Nível ${jogador.nivel}! +${REGRAS.pontosPorNivel} pontos`, 'destaque');
+  }
+  salvar();
+  atualizarTela();
 }
 
-function calcularStatus() {
-    const a = heroi.atr;
-    return {
-        vidaMax: REGRAS.vidaBase + a.vit * REGRAS.atributos.vit.porPonto,
-        manaMax: REGRAS.manaBase + a.esp * REGRAS.atributos.esp.porPonto,
-        danoFisico: a.for * REGRAS.atributos.for.porPonto,
-        danoMagico: a.int * REGRAS.atributos.int.porPonto,
-        precisao: REGRAS.precisaoBase + a.des * REGRAS.atributos.des.porPonto,
-        esquiva: a.agi * REGRAS.atributos.agi.porPonto
-    };
-}
-
-// ✅ FUNÇÃO DE XP GARANTIDA
-function ganharXP(qtd) {
-    if(!qtd || qtd <= 0) return;
-    heroi.xp += qtd;
-    let subiu = false;
-    while(heroi.xp >= REGRAS.xpPorNivel(heroi.nivel)) {
-        heroi.xp -= REGRAS.xpPorNivel(heroi.nivel);
-        heroi.nivel++;
-        heroi.ptsParaAlocar += REGRAS.pontosPorNivel;
-        subiu = true;
-    }
-    if(subiu) {
-        document.getElementById('aviso-subida').classList.remove('escondido');
-        setTimeout(()=>document.getElementById('aviso-subida').classList.add('escondido'), 4000);
+// EXPLORAÇÃO
+function explorar(){
+  const r = Math.random();
+  if(r < 0.45){
+    logar('🌿 Caminho tranquilo... nada encontrado.');
+    aviso('Caminho silencioso. Continue explorando.','normal');
+  }else if(r < 0.75){
+    let ouro = Math.floor(Math.random()*13)+8;
+    jogador.ouro += ouro;
+    logar(`💰 Encontrou ${ouro} ouro!`);
+    aviso(`+${ouro} Ouro!`,'ouro');
+    if(Math.random()<0.3){
+      const st = calcularStatus(jogador.atr);
+      jogador.vidaAtual = Math.min(st.vidaMax, jogador.vidaAtual+30);
+      logar('❤️ Poção de Vida recuperada!');
     }
     salvar();
-    atualizarPrincipal();
+  }else if(r < 0.95){
+    const chave = Math.random()<0.5 ? 'lobo' : 'cultista';
+    iniciarCombate(inimigos[chave]);
+  }else{
+    iniciarCombate(inimigos.loboAlfa);
+  }
+  atualizarTela();
 }
 
-function atualizarPrincipal() {
-    const st = calcularStatus();
-    const xpNec = REGRAS.xpPorNivel(heroi.nivel);
-    document.getElementById('nome-personagem').textContent = heroi.nome;
-    document.getElementById('exibir-nivel').textContent = heroi.nivel;
-    document.getElementById('exibir-ouro').textContent = heroi.ouro;
-    document.getElementById('val-vida').textContent = `${heroi.vidaAtual}/${st.vidaMax}`;
-    document.getElementById('bar-vida').style.width = `${(heroi.vidaAtual/st.vidaMax)*100}%`;
-    document.getElementById('val-mana').textContent = `${heroi.manaAtual}/${st.manaMax}`;
-    document.getElementById('bar-mana').style.width = `${(heroi.manaAtual/st.manaMax)*100}%`;
-    document.getElementById('val-xp').textContent = `${heroi.xp}/${xpNec}`;
-    document.getElementById('bar-xp').style.width = `${Math.min(100,(heroi.xp/xpNec)*100)}%`;
-    
-    const aviso = document.getElementById('aviso-pts');
-    aviso.style.display = heroi.ptsParaAlocar > 0 ? 'block' : 'none';
-    document.getElementById('pts-disponiveis').textContent = heroi.ptsParaAlocar;
-    
-    document.getElementById('status-geral').innerHTML = `
-        <p><strong>⚔️ Dano Físico:</strong> ${st.danoFisico}</p>
-        <p><strong>🤸 Precisão:</strong> ${st.precisao}%</p>
-        <p><strong>🏃 Esquiva:</strong> ${st.esquiva}%</p>
-        <p><strong>❤️ Vida Máx:</strong> ${st.vidaMax}</p>
-        <p><strong>🧠 Dano Mágico:</strong> ${st.danoMagico}</p>
-        <p><strong>💎 Mana Máx:</strong> ${st.manaMax}</p>
-        <hr style="margin:0.7rem 0;border:none;border-top:1px dashed #d4b896;">
-        <p style="font-size:0.9rem;color:#666;">
-            Força ${heroi.atr.for} | Destreza ${heroi.atr.des} | Agilidade ${heroi.atr.agi}<br>
-            Vitalidade ${heroi.atr.vit} | Inteligência ${heroi.atr.int} | Espírito ${heroi.atr.esp}
-        </p>
-    `;
-    
-    const btnFloresta = document.getElementById('btn-floresta');
-    btnFloresta.disabled = heroi.nivel > REGRAS.nivelMaxFloresta;
-    btnFloresta.textContent = heroi.nivel > REGRAS.nivelMaxFloresta 
-        ? '🔒 Floresta Negra concluída' 
-        : '🌑 Explorar Floresta Negra';
+function aviso(texto,tipo){
+  const a = document.getElementById('aviso-area');
+  const cls = {
+    normal:'',
+    ouro:'aviso',
+    perigo:'aviso aviso-perigo',
+    elite:'aviso aviso-elite'
+  };
+  a.innerHTML = `<div class="${cls[tipo]||''}">${texto}</div>`;
+  setTimeout(()=>a.innerHTML='',3500);
 }
 
-let intervaloChat;
-
-function entrarTaverna() {
-    trocaTela('taverna');
-    carregarChat();
-    intervaloChat = setInterval(carregarChat, 2000);
+// COMBATE
+function iniciarCombate(dados){
+  oponente = {...dados,vidaAtual:dados.vida};
+  turnoElite = 0;
+  logar(`⚔️ Encontro: ${dados.nome}!`);
+  if(dados.elite){
+    aviso('⚡ ALERTA: MONSTRO ELITE!','elite');
+    logar('⚠️ Este é um inimigo formidável! Tenha cuidado!','destaque');
+  }
+  atualizarTela();
 }
 
-function sairTaverna() {
-    clearInterval(intervaloChat);
-    salvar();
-    atualizarPrincipal();
-    trocaTela('principal');
+function atacarFisico(){
+  if(!oponente) return;
+  const st = calcularStatus(jogador.atr);
+  const acertou = Math.random()*100 < st.precisao - oponente.esquiva/3;
+  
+  if(acertou){
+    oponente.vidaAtual -= st.danoFis;
+    logar(`⚔️ Acertou! ${st.danoFis} de dano!`);
+  }else{
+    logar('💨 Errou o ataque!');
+  }
+  
+  if(oponente.vidaAtual <= 0){
+    vitoria();
+    return;
+  }
+  turnoInimigo();
 }
 
-function recuperarVida() {
-    const st = calcularStatus();
-    heroi.vidaAtual = st.vidaMax;
-    salvar();
-    const aviso = document.getElementById('curou-vida');
-    aviso.style.display = 'block';
-    setTimeout(()=>aviso.style.display='none', 2500);
-    atualizarPrincipal();
+function atacarMagico(){
+  if(!oponente || jogador.manaAtual < 10){
+    logar('✨ Mana insuficiente!');
+    return;
+  }
+  jogador.manaAtual -= 10;
+  const st = calcularStatus(jogador.atr);
+  const acertou = Math.random()*100 < st.precisao - oponente.esquiva/3;
+  
+  if(acertou){
+    oponente.vidaAtual -= st.danoMag;
+    logar(`✨ Golpe Mágico! ${st.danoMag} de dano!`);
+  }else{
+    logar('💨 A magia falhou!');
+  }
+  
+  if(oponente.vidaAtual <= 0){
+    vitoria();
+    return;
+  }
+  turnoInimigo();
 }
 
-function recuperarMana() {
-    const st = calcularStatus();
-    heroi.manaAtual = st.manaMax;
-    salvar();
-    const aviso = document.getElementById('curou-mana');
-    aviso.style.display = 'block';
-    setTimeout(()=>aviso.style.display='none', 2500);
-    atualizarPrincipal();
-}
-
-function carregarChat() {
-    const caixa = document.getElementById('caixa-chat');
-    const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
-    
-    caixa.innerHTML = mensagens.map(m => `
-        <div class="chat-msg">
-            <span class="chat-nome">${m.nome}</span>
-            <span class="chat-hora">${m.hora}</span>
-            <div class="chat-texto">${m.texto}</div>
-        </div>
-    `).join('');
-    
-    caixa.scrollTop = caixa.scrollHeight;
-    document.getElementById('contador-online').textContent = `🟢 Jogadores: ${Math.max(1, mensagens.length)}`;
-}
-
-function enviarMensagem() {
-    const campo = document.getElementById('mensagem-chat');
-    const texto = campo.value.trim();
-    if(!texto || !heroi.nome) return;
-    
-    const agora = new Date();
-    const hora = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}`;
-    
-    const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
-    mensagens.push({nome: heroi.nome, texto: texto, hora: hora});
-    if(mensagens.length > LIMITE_MSG) mensagens.shift();
-    
-    localStorage.setItem(CHAVE_CHAT, JSON.stringify(mensagens));
-    campo.value = '';
-    carregarChat();
-}
-
-document.addEventListener('keydown', e => {
-    if(e.key === 'Enter' && !document.getElementById('taverna').classList.contains('escondido')) {
-        enviarMensagem();
+function turnoInimigo(){
+  const st = calcularStatus(jogador.atr);
+  turnoElite++;
+  
+  let ataques = 1;
+  if(oponente.elite && turnoElite % 3 === 0){
+    ataques = 2;
+    logar('⚡ O Lobo Alfa ataca DUAS VEZES!','destaque');
+  }
+  
+  for(let i=0;i<ataques;i++){
+    const acertou = Math.random()*100 < oponente.prec - st.esquiva/3;
+    if(acertou){
+      let dano = oponente.dano;
+      if(oponente.danoMag && Math.random()<0.4){
+        dano = oponente.danoMag;
+        logar(`🧙 Ataque Mágico! -${dano} de vida`);
+      }else{
+        logar(`💥 O inimigo ataca! -${dano} de vida`);
+      }
+      jogador.vidaAtual -= dano;
+    }else{
+      logar('🛡️ Esquivou do ataque!');
     }
+  }
+  
+  if(jogador.vidaAtual <= 0){
+    derrota();
+    return;
+  }
+  salvar();
+  atualizarTela();
+}
+
+function vitoria(){
+  logar(`🏆 Derrotou ${oponente.nome}!`,'destaque');
+  ganharXP(oponente.xp);
+  jogador.ouro += oponente.ouro;
+  logar(`+${oponente.xp} XP • +${oponente.ouro} Ouro`,'destaque');
+  aviso('🏆 VITÓRIA!','ouro');
+  oponente = null;
+  salvar();
+  atualizarTela();
+}
+
+function derrota(){
+  logar('💀 Foi derrotado... Retirou-se ferido.','destaque');
+  jogador.ouro = Math.floor(jogador.ouro/2);
+  const st = calcularStatus(jogador.atr);
+  jogador.vidaAtual = Math.floor(st.vidaMax * 0.25);
+  jogador.manaAtual = Math.floor(st.manaMax * 0.25);
+  aviso('Derrotado... perdeu metade do ouro.','perigo');
+  oponente = null;
+  salvar();
+  atualizarTela();
+}
+
+function tentarFugir(){
+  if(Math.random() < 0.6){
+    logar('🏃 Conseguiu retirar-se com segurança!');
+    oponente = null;
+    atualizarTela();
+  }else{
+    logar('🚫 Falhou em fugir!');
+    turnoInimigo();
+  }
+}
+
+// DISTRIBUIR PONTOS
+function abrirDistribuir(){
+  trocarTela('tela-distribuir');
+  renderDistribuir();
+}
+function fecharDistribuir(){
+  trocarTela('tela-principal');
+}
+function renderDistribuir(){
+  document.getElementById('disp-pts').textContent = jogador.ptsDisponiveis;
+  const div = document.getElementById('dist-linhas');
+  const nomes = {for:'Força ⚔️',des:'Destreza 🤸',agi:'Agilidade 🏃',vit:'Vitalidade ❤️',int:'Inteligência 🧠',esp:'Espírito 💎'};
+  div.innerHTML = '';
+  for(const a in nomes){
+    div.innerHTML += `
+    <div class="linha" style="padding:8px 0;border-bottom:1px solid #333;">
+      <span>${nomes[a]}</span>
+      <span style="display:flex;gap:8px;align-items:center;">
+        <button onclick="diminuirPonto('${a}')" style="padding:4px 8px;font-size:.8rem;" ${jogador.atr[a]<=5?'disabled':''}>−</button>
+        <strong>${jogador.atr[a]}</strong>
+        <button onclick="adicionarPonto('${a}')" style="padding:4px 8px;font-size:.8rem;" ${jogador.ptsDisponiveis<=0?'disabled':''}>+</button>
+      </span>
+    </div>`;
+  }
+}
+function adicionarPonto(a){
+  if(jogador.ptsDisponiveis<=0) return;
+  jogador.atr[a]++;
+  jogador.ptsDisponiveis--;
+  renderDistribuir();
+}
+function diminuirPonto(a){
+  if(jogador.atr[a]<=5) return;
+  jogador.atr[a]--;
+  jogador.ptsDisponiveis++;
+  renderDistribuir();
+}
+function salvarDistribuicao(){
+  const st = calcularStatus(jogador.atr);
+  jogador.vidaAtual = Math.min(jogador.vidaAtual, st.vidaMax);
+  jogador.manaAtual = Math.min(jogador.manaAtual, st.manaMax);
+  salvar();
+  atualizarTela();
+  trocarTela('tela-principal');
+  logar('📝 Pontos distribuídos!');
+}
+
+function voltarCidade(){
+  if(confirm('Voltar à Cidade? O progresso será salvo.')){
+    salvar();
+    oponente = null;
+    atualizarTela();
+    logar('🏠 Retornou à Cidade.');
+  }
+}
+
+// INICIALIZAÇÃO
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('btn-retomar').style.display = localStorage.getItem(CHAVE) ? 'block' : 'none';
 });
-
-function entrarFloresta() {
-    if(heroi.nivel > REGRAS.nivelMaxFloresta) return alert('Você já superou esta área!');
-    trocaTela('floresta');
-    document.getElementById('flor-nivel').textContent = heroi.nivel;
-    document.getElementById('flor-log').innerHTML = '<em>Você adentra a Floresta Negra...</em><br>';
-    proximoPasso();
-}
-function sairFloresta() { salvar(); atualizarPrincipal(); trocaTela('principal'); }
-
-function proximoPasso() {
-    const tipo = Math.floor(Math.random()*3);
-    if(tipo===0) encontroMonstro();
-    else if(tipo===1) encontroEmboscada();
-    else encontroTesouro();
-}
-
-function addLog(texto) {
-    document.getElementById('flor-log').innerHTML += texto + '<br>';
-    document.getElementById('flor-log').scrollTop = 9999;
-}
-
-function encontroMonstro() {
-    const disp = MONSTROS.filter(m => heroi.nivel >= m.minNivel);
-    const m = disp[Math.floor(Math.random()*disp.length)];
-    document.getElementById('flor-cena').innerHTML = `
-        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}!</h3>
-        <p>Um ser emerge da escuridão e te encara!</p>
-        <p><strong>Vida:</strong> ${m.vida} | <strong>Dano:</strong> ${m.dano}</p>
-    `;
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Ataque Físico</button>
-        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Ataque Mágico</button>
-        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Tentar Fugir</button>
-    `;
-}
-
-function batalhaFisico(m) {
-    const st = calcularStatus();
-    const dano = st.danoFisico;
-    const acertou = Math.random()*100 < st.precisao;
-    
-    if(!acertou) {
-        addLog(`⚔️ Contra ${m.nome}: Errou o golpe!`);
-        ataqueInimigo(m);
-        return;
-    }
-    
-    m.vida -= dano;
-    addLog(`⚔️ Contra ${m.nome}: Acertou! ${dano} de dano!`);
-    
-    if(m.vida <= 0) {
-        vitoria(m);
-        return;
-    }
-    
-    document.getElementById('flor-cena').innerHTML = `
-        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
-        <p>O inimigo resiste! Vida restante: ${m.vida}</p>
-    `;
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Ataque Físico</button>
-        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Ataque Mágico</button>
-        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
-    `;
-    ataqueInimigo(m);
-}
-
-function batalhaMagico(m) {
-    if(heroi.manaAtual < 10) {
-        addLog('✨ Mana insuficiente!');
-        ataqueInimigo(m);
-        return;
-    }
-    heroi.manaAtual -= 10;
-    const st = calcularStatus();
-    const dano = st.danoMagico;
-    
-    m.vida -= dano;
-    addLog(`✨ Contra ${m.nome}: Magia! ${dano} de dano! (-10 mana)`);
-    
-    if(m.vida <= 0) {
-        vitoria(m);
-        return;
-    }
-    
-    document.getElementById('flor-cena').innerHTML = `
-        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
-        <p>Resiste! Vida: ${m.vida}</p>
-    `;
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao botao-perigo" onclick='batalhaFisico(${JSON.stringify(m)})'>⚔️ Físico</button>
-        <button class="botao" onclick='batalhaMagico(${JSON.stringify(m)})'>✨ Mágico</button>
-        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
-    `;
-    ataqueInimigo(m);
-}
-
-function ataqueInimigo(m) {
-    const st = calcularStatus();
-    if(Math.random()*100 < st.esquiva) {
-        addLog(`🏃 Desviou do ataque de ${m.nome}!`);
-        salvar();
-        setTimeout(proximoPasso, 800);
-        return;
-    }
-    
-    const reducao = Math.floor(heroi.atr.vit / 5);
-    const danoRecebido = Math.max(1, m.dano - reducao);
-    heroi.vidaAtual -= danoRecebido;
-    addLog(`💥 ${m.nome} ataca! ${danoRecebido} de dano recebido!`);
-    
-    if(heroi.vidaAtual <= 0) {
-        const st = calcularStatus();
-        heroi.vidaAtual = Math.floor(st.vidaMax * 0.25);
-        addLog('💚 Você caiu! Recupera forças com 25% de vida...');
-        salvar();
-        atualizarPrincipal();
-        trocaTela('principal');
-        return;
-    }
-    
-    salvar();
-    setTimeout(proximoPasso, 800);
-}
-
-// ✅ VITÓRIA — XP GARANTIDO AQUI!
-function vitoria(m) {
-    addLog(`🎉 Derrotou ${m.nome}! +${m.xp} XP • +${m.ouro} Ouro`);
-    ganharXP(m.xp); // ✅ CHAMADA GARANTIDA
-    heroi.ouro += m.ouro;
-    salvar();
-    document.getElementById('flor-cena').innerHTML = `
-        <h3 style="color:#86efac;">🎉 Vitória!</h3>
-        <p>O inimigo caiu! +${m.xp} XP e ${m.ouro} ouro.</p>
-    `;
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao" onclick="proximoPasso()">🌲 Continuar Explorando</button>
-        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
-    `;
-}
-
-function tentarFugir() {
-    const st = calcularStatus();
-    if(Math.random()*100 < st.esquiva) {
-        addLog('🏃 Fugiu com sucesso!');
-        salvar();
-        setTimeout(proximoPasso, 600);
-    } else {
-        addLog('🏃 Tentou fugir mas foi alcançado!');
-        setTimeout(proximoPasso, 600);
-    }
-}
-
-function encontroEmboscada() {
-    const e = EMBOISCADAS[Math.floor(Math.random()*EMBOISCADAS.length)];
-    const st = calcularStatus();
-    
-    if(Math.random()*100 < st.esquiva) {
-        addLog(`🛡️ Emboscada: ${e.nome} — Você antecipou e desviou!`);
-        document.getElementById('flor-cena').innerHTML = `
-            <h3 style="color:#ffd700;">⚠️ ${e.nome}</h3>
-            <p>${e.texto}</p>
-            <p style="color:#86efac;"><strong>Você desviou!</strong> Agilidade salvou você.</p>
-        `;
-    } else {
-        let danoReal = e.dano - Math.floor(heroi.atr.vit/5);
-        danoReal = Math.max(1, danoReal);
-        heroi.vidaAtual -= danoReal;
-        addLog(`⚠️ ${e.nome}: -${danoReal} vida`);
-        
-        if(e.mana) {
-            heroi.manaAtual = Math.max(0, heroi.manaAtual + e.mana);
-            addLog(`⚠️ Também afetou sua energia: ${e.mana} mana`);
-        }
-        
-        document.getElementById('flor-cena').innerHTML = `
-            <h3 style="color:#ff6b6b;">⚠️ ${e.nome}</h3>
-            <p>${e.texto}</p>
-            <p><strong>Recebeu ${danoReal} de dano!</strong></p>
-        `;
-        
-        if(heroi.vidaAtual <= 0) {
-            const st = calcularStatus();
-            heroi.vidaAtual = Math.floor(st.vidaMax * 0.25);
-            addLog('💚 Recupera com 25% de vida...');
-            salvar();
-            atualizarPrincipal();
-            trocaTela('principal');
-            return;
-        }
-    }
-    
-    salvar();
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao" onclick="proximoPasso()">🌲 Seguir Caminho</button>
-        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
-    `;
-}
-
-function encontroTesouro() {
-    const t = TESOUROS[Math.floor(Math.random()*TESOUROS.length)];
-    let ganhos = [];
-    
-    if(t.ouro) { heroi.ouro += t.ouro; ganhos.push(`+${t.ouro} ouro`); }
-    if(t.cura) { 
-        const st = calcularStatus();
-        heroi.vidaAtual = Math.min(st.vidaMax, heroi.vidaAtual + t.cura); 
-        ganhos.push(`+${t.cura} vida`);
-    }
-    if(t.xp) { ganharXP(t.xp); ganhos.push(`+${t.xp} XP`); }
-    
-    addLog(`💰 ${t.nome}: ${ganhos.join(' • ')}`);
-    document.getElementById('flor-cena').innerHTML = `
-        <h3 style="color:#ffd700;">💰 ${t.nome}</h3>
-        <p>${t.texto}</p>
-        <p><strong>Conseguiu:</strong> ${ganhos.join(' • ')}</p>
-    `;
-    salvar();
-    document.getElementById('flor-acoes').innerHTML = `
-        <button class="botao" onclick="proximoPasso()">🌲 Continuar Explorando</button>
-        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
-    `;
-}
-
-verificaRetomar();
 </script>
+
 </body>
 </html>
