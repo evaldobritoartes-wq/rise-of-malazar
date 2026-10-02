@@ -25,10 +25,11 @@ h2 {text-align:center;color:var(--tinta);margin-bottom:1.5rem;}
 .botao {padding:1rem 1.5rem;font-size:1.1rem;background:linear-gradient(to bottom,#d4a017,#b8860b);color:white;border:none;border-radius:6px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
 .botao:hover {transform:scale(1.03);box-shadow:0 4px 10px rgba(184,134,11,0.4);}
 .botoes-genero{display:flex;gap:0.5rem;justify-content:center;margin:0.5rem 0 1rem;flex-wrap:wrap}
-.botoes-genero button{flex:1;min-width:100px}
+.botoes-genero button{flex:1;min-width:100px;padding:0.7rem;border:2px solid #bbaa88;border-radius:6px;background:#f5efe0;cursor:pointer;transition:all 0.2s;}
+.botoes-genero button.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.3);font-weight:bold;}
 .lista-opcoes{display:flex;flex-direction:column;gap:0.5rem;margin:0.5rem 0 1rem}
-.opcao{padding:0.8rem;border:2px solid transparent;border-radius:8px;background:rgba(139,90,43,0.1);cursor:pointer}
-.opcao.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.2)}
+.opcao{padding:0.8rem;border:2px solid transparent;border-radius:8px;background:rgba(139,90,43,0.1);cursor:pointer;transition:all 0.2s;}
+.opcao.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.2);font-weight:bold;}
 .rotulo {font-weight:bold;margin:1rem 0 0.5rem;display:block;}
 .campo {width:100%;padding:0.8rem;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
 .aviso {margin-top:1.5rem;font-size:0.9rem;color:var(--tinta-suave);text-align:center;}
@@ -143,9 +144,9 @@ function voltarInicio() {
 
 function selGen(g) {
     selecionado.genero = g;
-    document.querySelectorAll('[data-gen]').forEach(el =>
-        el.classList.toggle('selecionada', el.dataset.gen === g)
-    );
+    document.querySelectorAll('[data-gen]').forEach(el => {
+        el.classList.toggle('selecionada', el.dataset.gen === g);
+    });
 }
 
 function selRaca(id) {
@@ -199,8 +200,10 @@ function confirmarCriacao() {
     localStorage.setItem('malazar_jog', JSON.stringify(jogador));
     
     alert(`Bem-vindo, ${nome}!\nSua jornada começa agora...`);
-    // Aqui você abre a tela do jogo principal
-    voltarInicio();
+    
+    // ✅ Quando tiver a próxima tela, troque a linha abaixo:
+    // trocarTela('tela-cidade');
+    voltarInicio(); // ← remova esta linha quando tiver a próxima tela!
 }
 </script>
 
