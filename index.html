@@ -45,8 +45,6 @@ h1{color:var(--ouro);font-size:2rem;}
 .pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;font-size:1.2rem;font-weight:bold;}
 .salvo-ok{text-align:center;color:#4a7c59;font-size:0.85rem;margin-top:0.5rem;}
 .log{max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.05);padding:0.8rem;border-radius:4px;margin:0.5rem 0;font-size:0.9rem;}
-
-/* ===== ESTILOS DA TAVERNA ===== */
 .chat-area{height:250px;overflow-y:auto;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:6px;margin:0.5rem 0;}
 .chat-msg{margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px dashed rgba(255,255,255,0.15);}
 .chat-nome{font-weight:bold;color:#ffd700;}
@@ -58,7 +56,6 @@ h1{color:var(--ouro);font-size:2rem;}
 </head>
 <body>
 
-<!-- TELA INÍCIO -->
 <div id="inicio" class="tela">
     <div class="pergaminho">
         <h1>MALAZAR</h1>
@@ -69,7 +66,6 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
-<!-- TELA DIGITAR NOME -->
 <div id="nomear" class="tela escondido">
     <div class="pergaminho">
         <h2>📝 Nome do Herói</h2>
@@ -80,7 +76,6 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
-<!-- TELA DISTRIBUIÇÃO -->
 <div id="distribuir" class="tela escondido">
     <div class="pergaminho">
         <h2 id="titulo-nivel">Distribuir — Nível 1</h2>
@@ -91,7 +86,6 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
-<!-- TELA PRINCIPAL -->
 <div id="principal" class="tela escondido">
     <div class="pergaminho">
         <h2 id="nome-personagem">Herói</h2>
@@ -129,7 +123,6 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
-<!-- ===== TELA TAVERNA ===== -->
 <div id="taverna" class="tela escondido">
     <div class="pergaminho taverna">
         <h2>🏠 Taverna do Caminho</h2>
@@ -160,7 +153,6 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
-<!-- TELA FLORESTA NEGRA -->
 <div id="floresta" class="tela escondido">
     <div class="pergaminho floresta">
         <h2>🌑 Floresta Negra</h2>
@@ -182,9 +174,9 @@ h1{color:var(--ouro);font-size:2rem;}
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v8';
+const CHAVE_SALVO = 'malazar_heroi_v9';
 const CHAVE_CHAT = 'malazar_chat_global';
-const LIMITE_MSG = 30; // Mantém só as últimas mensagens
+const LIMITE_MSG = 30;
 
 const REGRAS = {
     valorBase: 5,
@@ -228,7 +220,6 @@ let heroi = {
     atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
 };
 
-// ===== SALVAMENTO =====
 function salvar() {
     localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
     const m = document.getElementById('salvo-mensagem');
@@ -271,7 +262,6 @@ function confirmarNome() {
 
 function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
-// ===== DISTRIBUIÇÃO =====
 let distTemp = {};
 
 function abrirDistribuicao() {
@@ -352,7 +342,9 @@ function calcularStatus() {
     };
 }
 
+// ✅ FUNÇÃO DE XP GARANTIDA
 function ganharXP(qtd) {
+    if(!qtd || qtd <= 0) return;
     heroi.xp += qtd;
     let subiu = false;
     while(heroi.xp >= REGRAS.xpPorNivel(heroi.nivel)) {
@@ -365,7 +357,8 @@ function ganharXP(qtd) {
         document.getElementById('aviso-subida').classList.remove('escondido');
         setTimeout(()=>document.getElementById('aviso-subida').classList.add('escondido'), 4000);
     }
-    salvar(); atualizarPrincipal();
+    salvar();
+    atualizarPrincipal();
 }
 
 function atualizarPrincipal() {
@@ -406,13 +399,12 @@ function atualizarPrincipal() {
         : '🌑 Explorar Floresta Negra';
 }
 
-// ===== TAVERNA =====
 let intervaloChat;
 
 function entrarTaverna() {
     trocaTela('taverna');
     carregarChat();
-    intervaloChat = setInterval(carregarChat, 2000); // Atualiza a cada 2s
+    intervaloChat = setInterval(carregarChat, 2000);
 }
 
 function sairTaverna() {
@@ -442,7 +434,6 @@ function recuperarMana() {
     atualizarPrincipal();
 }
 
-// ===== CHAT GLOBAL =====
 function carregarChat() {
     const caixa = document.getElementById('caixa-chat');
     const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
@@ -468,13 +459,7 @@ function enviarMensagem() {
     const hora = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}`;
     
     const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
-    mensagens.push({
-        nome: heroi.nome,
-        texto: texto,
-        hora: hora
-    });
-    
-    // Mantém só as últimas mensagens
+    mensagens.push({nome: heroi.nome, texto: texto, hora: hora});
     if(mensagens.length > LIMITE_MSG) mensagens.shift();
     
     localStorage.setItem(CHAVE_CHAT, JSON.stringify(mensagens));
@@ -482,14 +467,12 @@ function enviarMensagem() {
     carregarChat();
 }
 
-// Envia ao apertar Enter
 document.addEventListener('keydown', e => {
-    if(e.key === 'Enter' && document.getElementById('taverna').classList.contains('escondido') === false) {
+    if(e.key === 'Enter' && !document.getElementById('taverna').classList.contains('escondido')) {
         enviarMensagem();
     }
 });
 
-// ===== FLORESTA =====
 function entrarFloresta() {
     if(heroi.nivel > REGRAS.nivelMaxFloresta) return alert('Você já superou esta área!');
     trocaTela('floresta');
@@ -615,9 +598,10 @@ function ataqueInimigo(m) {
     setTimeout(proximoPasso, 800);
 }
 
+// ✅ VITÓRIA — XP GARANTIDO AQUI!
 function vitoria(m) {
     addLog(`🎉 Derrotou ${m.nome}! +${m.xp} XP • +${m.ouro} Ouro`);
-    ganharXP(m.xp);
+    ganharXP(m.xp); // ✅ CHAMADA GARANTIDA
     heroi.ouro += m.ouro;
     salvar();
     document.getElementById('flor-cena').innerHTML = `
