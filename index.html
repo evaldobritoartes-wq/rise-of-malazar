@@ -11,8 +11,6 @@
     --fundo:#f8f0dc;
     --tinta:#2c1810;
     --tinta-suave:#5a4538;
-    --sucesso:#2e7d32;
-    --perigo:#c62828;
     --vida:#ef4444;
     --mana:#6366f1;
 }
@@ -28,14 +26,13 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
 .divisor{height:2px;background:linear-gradient(to right,transparent,var(--ouro),transparent);margin:1rem 0;}
 .botao{width:100%;padding:1rem;margin:0.5rem 0;font-size:1rem;background:linear-gradient(var(--ouro-claro),var(--ouro));color:#fff;border:none;border-radius:6px;cursor:pointer;transition:transform 0.15s;}
 .botao:active{transform:scale(0.97);}
+.botao:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 .botao-gen{padding:0.8rem;margin:0.25rem;border:2px solid #bbaa88;border-radius:6px;background:#f5efe0;cursor:pointer;transition:all 0.2s;}
 .botao-gen.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.3);font-weight:bold;}
 .opcao{padding:1rem;margin:0.5rem 0;border:2px solid transparent;border-radius:6px;background:rgba(139,90,43,0.1);cursor:pointer;transition:all 0.2s;}
 .opcao.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.2);font-weight:bold;}
 .campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
 .voltar{background:linear-gradient(#7a5c3a,#5c442e);}
-
-/* TELA CIDADE */
 .barras{display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap;}
 .bloco{flex:1;min-width:120px;}
 .etiqueta{font-weight:bold;display:flex;justify-content:space-between;margin-bottom:0.25rem;font-size:0.9rem;}
@@ -57,7 +54,9 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
         <p class="subtitulo">Crônicas de uma Era Esquecida</p>
         <div class="divisor"></div>
         <p style="text-align:center;margin-bottom:2rem;">As sombras despertaram. Cabe a ti deter o culto antes que Malazar desperte.</p>
-        <button class="botao" onclick="vaiCriar()">⚔️ Iniciar Jornada</button>
+        
+        <button id="btn-retomar" class="botao" style="display:none" onclick="retomarJornada()">🔄 Retomar Jornada</button>
+        <button class="botao" onclick="vaiCriar()">⚔️ Nova Jornada</button>
         <button class="botao" onclick="vaiHistoria()">📜 A História</button>
     </div>
 </div>
@@ -97,7 +96,6 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
         <p style="text-align:center;font-style:italic;color:var(--tinta-suave);">Bem-vindo à Cidade de Malazar!</p>
         <div class="divisor"></div>
         
-        <!-- BARRAS DE VIDA E MANA -->
         <div class="barras">
             <div class="bloco">
                 <div class="etiqueta"><span>❤️ Vida</span><span id="val-vida">--</span></div>
@@ -109,14 +107,12 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
             </div>
         </div>
         
-        <!-- NÍVEL E RECURSOS -->
         <div class="status-centro">
             <p><strong>Nível:</strong> <span id="nivel">1</span></p>
             <p><strong>XP:</strong> <span id="xp">0</span>/<span id="xp-prox">100</span></p>
             <p><strong>Ouro:</strong> <span id="ouro">50</span> 💰</p>
         </div>
         
-        <!-- FICHA DO HERÓI -->
         <div class="ficha">
             <h3>📊 Ficha do Herói</h3>
             <div class="linha"><span>Raça:</span><span id="ficha-raca">--</span></div>
@@ -127,10 +123,9 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
             <div class="linha"><span>Resistência:</span><span id="ficha-con">10</span></div>
         </div>
         
-        <!-- AÇÕES DO JOGO -->
-        <button class="botao" onclick="alert('Em desenvolvimento! ⚔️\nAventura em breve!')">⚔️ Portão da Masmorra — Aventurar-se</button>
-        <button class="botao" onclick="alert('Em desenvolvimento! 🍺')">🍺 Taverna — Descansar</button>
-        <button class="botao" onclick="alert('Em desenvolvimento! 🛒')">🛒 Loja — Comprar Suprimentos</button>
+        <button class="botao" onclick="alert('Em desenvolvimento! ⚔️')">⚔️ Portão da Masmorra</button>
+        <button class="botao" onclick="alert('Em desenvolvimento! 🍺')">🍺 Taverna</button>
+        <button class="botao" onclick="alert('Em desenvolvimento! 🛒')">🛒 Loja</button>
         <button class="botao voltar" onclick="sairJogo()">🚪 Sair / Trocar Herói</button>
     </div>
 </div>
@@ -140,14 +135,12 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
     <div class="pergaminho">
         <h2>A História</h2>
         <div class="divisor"></div>
-        <p style="margin-bottom:1rem;">Há milênios, Malazar — um senhor sombrio de poder imenso — foi selado por heróis lendários. Mas o selo enfraquece...</p>
-        <p style="margin-bottom:2rem;">Cultos espalhados pelo mundo buscam despertá-lo. Cabe a ti, escolhido, fortalecer o selo e deter a escuridão.</p>
+        <p style="margin-bottom:1rem;">Há milênios, Malazar foi selado... mas o culto desperta.</p>
         <button class="botao voltar" onclick="vaiInicio()">↩️ Voltar</button>
     </div>
 </div>
 
 <script>
-// DADOS DO JOGO
 const RACAS = [
     {id:'hum',nome:'Humano',bonus:{for:10,agi:10,int:10,con:10,vida:100,mana:50}},
     {id:'elf',nome:'Elfo',bonus:{for:8,agi:14,int:12,con:8,vida:80,mana:80}},
@@ -161,21 +154,15 @@ const CLASSES = [
     {id:'sac',nome:'Sacerdote',mod:{for:+1,agi:0,int:+2,con:+2,vida:+15,mana:+20}}
 ];
 
-// ESCOLHAS DO JOGADOR
 let heroi = {
-    nome:'',
-    genero:null,
-    raca:null,
-    classe:null,
-    nivel:1,
-    xp:0,
-    ouro:50,
-    vidaMax:100,
-    vidaAtual:100,
-    manaMax:50,
-    manaAtual:50,
+    nome:'', genero:null, raca:null, classe:null,
+    nivel:1, xp:0, ouro:50,
+    vidaMax:100, vidaAtual:100,
+    manaMax:50, manaAtual:50,
     atributos:{for:10,agi:10,int:10,con:10}
 };
+
+const CHAVE_SALVO = 'malazar_heroi';
 
 // TROCA DE TELA
 function trocaTela(id) {
@@ -183,34 +170,48 @@ function trocaTela(id) {
     document.getElementById(id).classList.remove('escondido');
 }
 
-function vaiInicio() { trocaTela('inicio'); }
+// VERIFICA SE TEM JOGO SALVO AO CARREGAR
+function verificaSalvo() {
+    const salvo = localStorage.getItem(CHAVE_SALVO);
+    const btn = document.getElementById('btn-retomar');
+    if(salvo) {
+        heroi = JSON.parse(salvo);
+        btn.style.display = 'block';
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+function vaiInicio() {
+    verificaSalvo();
+    trocaTela('inicio');
+}
+
 function vaiHistoria() { trocaTela('historia'); }
 
 function vaiCriar() {
-    // LIMPA TUDO
-    heroi.nome = '';
-    heroi.genero = heroi.raca = heroi.classe = null;
+    heroi = {nome:'', genero:null, raca:null, classe:null, nivel:1, xp:0, ouro:50, vidaMax:100, vidaAtual:100, manaMax:50, manaAtual:50, atributos:{for:10,agi:10,int:10,con:10}};
     document.getElementById('nome').value = '';
     document.querySelectorAll('.botao-gen, .opcao').forEach(b => b.classList.remove('ativo'));
     carregaOpcoes();
     trocaTela('criar');
 }
 
-// ESCOLHA DE GÊNERO
+function retomarJornada() {
+    preencheTelaCidade();
+    trocaTela('cidade');
+}
+
 function escolheGen(valor) {
     heroi.genero = valor;
     document.querySelectorAll('.botao-gen').forEach(b => b.classList.remove('ativo'));
-    if(valor === 'masc') document.getElementById('gen-m').classList.add('ativo');
-    if(valor === 'fem') document.getElementById('gen-f').classList.add('ativo');
-    if(valor === 'neutro') document.getElementById('gen-n').classList.add('ativo');
+    document.getElementById('gen-'+(valor==='masc'?'m':valor==='fem'?'f':'n')).classList.add('ativo');
 }
 
-// CARREGA RAÇAS E CLASSES
 function carregaOpcoes() {
     document.getElementById('lista-racas').innerHTML = RACAS.map(r =>
         `<div class="opcao" id="raca-${r.id}" onclick="escolheRaca('${r.id}')">${r.nome}</div>`
     ).join('');
-    
     document.getElementById('lista-classes').innerHTML = CLASSES.map(c =>
         `<div class="opcao" id="classe-${c.id}" onclick="escolheClasse('${c.id}')">${c.nome}</div>`
     ).join('');
@@ -228,43 +229,38 @@ function escolheClasse(id) {
     document.getElementById(`classe-${id}`).classList.add('ativo');
 }
 
-// CONFIRMA E ENTRA NO JOGO
 function confirma() {
     const nome = document.getElementById('nome').value.trim();
-    
-    if(!nome) return alert('Digite seu nome, herói!');
-    if(!heroi.genero) return alert('Escolha seu gênero!');
-    if(!heroi.raca) return alert('Escolha sua raça!');
-    if(!heroi.classe) return alert('Escolha sua classe!');
+    if(!nome) return alert('Digite seu nome!');
+    if(!heroi.genero) return alert('Escolha o gênero!');
+    if(!heroi.raca) return alert('Escolha a raça!');
+    if(!heroi.classe) return alert('Escolha a classe!');
     
     heroi.nome = nome;
     inicializaAtributos();
+    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
     preencheTelaCidade();
-    trocaTela('cidade'); // ✅ AGORA VAI DIRETO PRO JOGO!
+    trocaTela('cidade');
 }
 
-// CALCULA ATRIBUTOS FINAIS
 function inicializaAtributos() {
-    const raca = RACAS.find(r => r.id === heroi.raca);
-    const classe = CLASSES.find(c => c.id === heroi.classe);
-    
+    const r = RACAS.find(x => x.id === heroi.raca);
+    const c = CLASSES.find(x => x.id === heroi.classe);
     heroi.atributos = {
-        for: raca.bonus.for + classe.mod.for,
-        agi: raca.bonus.agi + classe.mod.agi,
-        int: raca.bonus.int + classe.mod.int,
-        con: raca.bonus.con + classe.mod.con
+        for: r.bonus.for + c.mod.for,
+        agi: r.bonus.agi + c.mod.agi,
+        int: r.bonus.int + c.mod.int,
+        con: r.bonus.con + c.mod.con
     };
-    
-    heroi.vidaMax = raca.bonus.vida + classe.mod.vida;
+    heroi.vidaMax = r.bonus.vida + c.mod.vida;
     heroi.vidaAtual = heroi.vidaMax;
-    heroi.manaMax = raca.bonus.mana + classe.mod.mana;
+    heroi.manaMax = r.bonus.mana + c.mod.mana;
     heroi.manaAtual = heroi.manaMax;
 }
 
-// PREENCHE TELA DA CIDADE
 function preencheTelaCidade() {
-    const racaNome = RACAS.find(r => r.id === heroi.raca).nome;
-    const classeNome = CLASSES.find(c => c.id === heroi.classe).nome;
+    const rNome = RACAS.find(x => x.id === heroi.raca)?.nome || heroi.raca;
+    const cNome = CLASSES.find(x => x.id === heroi.classe)?.nome || heroi.classe;
     
     document.getElementById('nome-jogador-titulo').textContent = heroi.nome;
     document.getElementById('val-vida').textContent = `${heroi.vidaAtual}/${heroi.vidaMax}`;
@@ -272,19 +268,26 @@ function preencheTelaCidade() {
     document.getElementById('nivel').textContent = heroi.nivel;
     document.getElementById('xp').textContent = heroi.xp;
     document.getElementById('ouro').textContent = heroi.ouro;
-    document.getElementById('ficha-raca').textContent = racaNome;
-    document.getElementById('ficha-classe').textContent = classeNome;
+    document.getElementById('ficha-raca').textContent = rNome;
+    document.getElementById('ficha-classe').textContent = cNome;
     document.getElementById('ficha-forca').textContent = heroi.atributos.for;
     document.getElementById('ficha-agilidade').textContent = heroi.atributos.agi;
     document.getElementById('ficha-int').textContent = heroi.atributos.int;
     document.getElementById('ficha-con').textContent = heroi.atributos.con;
+    
+    // Salva a cada carregamento
+    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
 }
 
 function sairJogo() {
-    if(confirm('Deseja sair? Seu herói será perdido!')) {
+    if(confirm('Sair? O progresso será salvo!')) {
+        localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
         vaiInicio();
     }
 }
+
+// AO ABRIR A PÁGINA — VERIFICA SALVO
+verificaSalvo();
 </script>
 
 </body>
