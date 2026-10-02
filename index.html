@@ -3,98 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MALAZAR - Crônicas de uma Era Esquecida</title>
+<title>MALAZAR - Floresta Negra</title>
 <style>
 :root {
-    --ouro:#b8860b;
-    --ouro-claro:#d4a017;
-    --fundo:#f8f0dc;
-    --tinta:#2c1810;
-    --tinta-suave:#5a4538;
-    --vida:#ef4444;
-    --mana:#6366f1;
+    --ouro:#b8860b; --ouro-claro:#d4a017; --fundo:#f8f0dc;
+    --tinta:#2c1810; --vida:#ef4444; --mana:#6366f1; --destaque:#4a7c59;
+    --floresta:#1a2f1a; --perigo:#8b0000; --tesouro:#ffd700;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
-body{background:var(--fundo);color:var(--tinta);padding:1rem;max-width:520px;margin:0 auto;min-height:100vh;}
-.tela{display:block;}
-.escondido{display:none !important;}
-.pergaminho{background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
-h1{text-align:center;color:var(--ouro);font-size:2.5rem;margin-bottom:0.5rem;}
-h2{text-align:center;margin-bottom:1.5rem;}
-h3{margin:1rem 0 0.5rem;color:var(--tinta);}
-.subtitulo{text-align:center;font-style:italic;color:var(--tinta-suave);margin-bottom:2rem;}
-.divisor{height:2px;background:linear-gradient(to right,transparent,var(--ouro),transparent);margin:1rem 0;}
-.botao{width:100%;padding:1rem;margin:0.5rem 0;font-size:1rem;background:linear-gradient(var(--ouro-claro),var(--ouro));color:#fff;border:none;border-radius:6px;cursor:pointer;transition:transform 0.15s;}
+body{background:var(--fundo);color:var(--tinta);padding:1rem;max-width:540px;margin:0 auto;min-height:100vh;}
+.tela{display:block;} .escondido{display:none !important;}
+.pergaminho{background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:1.5rem;margin-bottom:1rem;}
+h1,h2,h3{text-align:center;margin-bottom:1rem;}
+h1{color:var(--ouro);font-size:2rem;}
+.subtitulo{text-align:center;font-style:italic;color:#5a4538;margin-bottom:1.5rem;}
+.botao{width:100%;padding:0.9rem;margin:0.4rem 0;font-size:1rem;background:linear-gradient(var(--ouro-claro),var(--ouro));color:#fff;border:none;border-radius:6px;cursor:pointer;transition:transform 0.15s;}
 .botao:active{transform:scale(0.97);}
-.botao:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.botao-gen{padding:0.8rem;margin:0.25rem;border:2px solid #bbaa88;border-radius:6px;background:#f5efe0;cursor:pointer;transition:all 0.2s;}
-.botao-gen.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.3);font-weight:bold;}
-.opcao{padding:1rem;margin:0.5rem 0;border:2px solid transparent;border-radius:6px;background:rgba(139,90,43,0.1);cursor:pointer;transition:all 0.2s;}
-.opcao.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.2);font-weight:bold;}
+.botao:disabled{opacity:0.5;cursor:not-allowed;}
+.botao-voltar{background:linear-gradient(#7a5c3a,#5c442e);}
+.botao-perigo{background:linear-gradient(#8b0000,#5c0000);}
+.botao-tesouro{background:linear-gradient(#d4a017,#b8860b);}
+.botao-ponto{width:40px;height:40px;padding:0;font-size:1.2rem;margin:0.1rem;}
 .campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
-.voltar{background:linear-gradient(#7a5c3a,#5c442e);}
-.barras{display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap;}
+.atributo{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px dashed #d4b896;}
+.nome-atr{flex:2;} .val-atr{flex:1;text-align:center;font-weight:bold;} .controle{display:flex;gap:0.3rem;}
+.barras,.xp-bar{margin:1rem 0;}
 .bloco{flex:1;min-width:120px;}
 .etiqueta{font-weight:bold;display:flex;justify-content:space-between;margin-bottom:0.25rem;font-size:0.9rem;}
 .barra{height:16px;background:#e6d9b8;border:1px solid #b89a5b;border-radius:4px;overflow:hidden;}
 .barra-int{height:100%;transition:width 0.3s;}
 .vida{background:linear-gradient(90deg,#ef4444,#fca5a5);}
 .mana{background:linear-gradient(90deg,#6366f1,#a5b4fc);}
-.status-centro{text-align:center;margin:1rem 0;line-height:1.8;}
-.ficha{background:rgba(255,255,255,0.5);border-radius:6px;padding:1rem;margin:1rem 0;}
-.linha{display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px dashed #d4b896;}
+.xp{background:linear-gradient(90deg,#4ade80,#86efac);}
+.floresta{background:linear-gradient(135deg,#233523,#2c422c);color:#e0e0e0;border:3px solid #3a5f3a;}
+.aviso-nivel{background:#fff3cd;border:2px solid #f59e0b;padding:0.8rem;border-radius:6px;text-align:center;margin:1rem 0;animation:pulse 1s infinite alternate;}
+@keyframes pulse {from{box-shadow:0 0 0 transparent;}to{box-shadow:0 0 10px #f59e0b50;}}
+.area-texto{background:rgba(0,0,0,0.1);padding:1rem;border-radius:6px;margin:1rem 0;line-height:1.6;}
+.pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;}
+.salvo-ok{text-align:center;color:#4a7c59;font-size:0.85rem;margin-top:0.5rem;}
+.log{max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.05);padding:0.8rem;border-radius:4px;margin:0.5rem 0;font-size:0.9rem;}
 </style>
 </head>
 <body>
 
-<!-- TELA INICIO -->
+<!-- TELA INÍCIO -->
 <div id="inicio" class="tela">
     <div class="pergaminho">
         <h1>MALAZAR</h1>
         <p class="subtitulo">Crônicas de uma Era Esquecida</p>
-        <div class="divisor"></div>
-        <p style="text-align:center;margin-bottom:2rem;">As sombras despertaram. Cabe a ti deter o culto antes que Malazar desperte.</p>
-        
-        <button id="btn-retomar" class="botao" style="display:none" onclick="retomarJornada()">🔄 Retomar Jornada</button>
-        <button class="botao" onclick="vaiCriar()">⚔️ Nova Jornada</button>
-        <button class="botao" onclick="vaiHistoria()">📜 A História</button>
+        <button id="btn-retomar" class="botao" style="display:none" onclick="retomar()">🔄 Retomar Jornada</button>
+        <button class="botao" onclick="novaJornada()">⚔️ Nova Jornada</button>
+        <button class="botao" onclick="alert('História em breve...')">📜 A História</button>
     </div>
 </div>
 
-<!-- TELA CRIAÇÃO -->
-<div id="criar" class="tela escondido">
+<!-- TELA DISTRIBUIÇÃO -->
+<div id="distribuir" class="tela escondido">
     <div class="pergaminho">
-        <h2>Criar Herói</h2>
-        <div class="divisor"></div>
-        
-        <label><strong>Nome do Herói:</strong></label>
-        <input type="text" id="nome" class="campo" placeholder="Digite seu nome...">
-        
-        <label><strong>Gênero:</strong></label>
-        <div>
-            <button class="botao-gen" id="gen-m" onclick="escolheGen('masc')">Masculino</button>
-            <button class="botao-gen" id="gen-f" onclick="escolheGen('fem')">Feminino</button>
-            <button class="botao-gen" id="gen-n" onclick="escolheGen('neutro')">Neutro</button>
-        </div>
-        
-        <label><strong>Raça:</strong></label>
-        <div id="lista-racas"></div>
-        
-        <label><strong>Classe:</strong></label>
-        <div id="lista-classes"></div>
-        
-        <div class="divisor"></div>
-        <button class="botao" onclick="confirma()">✅ Confirmar e Entrar</button>
-        <button class="botao voltar" onclick="vaiInicio()">↩️ Voltar</button>
+        <h2 id="titulo-nivel">Distribuir Pontos</h2>
+        <div class="pontos-disponiveis"><strong>Pontos: <span id="pts-restantes">0</span></strong></div>
+        <div id="lista-atributos"></div>
+        <button class="botao" onclick="confirmarDistribuicao()">✅ Confirmar</button>
+        <button class="botao botao-voltar" onclick="sair()">🚪 Sair</button>
     </div>
 </div>
 
-<!-- TELA CIDADE / JOGO -->
-<div id="cidade" class="tela escondido">
+<!-- TELA PRINCIPAL -->
+<div id="principal" class="tela escondido">
     <div class="pergaminho">
-        <h2 id="nome-jogador-titulo">Herói</h2>
-        <p style="text-align:center;font-style:italic;color:var(--tinta-suave);">Bem-vindo à Cidade de Malazar!</p>
-        <div class="divisor"></div>
+        <h2 id="nome-personagem">Herói</h2>
+        <p style="text-align:center;">Nível <span id="exibir-nivel">1</span> • Ouro: <span id="exibir-ouro">0</span> 💰</p>
+        <div id="aviso-subida" class="aviso-nivel escondido">🎉 Subiu de Nível! +3 pontos!</div>
         
         <div class="barras">
             <div class="bloco">
@@ -106,189 +85,426 @@ h3{margin:1rem 0 0.5rem;color:var(--tinta);}
                 <div class="barra"><div id="bar-mana" class="barra-int mana" style="width:100%"></div></div>
             </div>
         </div>
-        
-        <div class="status-centro">
-            <p><strong>Nível:</strong> <span id="nivel">1</span></p>
-            <p><strong>XP:</strong> <span id="xp">0</span>/<span id="xp-prox">100</span></p>
-            <p><strong>Ouro:</strong> <span id="ouro">50</span> 💰</p>
+        <div class="xp-bar">
+            <div class="etiqueta"><span>⭐ Experiência</span><span id="val-xp">0/100</span></div>
+            <div class="barra"><div id="bar-xp" class="barra-int xp" style="width:0%"></div></div>
         </div>
         
-        <div class="ficha">
-            <h3>📊 Ficha do Herói</h3>
-            <div class="linha"><span>Raça:</span><span id="ficha-raca">--</span></div>
-            <div class="linha"><span>Classe:</span><span id="ficha-classe">--</span></div>
-            <div class="linha"><span>Força:</span><span id="ficha-forca">10</span></div>
-            <div class="linha"><span>Agilidade:</span><span id="ficha-agilidade">10</span></div>
-            <div class="linha"><span>Inteligência:</span><span id="ficha-int">10</span></div>
-            <div class="linha"><span>Resistência:</span><span id="ficha-con">10</span></div>
+        <div id="aviso-pts" class="pontos-disponiveis" style="display:none;">
+            ⬆️ <strong id="pts-disponiveis">0</strong> pontos disponíveis!
+            <button class="botao" style="margin:0.5rem 0 0 0;padding:0.5rem;" onclick="abrirDistribuicao()">📝 Alocar</button>
         </div>
-        
-        <button class="botao" onclick="alert('Em desenvolvimento! ⚔️')">⚔️ Portão da Masmorra</button>
-        <button class="botao" onclick="alert('Em desenvolvimento! 🍺')">🍺 Taverna</button>
-        <button class="botao" onclick="alert('Em desenvolvimento! 🛒')">🛒 Loja</button>
-        <button class="botao voltar" onclick="sairJogo()">🚪 Sair / Trocar Herói</button>
+
+        <h3>📊 Status</h3>
+        <div id="status-geral" style="background:rgba(255,255,255,0.5);padding:1rem;border-radius:6px;margin:1rem 0;"></div>
+
+        <button class="botao" id="btn-floresta" onclick="entrarFloresta()">🌑 Explorar Floresta Negra</button>
+        <button class="botao" onclick="abrirDistribuicao()">📝 Distribuir Pontos</button>
+        <button class="botao botao-voltar" onclick="sair()">🚪 Salvar e Sair</button>
+        <p class="salvo-ok" id="salvo-mensagem" style="display:none;">✅ Salvo</p>
     </div>
 </div>
 
-<!-- TELA HISTÓRIA -->
-<div id="historia" class="tela escondido">
-    <div class="pergaminho">
-        <h2>A História</h2>
-        <div class="divisor"></div>
-        <p style="margin-bottom:1rem;">Há milênios, Malazar foi selado... mas o culto desperta.</p>
-        <button class="botao voltar" onclick="vaiInicio()">↩️ Voltar</button>
+<!-- TELA FLORESTA NEGRA -->
+<div id="floresta" class="tela escondido">
+    <div class="pergaminho floresta">
+        <h2>🌑 Floresta Negra</h2>
+        <p style="text-align:center;font-style:italic;">Nuvens baixas cobrem a copa das árvores. O ar é frio e silencioso...</p>
+        <p style="text-align:center;margin:0.5rem 0;">📍 Nível atual: <strong id="flor-nivel">1</strong> / 5</p>
+        
+        <div class="area-texto" id="flor-cena">
+            Escolha explorar. Cada passo pode trazer perigo... ou riqueza.
+        </div>
+        
+        <div id="flor-acoes"></div>
+        
+        <div class="log" id="flor-log">
+            <em>Histórico da exploração:</em><br>
+        </div>
+        
+        <button class="botao botao-voltar" style="margin-top:1rem;" onclick="sairFloresta()">🚪 Sair da Floresta</button>
     </div>
 </div>
 
 <script>
-const RACAS = [
-    {id:'hum',nome:'Humano',bonus:{for:10,agi:10,int:10,con:10,vida:100,mana:50}},
-    {id:'elf',nome:'Elfo',bonus:{for:8,agi:14,int:12,con:8,vida:80,mana:80}},
-    {id:'ana',nome:'Anão',bonus:{for:14,agi:6,int:8,con:14,vida:120,mana:30}},
-    {id:'meio',nome:'Meio-Sangue',bonus:{for:12,agi:12,int:12,con:10,vida:100,mana:60}}
+const CHAVE_SALVO = 'malazar_heroi_v4';
+
+const REGRAS = {
+    basePontos: 5,
+    pontosPorNivel: 3,
+    atributos: {
+        for: {nome:'Força', icone:'⚔️', desc:'Dano Físico', porPonto:2},
+        des: {nome:'Destreza', icone:'🤸', desc:'Precisão', porPonto:4},
+        agi: {nome:'Agilidade', icone:'🏃', desc:'Esquiva', porPonto:3},
+        vit: {nome:'Vitalidade', icone:'❤️', desc:'Vida', porPonto:15},
+        int: {nome:'Inteligência', icone:'🧠', desc:'Dano Mágico', porPonto:2.5},
+        esp: {nome:'Espírito', icone:'💎', desc:'Mana', porPonto:12}
+    },
+    vidaBase: 25, manaBase: 20, precisaoBase: 50,
+    xpPorNivel: n => Math.floor(100 * Math.pow(1.2, n - 1)),
+    nivelMaxFloresta: 5
+};
+
+const MONSTROS = [
+    {nome:'Lobo Sombrio', vida:40, dano:8, xp:25, ouro:12, minNivel:1},
+    {nome:'Cultista Errante', vida:55, dano:10, xp:35, ouro:18, minNivel:2},
+    {nome:'Aranha Gigante', vida:70, dano:12, xp:45, ouro:25, minNivel:3},
+    {nome:'Guardião da Floresta', vida:100, dano:15, xp:80, ouro:50, minNivel:4}
 ];
-const CLASSES = [
-    {id:'guer',nome:'Guerreiro',mod:{for:+3,agi:+1,int:0,con:+2,vida:+20,mana:0}},
-    {id:'mag',nome:'Mago',mod:{for:0,agi:+1,int:+4,con:0,vida:0,mana:+40}},
-    {id:'lad',nome:'Ladino',mod:{for:+1,agi:+4,int:+1,con:0,vida:+10,mana:+10}},
-    {id:'sac',nome:'Sacerdote',mod:{for:+1,agi:0,int:+2,con:+2,vida:+15,mana:+20}}
+
+const TESOUROS = [
+    {nome:'Bolsa de Moedas', ouro:15, texto:'Você encontra uma bolsa abandonada entre as raízes.'},
+    {nome:'Poção de Vida', cura:30, ouro:5, texto:'Um frasco brilha sob a luz fraca.'},
+    {nome:'Gema Escura', ouro:40, texto:'Uma pedra preciosa, fria e cintilante.'},
+    {nome:'Pergaminho Antigo', xp:20, ouro:10, texto:'Você lê conhecimentos esquecidos inscritos em pergaminho.'}
+];
+
+const EMBOISCADAS = [
+    {nome:'Raízes Armadilha', dano:15, texto:'O chão se move! Vinhas grossas tentam te prender.'},
+    {nome:'Cova Escondida', dano:20, texto:'Você pisa em falso e despenca numa cova oculta.'},
+    {nome:'Névoa Venenosa', dano:12, mana:-10, texto:'Uma névoa densa e ácida toma conta do caminho.'}
 ];
 
 let heroi = {
-    nome:'', genero:null, raca:null, classe:null,
-    nivel:1, xp:0, ouro:50,
-    vidaMax:100, vidaAtual:100,
-    manaMax:50, manaAtual:50,
-    atributos:{for:10,agi:10,int:10,con:10}
+    nome:'', nivel:1, xp:0, ouro:10, vidaAtual:100, manaAtual:80,
+    ptsParaAlocar:0, atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
 };
 
-const CHAVE_SALVO = 'malazar_heroi';
+// SALVAMENTO
+function salvar() {
+    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
+    const m = document.getElementById('salvo-mensagem');
+    m.style.display='block'; setTimeout(()=>m.style.display='none', 2000);
+}
+function carregar() {
+    const s = localStorage.getItem(CHAVE_SALVO);
+    if(s) heroi = JSON.parse(s);
+    return !!s;
+}
 
 // TROCA DE TELA
 function trocaTela(id) {
-    document.querySelectorAll('.tela').forEach(t => t.classList.add('escondido'));
+    document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
     document.getElementById(id).classList.remove('escondido');
 }
+function verificaRetomar() {
+    const t = carregar();
+    document.getElementById('btn-retomar').style.display = t ? 'block' : 'none';
+}
+function retomar() { carregar(); atualizarPrincipal(); trocaTela('principal'); }
+function novaJornada() {
+    heroi = {nome:'',nivel:1,xp:0,ouro:10,vidaAtual:100,manaAtual:80,ptsParaAlocar:3,atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}};
+    trocaTela('distribuir');
+    document.getElementById('titulo-nivel').textContent = 'Distribuir — Nível 1';
+    renderDistribuicao();
+}
+function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
-// VERIFICA SE TEM JOGO SALVO AO CARREGAR
-function verificaSalvo() {
-    const salvo = localStorage.getItem(CHAVE_SALVO);
-    const btn = document.getElementById('btn-retomar');
-    if(salvo) {
-        heroi = JSON.parse(salvo);
-        btn.style.display = 'block';
-    } else {
-        btn.style.display = 'none';
+// DISTRIBUIÇÃO
+let distTemp = {};
+function abrirDistribuicao() {
+    distTemp = {...heroi.atr};
+    trocaTela('distribuir');
+    document.getElementById('titulo-nivel').textContent = `Distribuir — Nível ${heroi.nivel}`;
+    renderDistribuicao();
+}
+function renderDistribuicao() {
+    document.getElementById('pts-restantes').textContent = heroi.ptsParaAlocar;
+    const c = document.getElementById('lista-atributos'); c.innerHTML='';
+    for(const [k,r] of Object.entries(REGRAS.atributos)) {
+        const v = distTemp[k];
+        c.innerHTML += `<div class="atributo">
+            <div class="nome-atr"><strong>${r.icone} ${r.nome}</strong><br><small>+${r.porPonto} ${r.desc}</small></div>
+            <div class="val-atr">${v}</div>
+            <div class="controle">
+                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=5?'disabled':''}>−</button>
+                <button class="botao botao-ponto" onclick="aumentar('${k}')" ${heroi.ptsParaAlocar<=0?'disabled':''}>+</button>
+            </div>
+        </div>`;
     }
 }
-
-function vaiInicio() {
-    verificaSalvo();
-    trocaTela('inicio');
+function aumentar(k) { if(heroi.ptsParaAlocar<=0) return; distTemp[k]++; heroi.ptsParaAlocar--; renderDistribuicao(); }
+function diminuir(k) { if(distTemp[k]<=5) return; distTemp[k]--; heroi.ptsParaAlocar++; renderDistribuicao(); }
+function confirmarDistribuicao() {
+    heroi.atr = {...distTemp};
+    const st = calcularStatus();
+    heroi.vidaAtual = st.vidaMax;
+    heroi.manaAtual = st.manaMax;
+    salvar(); atualizarPrincipal(); trocaTela('principal');
 }
 
-function vaiHistoria() { trocaTela('historia'); }
-
-function vaiCriar() {
-    heroi = {nome:'', genero:null, raca:null, classe:null, nivel:1, xp:0, ouro:50, vidaMax:100, vidaAtual:100, manaMax:50, manaAtual:50, atributos:{for:10,agi:10,int:10,con:10}};
-    document.getElementById('nome').value = '';
-    document.querySelectorAll('.botao-gen, .opcao').forEach(b => b.classList.remove('ativo'));
-    carregaOpcoes();
-    trocaTela('criar');
-}
-
-function retomarJornada() {
-    preencheTelaCidade();
-    trocaTela('cidade');
-}
-
-function escolheGen(valor) {
-    heroi.genero = valor;
-    document.querySelectorAll('.botao-gen').forEach(b => b.classList.remove('ativo'));
-    document.getElementById('gen-'+(valor==='masc'?'m':valor==='fem'?'f':'n')).classList.add('ativo');
-}
-
-function carregaOpcoes() {
-    document.getElementById('lista-racas').innerHTML = RACAS.map(r =>
-        `<div class="opcao" id="raca-${r.id}" onclick="escolheRaca('${r.id}')">${r.nome}</div>`
-    ).join('');
-    document.getElementById('lista-classes').innerHTML = CLASSES.map(c =>
-        `<div class="opcao" id="classe-${c.id}" onclick="escolheClasse('${c.id}')">${c.nome}</div>`
-    ).join('');
-}
-
-function escolheRaca(id) {
-    heroi.raca = id;
-    document.querySelectorAll('#lista-racas .opcao').forEach(o => o.classList.remove('ativo'));
-    document.getElementById(`raca-${id}`).classList.add('ativo');
-}
-
-function escolheClasse(id) {
-    heroi.classe = id;
-    document.querySelectorAll('#lista-classes .opcao').forEach(o => o.classList.remove('ativo'));
-    document.getElementById(`classe-${id}`).classList.add('ativo');
-}
-
-function confirma() {
-    const nome = document.getElementById('nome').value.trim();
-    if(!nome) return alert('Digite seu nome!');
-    if(!heroi.genero) return alert('Escolha o gênero!');
-    if(!heroi.raca) return alert('Escolha a raça!');
-    if(!heroi.classe) return alert('Escolha a classe!');
-    
-    heroi.nome = nome;
-    inicializaAtributos();
-    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
-    preencheTelaCidade();
-    trocaTela('cidade');
-}
-
-function inicializaAtributos() {
-    const r = RACAS.find(x => x.id === heroi.raca);
-    const c = CLASSES.find(x => x.id === heroi.classe);
-    heroi.atributos = {
-        for: r.bonus.for + c.mod.for,
-        agi: r.bonus.agi + c.mod.agi,
-        int: r.bonus.int + c.mod.int,
-        con: r.bonus.con + c.mod.con
+// CÁLCULOS
+function calcularStatus() {
+    const a = heroi.atr;
+    return {
+        vidaMax: REGRAS.vidaBase + a.vit * REGRAS.atributos.vit.porPonto,
+        manaMax: REGRAS.manaBase + a.esp * REGRAS.atributos.esp.porPonto,
+        danoFisico: a.for * REGRAS.atributos.for.porPonto,
+        danoMagico: a.int * REGRAS.atributos.int.porPonto,
+        precisao: REGRAS.precisaoBase + a.des * REGRAS.atributos.des.porPonto,
+        esquiva: a.agi * REGRAS.atributos.agi.porPonto
     };
-    heroi.vidaMax = r.bonus.vida + c.mod.vida;
-    heroi.vidaAtual = heroi.vidaMax;
-    heroi.manaMax = r.bonus.mana + c.mod.mana;
-    heroi.manaAtual = heroi.manaMax;
 }
 
-function preencheTelaCidade() {
-    const rNome = RACAS.find(x => x.id === heroi.raca)?.nome || heroi.raca;
-    const cNome = CLASSES.find(x => x.id === heroi.classe)?.nome || heroi.classe;
-    
-    document.getElementById('nome-jogador-titulo').textContent = heroi.nome;
-    document.getElementById('val-vida').textContent = `${heroi.vidaAtual}/${heroi.vidaMax}`;
-    document.getElementById('val-mana').textContent = `${heroi.manaAtual}/${heroi.manaMax}`;
-    document.getElementById('nivel').textContent = heroi.nivel;
-    document.getElementById('xp').textContent = heroi.xp;
-    document.getElementById('ouro').textContent = heroi.ouro;
-    document.getElementById('ficha-raca').textContent = rNome;
-    document.getElementById('ficha-classe').textContent = cNome;
-    document.getElementById('ficha-forca').textContent = heroi.atributos.for;
-    document.getElementById('ficha-agilidade').textContent = heroi.atributos.agi;
-    document.getElementById('ficha-int').textContent = heroi.atributos.int;
-    document.getElementById('ficha-con').textContent = heroi.atributos.con;
-    
-    // Salva a cada carregamento
-    localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
+// XP E NÍVEL
+function ganharXP(qtd) {
+    heroi.xp += qtd;
+    let subiu = false;
+    while(heroi.xp >= REGRAS.xpPorNivel(heroi.nivel)) {
+        heroi.xp -= REGRAS.xpPorNivel(heroi.nivel);
+        heroi.nivel++;
+        heroi.ptsParaAlocar += REGRAS.pontosPorNivel;
+        subiu = true;
+    }
+    if(subiu) {
+        document.getElementById('aviso-subida').classList.remove('escondido');
+        setTimeout(()=>document.getElementById('aviso-subida').classList.add('escondido'), 4000);
+    }
+    salvar(); atualizarPrincipal();
 }
 
-function sairJogo() {
-    if(confirm('Sair? O progresso será salvo!')) {
-        localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
-        vaiInicio();
+// TELA PRINCIPAL
+function atualizarPrincipal() {
+    const st = calcularStatus();
+    const xpNec = REGRAS.xpPorNivel(heroi.nivel);
+    document.getElementById('nome-personagem').textContent = heroi.nome || 'Herói';
+    document.getElementById('exibir-nivel').textContent = heroi.nivel;
+    document.getElementById('exibir-ouro').textContent = heroi.ouro;
+    document.getElementById('val-vida').textContent = `${heroi.vidaAtual}/${st.vidaMax}`;
+    document.getElementById('bar-vida').style.width = `${(heroi.vidaAtual/st.vidaMax)*100}%`;
+    document.getElementById('val-mana').textContent = `${heroi.manaAtual}/${st.manaMax}`;
+    document.getElementById('bar-mana').style.width = `${(heroi.manaAtual/st.manaMax)*100}%`;
+    document.getElementById('val-xp').textContent = `${heroi.xp}/${xpNec}`;
+    document.getElementById('bar-xp').style.width = `${Math.min(100,(heroi.xp/xpNec)*100)}%`;
+    
+    const aviso = document.getElementById('aviso-pts');
+    aviso.style.display = heroi.ptsParaAlocar>0 ? 'block' : 'none';
+    document.getElementById('pts-disponiveis').textContent = heroi.ptsParaAlocar;
+    
+    document.getElementById('status-geral').innerHTML = `
+        <p><strong>⚔️ Dano Físico:</strong> ${st.danoFisico}</p>
+        <p><strong>🤸 Precisão:</strong> ${st.precisao}%</p>
+        <p><strong>🏃 Esquiva:</strong> ${st.esquiva}%</p>
+        <p><strong>❤️ Vida Máx:</strong> ${st.vidaMax}</p>
+        <p><strong>🧠 Dano Mágico:</strong> ${st.danoMagico}</p>
+        <p><strong>💎 Mana Máx:</strong> ${st.manaMax}</p>
+        <hr style="margin:0.7rem 0;border:none;border-top:1px dashed #d4b896;">
+        <p style="font-size:0.9rem;color:#666;">
+            Força ${heroi.atr.for} | Destreza ${heroi.atr.des} | Agilidade ${heroi.atr.agi}<br>
+            Vitalidade ${heroi.atr.vit} | Inteligência ${heroi.atr.int} | Espírito ${heroi.atr.esp}
+        </p>
+    `;
+    
+    const btnFloresta = document.getElementById('btn-floresta');
+    btnFloresta.disabled = heroi.nivel > REGRAS.nivelMaxFloresta;
+    btnFloresta.textContent = heroi.nivel > REGRAS.nivelMaxFloresta 
+        ? '🔒 Floresta Negra concluída' 
+        : '🌑 Explorar Floresta Negra';
+}
+
+// ========= FLORESTA NEGRA =========
+function entrarFloresta() {
+    if(heroi.nivel > REGRAS.nivelMaxFloresta) return alert('Você já superou esta área!');
+    trocaTela('floresta');
+    document.getElementById('flor-nivel').textContent = heroi.nivel;
+    document.getElementById('flor-log').innerHTML = '<em>Você adentra a Floresta Negra...</em><br>';
+    proximoPasso();
+}
+function sairFloresta() { salvar(); atualizarPrincipal(); trocaTela('principal'); }
+
+function proximoPasso() {
+    const tipo = Math.floor(Math.random()*3); // 0=Monstro, 1=Emboscada, 2=Tesouro
+    if(tipo===0) encontroMonstro();
+    else if(tipo===1) encontroEmboscada();
+    else encontroTesouro();
+}
+
+function addLog(texto) {
+    document.getElementById('flor-log').innerHTML += texto + '<br>';
+    document.getElementById('flor-log').scrollTop = 9999;
+}
+
+function encontroMonstro() {
+    const disp = MONSTROS.filter(m => heroi.nivel >= m.minNivel);
+    const m = disp[Math.floor(Math.random()*disp.length)];
+    document.getElementById('flor-cena').innerHTML = `
+        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}!</h3>
+        <p>Um ser emerge da escuridão e te encara!</p>
+        <p><strong>Vida:</strong> ${m.vida} | <strong>Dano:</strong> ${m.dano}</p>
+    `;
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Ataque Físico</button>
+        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Ataque Mágico</button>
+        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Tentar Fugir</button>
+    `;
+}
+
+function batalhaFisico(m) {
+    const st = calcularStatus();
+    const dano = st.danoFisico;
+    const acertou = st.precisao >= 50; // Sem dados = comparação direta
+    if(!acertou) {
+        addLog(`⚔️ Contra ${m.nome}: Errou o golpe!`);
+        ataqueInimigo(m);
+        return;
+    }
+    const vidaRestante = m.vida - dano;
+    addLog(`⚔️ Contra ${m.nome}: Acertou! ${dano} de dano!`);
+    if(vidaRestante <= 0) {
+        vitoria(m);
+        return;
+    }
+    m.vida = vidaRestante;
+    document.getElementById('flor-cena').innerHTML = `
+        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
+        <p>O inimigo resiste! Vida restante: ${vidaRestante}</p>
+    `;
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Ataque Físico</button>
+        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Ataque Mágico</button>
+        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
+    `;
+    ataqueInimigo(m);
+}
+
+function batalhaMagico(m) {
+    if(heroi.manaAtual < 10) {
+        addLog('✨ Mana insuficiente!');
+        ataqueInimigo(m);
+        return;
+    }
+    heroi.manaAtual -= 10;
+    const st = calcularStatus();
+    const dano = st.danoMagico;
+    const vidaRestante = m.vida - dano;
+    addLog(`✨ Contra ${m.nome}: Magia! ${dano} de dano! (-10 mana)`);
+    if(vidaRestante <= 0) {
+        vitoria(m);
+        return;
+    }
+    m.vida = vidaRestante;
+    document.getElementById('flor-cena').innerHTML = `
+        <h3 style="color:#ff6b6b;">⚔️ ${m.nome}</h3>
+        <p>Resiste! Vida: ${vidaRestante}</p>
+    `;
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao botao-perigo" onclick="batalhaFisico(${JSON.stringify(m).replace(/"/g,'&quot;')})">⚔️ Físico</button>
+        <button class="botao" onclick="batalhaMagico(${JSON.stringify(m).replace(/"/g,'&quot;')})">✨ Mágico</button>
+        <button class="botao botao-voltar" onclick="tentarFugir()">🏃 Fugir</button>
+    `;
+    ataqueInimigo(m);
+}
+
+function ataqueInimigo(m) {
+    const st = calcularStatus();
+    if(st.esquiva >= 25) { // Limite fixo de precisão inimiga
+        addLog(`🏃 Desviou do ataque de ${m.nome}!`);
+        salvar(); proximoPasso();
+        return;
+    }
+    const danoRecebido = Math.max(1, m.dano - Math.floor(heroi.atr.vit/5));
+    heroi.vidaAtual -= danoRecebido;
+    addLog(`💥 ${m.nome} ataca! ${danoRecebido} de dano recebido!`);
+    if(heroi.vidaAtual <= 0) {
+        heroi.vidaAtual = Math.floor(calcularStatus().vidaMax * 0.25);
+        addLog('💚 Você caiu! Recupera forças com 25% de vida...');
+        salvar(); atualizarPrincipal(); trocaTela('principal');
+        return;
+    }
+    salvar();
+}
+
+function vitoria(m) {
+    addLog(`🎉 Derrotou ${m.nome}! +${m.xp} XP • +${m.ouro} Ouro`);
+    ganharXP(m.xp);
+    heroi.ouro += m.ouro;
+    salvar();
+    document.getElementById('flor-cena').innerHTML = `
+        <h3 style="color:#86efac;">🎉 Vitória!</h3>
+        <p>O inimigo caiu! +${m.xp} XP e ${m.ouro} ouro.</p>
+    `;
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao" onclick="proximoPasso()">🌲 Continuar Explorando</button>
+        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
+    `;
+}
+
+function tentarFugir() {
+    const st = calcularStatus();
+    if(st.esquiva >= 15) {
+        addLog('🏃 Fugiu com sucesso!');
+        salvar(); proximoPasso();
+    } else {
+        addLog('🏃 Tentou fugir mas foi alcançado!');
+        // Pegar dano de quem estava lutando
+        document.getElementById('flor-cena').innerHTML = `<p>Foi alcançado! Prepare-se!</p>`;
+        // Recarrega o último monstro se houver
+        proximoPasso();
     }
 }
 
-// AO ABRIR A PÁGINA — VERIFICA SALVO
-verificaSalvo();
-</script>
+function encontroEmboscada() {
+    const e = EMBOISCADAS[Math.floor(Math.random()*EMBOISCADAS.length)];
+    const st = calcularStatus();
+    if(st.esquiva >= 20) {
+        addLog(`🛡️ Emboscada: ${e.nome} — Você antecipou e desviou!`);
+        document.getElementById('flor-cena').innerHTML = `
+            <h3 style="color:#ffd700;">⚠️ ${e.nome}</h3>
+            <p>${e.texto}</p>
+            <p style="color:#86efac;"><strong>Você desviou!</strong> Agilidade salvou você.</p>
+        `;
+    } else {
+        let danoReal = e.dano - Math.floor(heroi.atr.vit/5);
+        danoReal = Math.max(1, danoReal);
+        heroi.vidaAtual -= danoReal;
+        addLog(`⚠️ ${e.nome}: -${danoReal} vida`);
+        if(e.mana) {
+            heroi.manaAtual = Math.max(0, heroi.manaAtual + e.mana);
+            addLog(`⚠️ Também afetou sua energia: ${e.mana} mana`);
+        }
+        document.getElementById('flor-cena').innerHTML = `
+            <h3 style="color:#ff6b6b;">⚠️ ${e.nome}</h3>
+            <p>${e.texto}</p>
+            <p><strong>Recebeu ${danoReal} de dano!</strong></p>
+        `;
+        if(heroi.vidaAtual <= 0) {
+            heroi.vidaAtual = Math.floor(calcularStatus().vidaMax * 0.25);
+            addLog('💚 Recupera com 25% de vida...');
+            salvar(); atualizarPrincipal(); trocaTela('principal');
+            return;
+        }
+    }
+    salvar();
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao" onclick="proximoPasso()">🌲 Seguir Caminho</button>
+        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
+    `;
+}
 
+function encontroTesouro() {
+    const t = TESOUROS[Math.floor(Math.random()*TESOUROS.length)];
+    let ganhos = [];
+    if(t.ouro) { heroi.ouro += t.ouro; ganhos.push(`+${t.ouro} ouro`); }
+    if(t.cura) { 
+        heroi.vidaAtual = Math.min(calcularStatus().vidaMax, heroi.vidaAtual + t.cura); 
+        ganhos.push(`+${t.cura} vida`);
+    }
+    if(t.xp) { ganharXP(t.xp); ganhos.push(`+${t.xp} XP`); }
+    addLog(`💰 ${t.nome}: ${ganhos.join(' • ')}`);
+    document.getElementById('flor-cena').innerHTML = `
+        <h3 style="color:#ffd700;">💰 ${t.nome}</h3>
+        <p>${t.texto}</p>
+        <p><strong>Conseguiu:</strong> ${ganhos.join(' • ')}</p>
+    `;
+    salvar();
+    document.getElementById('flor-acoes').innerHTML = `
+        <button class="botao" onclick="proximoPasso()">🌲 Continuar Explorando</button>
+        <button class="botao botao-voltar" onclick="sairFloresta()">🚪 Sair</button>
+    `;
+}
+
+// INÍCIO
+verificaRetomar();
+</script>
 </body>
 </html>
