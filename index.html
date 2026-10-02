@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MALAZAR - Floresta Negra</title>
+<title>MALAZAR — Floresta Negra</title>
 <style>
 :root {
     --ouro:#b8860b; --ouro-claro:#d4a017; --fundo:#f8f0dc;
@@ -57,11 +57,22 @@ h1{color:var(--ouro);font-size:2rem;}
     </div>
 </div>
 
+<!-- TELA DIGITAR NOME -->
+<div id="nomear" class="tela escondido">
+    <div class="pergaminho">
+        <h2>📝 Nome do Herói</h2>
+        <p class="subtitulo">Como deseja ser chamado?</p>
+        <input type="text" id="campo-nome" class="campo" placeholder="Digite seu nome..." maxlength="15">
+        <button class="botao" onclick="confirmarNome()">✅ Confirmar</button>
+        <button class="botao botao-voltar" onclick="trocaTela('inicio')">🚪 Voltar</button>
+    </div>
+</div>
+
 <!-- TELA DISTRIBUIÇÃO -->
 <div id="distribuir" class="tela escondido">
     <div class="pergaminho">
         <h2 id="titulo-nivel">Distribuir — Nível 1</h2>
-        <div class="pontos-disponiveis">Pontos: <span id="pts-restantes">3</span></div>
+        <div class="pontos-disponiveis">Pontos: <span id="pts-restantes">0</span></div>
         <div id="lista-atributos"></div>
         <button class="botao" onclick="confirmarDistribuicao()">✅ Confirmar</button>
         <button class="botao botao-voltar" onclick="sair()">🚪 Sair</button>
@@ -72,8 +83,8 @@ h1{color:var(--ouro);font-size:2rem;}
 <div id="principal" class="tela escondido">
     <div class="pergaminho">
         <h2 id="nome-personagem">Herói</h2>
-        <p style="text-align:center;">Nível <span id="exibir-nivel">1</span> • Ouro: <span id="exibir-ouro">0</span> 💰</p>
-        <div id="aviso-subida" class="aviso-nivel escondido">🎉 Subiu de Nível! +3 pontos!</div>
+        <p style="text-align:center;">Nível <span id="exibir-nivel">1</span> • Ouro: <span id="exibir-ouro">10</span> 💰</p>
+        <div id="aviso-subida" class="aviso-nivel escondido">🎉 Subiu de Nível! +3 pontos disponíveis!</div>
         
         <div class="barras">
             <div class="bloco">
@@ -91,8 +102,8 @@ h1{color:var(--ouro);font-size:2rem;}
         </div>
         
         <div id="aviso-pts" class="pontos-disponiveis" style="display:none;">
-            ⬆️ <strong id="pts-disponiveis">0</strong> pontos disponíveis!
-            <button class="botao" style="margin:0.5rem 0 0 0;padding:0.5rem;" onclick="abrirDistribuicao()">📝 Alocar</button>
+            ⬆️ Você tem <strong id="pts-disponiveis">0</strong> pontos para alocar!
+            <button class="botao" style="margin:0.5rem 0 0 0;padding:0.5rem;" onclick="abrirDistribuicao()">📝 Alocar Agora</button>
         </div>
 
         <h3>📊 Status</h3>
@@ -101,7 +112,7 @@ h1{color:var(--ouro);font-size:2rem;}
         <button class="botao" id="btn-floresta" onclick="entrarFloresta()">🌑 Explorar Floresta Negra</button>
         <button class="botao" onclick="abrirDistribuicao()">📝 Distribuir Pontos</button>
         <button class="botao botao-voltar" onclick="sair()">🚪 Salvar e Sair</button>
-        <p class="salvo-ok" id="salvo-mensagem" style="display:none;">✅ Salvo</p>
+        <p class="salvo-ok" id="salvo-mensagem" style="display:none;">✅ Salvo automaticamente</p>
     </div>
 </div>
 
@@ -110,7 +121,7 @@ h1{color:var(--ouro);font-size:2rem;}
     <div class="pergaminho floresta">
         <h2>🌑 Floresta Negra</h2>
         <p style="text-align:center;font-style:italic;">Nuvens baixas cobrem a copa das árvores. O ar é frio e silencioso...</p>
-        <p style="text-align:center;margin:0.5rem 0;">📍 Nível atual: <strong id="flor-nivel">1</strong> / 5</p>
+        <p style="text-align:center;margin:0.5rem 0;">📍 Nível: <strong id="flor-nivel">1</strong> / 5</p>
         
         <div class="area-texto" id="flor-cena">
             Escolha explorar. Cada passo pode trazer perigo... ou riqueza.
@@ -127,11 +138,11 @@ h1{color:var(--ouro);font-size:2rem;}
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v5';
+const CHAVE_SALVO = 'malazar_heroi_v6';
 
 const REGRAS = {
-    basePontos: 5,
-    pontosPorNivel: 3,
+    valorBase: 5,           // ✅ Todos atributos começam com 5
+    pontosPorNivel: 3,      // ✅ Só ganha +3 ao SUBIR de nível
     atributos: {
         for: {nome:'Força', icone:'⚔️', desc:'Dano Físico', porPonto:2},
         des: {nome:'Destreza', icone:'🤸', desc:'Precisão', porPonto:4},
@@ -167,7 +178,8 @@ const EMBOISCADAS = [
 
 let heroi = {
     nome:'', nivel:1, xp:0, ouro:10, vidaAtual:100, manaAtual:80,
-    ptsParaAlocar:0, atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
+    ptsParaAlocar:0,        // ✅ Nível 1 = 0 pontos extras
+    atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}  // ✅ Todos = 5
 };
 
 // SALVAMENTO
@@ -192,24 +204,32 @@ function verificaRetomar() {
     document.getElementById('btn-retomar').style.display = t ? 'block' : 'none';
 }
 function retomar() { carregar(); atualizarPrincipal(); trocaTela('principal'); }
+
 function novaJornada() {
     heroi = {
         nome:'', nivel:1, xp:0, ouro:10, 
         vidaAtual:100, manaAtual:80, 
-        ptsParaAlocar:3, 
-        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
+        ptsParaAlocar:0,  // ✅ NENHUM ponto extra no início
+        atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}  // ✅ Todos = 5
     };
+    trocaTela('nomear'); // ✅ Tela de nome antes de distribuir
+}
+
+function confirmarNome() {
+    const nome = document.getElementById('campo-nome').value.trim();
+    if(!nome) return alert('Por favor, digite um nome!');
+    heroi.nome = nome;
     trocaTela('distribuir');
     document.getElementById('titulo-nivel').textContent = 'Distribuir — Nível 1';
     renderDistribuicao();
 }
+
 function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
 // DISTRIBUIÇÃO
 let distTemp = {};
 
 function abrirDistribuicao() {
-    // ✅ CORREÇÃO: Inicializa corretamente com os valores atuais
     distTemp = {
         for: heroi.atr.for,
         des: heroi.atr.des,
@@ -228,7 +248,6 @@ function renderDistribuicao() {
     const c = document.getElementById('lista-atributos'); 
     c.innerHTML = '';
     
-    // ✅ CORREÇÃO: Percorre as chaves corretamente
     const ordem = ['for','des','agi','vit','int','esp'];
     for(const k of ordem) {
         const r = REGRAS.atributos[k];
@@ -240,7 +259,7 @@ function renderDistribuicao() {
             </div>
             <div class="val-atr">${v}</div>
             <div class="controle">
-                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=REGRAS.basePontos?'disabled':''}>−</button>
+                <button class="botao botao-ponto" onclick="diminuir('${k}')" ${v<=REGRAS.valorBase?'disabled':''}>−</button>
                 <button class="botao botao-ponto" onclick="aumentar('${k}')" ${heroi.ptsParaAlocar<=0?'disabled':''}>+</button>
             </div>
         </div>`;
@@ -254,7 +273,7 @@ function aumentar(k) {
     renderDistribuicao(); 
 }
 function diminuir(k) { 
-    if(distTemp[k] <= REGRAS.basePontos) return; 
+    if(distTemp[k] <= REGRAS.valorBase) return; 
     distTemp[k]--; 
     heroi.ptsParaAlocar++; 
     renderDistribuicao(); 
@@ -282,14 +301,14 @@ function calcularStatus() {
     };
 }
 
-// XP E NÍVEL
+// XP E SUBIDA DE NÍVEL — SEM BOTÃO, SÓ JOGANDO
 function ganharXP(qtd) {
     heroi.xp += qtd;
     let subiu = false;
     while(heroi.xp >= REGRAS.xpPorNivel(heroi.nivel)) {
         heroi.xp -= REGRAS.xpPorNivel(heroi.nivel);
         heroi.nivel++;
-        heroi.ptsParaAlocar += REGRAS.pontosPorNivel;
+        heroi.ptsParaAlocar += REGRAS.pontosPorNivel; // ✅ Só ganha +3 ao subir
         subiu = true;
     }
     if(subiu) {
@@ -303,7 +322,7 @@ function ganharXP(qtd) {
 function atualizarPrincipal() {
     const st = calcularStatus();
     const xpNec = REGRAS.xpPorNivel(heroi.nivel);
-    document.getElementById('nome-personagem').textContent = heroi.nome || 'Herói';
+    document.getElementById('nome-personagem').textContent = heroi.nome;
     document.getElementById('exibir-nivel').textContent = heroi.nivel;
     document.getElementById('exibir-ouro').textContent = heroi.ouro;
     document.getElementById('val-vida').textContent = `${heroi.vidaAtual}/${st.vidaMax}`;
@@ -487,7 +506,6 @@ function tentarFugir() {
         setTimeout(proximoPasso, 600);
     } else {
         addLog('🏃 Tentou fugir mas foi alcançado!');
-        document.getElementById('flor-cena').innerHTML = `<p>Foi alcançado! Prepare-se!</p>`;
         setTimeout(proximoPasso, 600);
     }
 }
