@@ -3,207 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MALAZAR - Crônicas de uma Era Esquecida</title>
+<title>MALAZAR</title>
 <style>
-:root {
-    --tinta: #2c1810;
-    --tinta-suave: #5a4538;
-    --fundo: #f8f0dc;
-    --ouro: #b8860b;
-    --destaque: #8b0000;
-}
-* {margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
-body {background:var(--fundo);color:var(--tinta);line-height:1.6;}
-.tela {display:block;padding:1rem;max-width:500px;margin:0 auto;}
-.escondido {display:none !important;}
-.pergaminho {background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
-h1 {text-align:center;color:var(--ouro);font-size:2.5rem;margin-bottom:0.5rem;}
-h2 {text-align:center;color:var(--tinta);margin-bottom:1.5rem;}
-.subtitulo {text-align:center;font-style:italic;color:var(--tinta-suave);margin-bottom:2rem;}
-.divisor {height:2px;background:linear-gradient(to right,transparent,var(--ouro),transparent);margin:1rem 0 2rem;}
-.botoes {display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
-.botao {padding:1rem 1.5rem;font-size:1.1rem;background:linear-gradient(to bottom,#d4a017,#b8860b);color:white;border:none;border-radius:6px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
-.botao:hover {transform:scale(1.03);box-shadow:0 4px 10px rgba(184,134,11,0.4);}
-.botoes-genero{display:flex;gap:0.5rem;justify-content:center;margin:0.5rem 0 1rem;flex-wrap:wrap}
-.botoes-genero button{flex:1;min-width:100px;padding:0.7rem;border:2px solid #bbaa88;border-radius:6px;background:#f5efe0;cursor:pointer;transition:all 0.2s;}
-.botoes-genero button.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.3);font-weight:bold;}
-.lista-opcoes{display:flex;flex-direction:column;gap:0.5rem;margin:0.5rem 0 1rem}
-.opcao{padding:0.8rem;border:2px solid transparent;border-radius:8px;background:rgba(139,90,43,0.1);cursor:pointer;transition:all 0.2s;}
-.opcao.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.2);font-weight:bold;}
-.rotulo {font-weight:bold;margin:1rem 0 0.5rem;display:block;}
-.campo {width:100%;padding:0.8rem;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
-.aviso {margin-top:1.5rem;font-size:0.9rem;color:var(--tinta-suave);text-align:center;}
+:root {--ouro:#b8860b;--fundo:#f8f0dc;--tinta:#2c1810;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
+body{background:var(--fundo);color:var(--tinta);padding:1rem;max-width:500px;margin:0 auto;}
+.tela{display:block;}
+.escondido{display:none !important;}
+.pergaminho{background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:2rem;}
+h1{text-align:center;color:var(--ouro);margin-bottom:1rem;}
+h2{text-align:center;margin-bottom:1.5rem;}
+.botao{width:100%;padding:1rem;margin:0.5rem 0;font-size:1rem;background:linear-gradient(#d4a017,#b8860b);color:#fff;border:none;border-radius:6px;cursor:pointer;}
+.botao-gen{padding:0.8rem;margin:0.25rem;border:2px solid #bbaa88;border-radius:6px;background:#f5efe0;cursor:pointer;}
+.botao-gen.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.3);font-weight:bold;}
+.opcao{padding:1rem;margin:0.5rem 0;border:2px solid transparent;border-radius:6px;background:rgba(139,90,43,0.1);cursor:pointer;}
+.opcao.ativo{border-color:var(--ouro);background:rgba(212,165,22,0.2);}
+.campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;}
+.voltar{background:linear-gradient(#7a5c3a,#5c442e);}
 </style>
 </head>
 <body>
 
-<!-- TELA INICIAL -->
-<div id="tela-inicio" class="tela">
+<!-- TELA INICIO -->
+<div id="inicio" class="tela">
     <div class="pergaminho">
         <h1>MALAZAR</h1>
-        <p class="subtitulo">Crônicas de uma Era Esquecida</p>
-        <div class="divisor"></div>
-        <p style="text-align:center;margin-bottom:2rem;">
-            As sombras despertaram. Cabe a ti deter o culto antes que Malazar desperte.
-        </p>
-        <div class="botoes">
-            <button class="botao" onclick="iniciar()">⚔️ Iniciar Jornada</button>
-            <button class="botao" onclick="telaHistoria()">📜 A História</button>
-        </div>
+        <p style="text-align:center;margin:1rem 0 2rem;">As sombras despertaram...</p>
+        <button class="botao" onclick="vaiCriar()">⚔️ Iniciar Jornada</button>
+        <button class="botao" onclick="vaiHistoria()">📜 A História</button>
     </div>
 </div>
 
-<!-- TELA DE CRIAÇÃO -->
-<div id="tela-criar" class="tela escondido">
+<!-- TELA CRIAR -->
+<div id="criar" class="tela escondido">
     <div class="pergaminho">
         <h2>Criar Herói</h2>
-        <div class="divisor"></div>
         
-        <label class="rotulo">Nome do Herói:</label>
-        <input type="text" id="nome-jogador" class="campo" placeholder="Digite seu nome..." maxlength="20">
+        <label><strong>Nome:</strong></label>
+        <input type="text" id="nome" class="campo" placeholder="Seu nome...">
         
-        <label class="rotulo">Gênero:</label>
-        <div class="botoes-genero">
-            <button data-gen="masc">Masculino</button>
-            <button data-gen="fem">Feminino</button>
-            <button data-gen="neutro">Neutro</button>
+        <label><strong>Gênero:</strong></label>
+        <div>
+            <button class="botao-gen" id="gen-m" onclick="escolheGen('masc')">Masculino</button>
+            <button class="botao-gen" id="gen-f" onclick="escolheGen('fem')">Feminino</button>
+            <button class="botao-gen" id="gen-n" onclick="escolheGen('neutro')">Neutro</button>
         </div>
         
-        <label class="rotulo">Raça:</label>
-        <div id="lista-racas" class="lista-opcoes"></div>
+        <label><strong>Raça:</strong></label>
+        <div id="lista-racas"></div>
         
-        <label class="rotulo">Classe:</label>
-        <div id="lista-classes" class="lista-opcoes"></div>
+        <label><strong>Classe:</strong></label>
+        <div id="lista-classes"></div>
         
-        <div class="botoes">
-            <button class="botao" onclick="confirmarCriacao()">✅ Confirmar</button>
-            <button class="botao" style="background:linear-gradient(to bottom,#7a5c3a,#5c442e)" onclick="voltarInicio()">↩️ Voltar</button>
-        </div>
+        <button class="botao" onclick="confirma()">✅ Confirmar</button>
+        <button class="botao voltar" onclick="vaiInicio()">↩️ Voltar</button>
     </div>
 </div>
 
-<!-- TELA DE HISTÓRIA -->
-<div id="tela-historia" class="tela escondido">
+<!-- TELA HISTÓRIA -->
+<div id="historia" class="tela escondido">
     <div class="pergaminho">
         <h2>A História</h2>
-        <div class="divisor"></div>
-        <p style="margin-bottom:1rem;">Há milênios, Malazar — um senhor sombrio de poder imenso — foi selado por heróis lendários. Mas o selo enfraquece...</p>
-        <p style="margin-bottom:2rem;">Cultos espalhados pelo mundo buscam despertá-lo. Cabe a ti, escolhido, fortalecer o selo e deter a escuridão.</p>
-        <div class="botoes">
-            <button class="botao" onclick="voltarInicio()">↩️ Voltar</button>
-        </div>
+        <p style="margin:1rem 0;">Malazar foi selado... mas o culto desperta.</p>
+        <button class="botao" onclick="vaiInicio()">↩️ Voltar</button>
     </div>
 </div>
 
 <script>
-// DADOS DO JOGO
+// DADOS
 const RACAS = [
-    {id:'humano',nome:'Humano',desc:'Versátil e adaptável.'},
-    {id:'elfo',nome:'Elfo',desc:'Agilidade e sabedoria.'},
-    {id:'anao',nome:'Anão',desc:'Força e resistência.'},
-    {id:'meio-sangue',nome:'Meio-Sangue',desc:'Dupla herança, força dupla.'}
+    {id:'hum',nome:'Humano'},
+    {id:'elf',nome:'Elfo'},
+    {id:'ana',nome:'Anão'},
+    {id:'meio',nome:'Meio-Sangue'}
 ];
 const CLASSES = [
-    {id:'guerreiro',nome:'Guerreiro',desc:'Combate direto e resistência.'},
-    {id:'mago',nome:'Mago',desc:'Poderes arcanos e sabedoria.'},
-    {id:'ladino',nome:'Ladino',desc:'Agilidade e astúcia.'},
-    {id:'sacerdote',nome:'Sacerdote',desc:'Fé e proteção divina.'}
+    {id:'guer',nome:'Guerreiro'},
+    {id:'mag',nome:'Mago'},
+    {id:'lad',nome:'Ladino'},
+    {id:'sac',nome:'Sacerdote'}
 ];
 
-// ESTADO
-let selecionado = {raca:null,classe:null,genero:null};
+// ESCOLHAS
+let genEscolhido = null;
+let racaEscolhida = null;
+let classeEscolhida = null;
 
-// FUNÇÕES PRINCIPAIS
-function trocarTela(id) {
+// TROCA DE TELA
+function trocaTela(id) {
     document.querySelectorAll('.tela').forEach(t => t.classList.add('escondido'));
     document.getElementById(id).classList.remove('escondido');
 }
 
-function resetarSelecao() {
-    selecionado = {raca:null,classe:null,genero:null};
-    document.querySelectorAll('.opcao, [data-gen]').forEach(el => el.classList.remove('selecionada'));
-    document.getElementById('nome-jogador').value = '';
+function vaiInicio() { trocaTela('inicio'); }
+function vaiHistoria() { trocaTela('historia'); }
+
+function vaiCriar() {
+    // LIMPA TUDO ANTES DE ABRIR
+    genEscolhido = racaEscolhida = classeEscolhida = null;
+    document.getElementById('nome').value = '';
+    document.querySelectorAll('.botao-gen, .opcao').forEach(b => b.classList.remove('ativo'));
+    carregaOpcoes();
+    trocaTela('criar');
 }
 
-function iniciar() {
-    localStorage.removeItem('malazar_jog');
-    localStorage.removeItem('malazar_prog');
-    resetarSelecao();
-    montarCriacao();
-    trocarTela('tela-criar');
+// ESCOLHA DE GÊNERO — SIMPLES E DIRETO
+function escolheGen(valor) {
+    genEscolhido = valor;
+    // LIMPA TODOS
+    document.querySelectorAll('.botao-gen').forEach(b => b.classList.remove('ativo'));
+    // MARCA O ESCOLHIDO
+    if(valor === 'masc') document.getElementById('gen-m').classList.add('ativo');
+    if(valor === 'fem') document.getElementById('gen-f').classList.add('ativo');
+    if(valor === 'neutro') document.getElementById('gen-n').classList.add('ativo');
+    console.log('Gênero escolhido:', genEscolhido); // ← aparece no console
 }
 
-function telaHistoria() {
-    trocarTela('tela-historia');
-}
-
-function voltarInicio() {
-    resetarSelecao();
-    trocarTela('tela-inicio');
-}
-
-function selGen(g) {
-    selecionado.genero = g;
-    document.querySelectorAll('[data-gen]').forEach(el => {
-        el.classList.toggle('selecionada', el.dataset.gen === g);
-    });
-}
-
-function selRaca(id) {
-    selecionado.raca = id;
-    document.querySelectorAll('#lista-racas .opcao').forEach(el =>
-        el.classList.toggle('selecionada', el.dataset.id === id)
-    );
-}
-
-function selClasse(id) {
-    selecionado.classe = id;
-    document.querySelectorAll('#lista-classes .opcao').forEach(el =>
-        el.classList.toggle('selecionada', el.dataset.id === id)
-    );
-}
-
-function montarCriacao() {
-    const racasDiv = document.getElementById('lista-racas');
-    racasDiv.innerHTML = RACAS.map(r => `
-        <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
-            <strong>${r.nome}</strong> — ${r.desc}
-        </div>
-    `).join('');
+// CARREGA RAÇAS E CLASSES
+function carregaOpcoes() {
+    document.getElementById('lista-racas').innerHTML = RACAS.map(r =>
+        `<div class="opcao" id="raca-${r.id}" onclick="escolheRaca('${r.id}')">${r.nome}</div>`
+    ).join('');
     
-    const classesDiv = document.getElementById('lista-classes');
-    classesDiv.innerHTML = CLASSES.map(c => `
-        <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
-            <strong>${c.nome}</strong> — ${c.desc}
-        </div>
-    `).join('');
-    
-    // Vincula gênero
-    document.querySelectorAll('[data-gen]').forEach(btn => {
-        btn.onclick = () => selGen(btn.dataset.gen);
-    });
+    document.getElementById('lista-classes').innerHTML = CLASSES.map(c =>
+        `<div class="opcao" id="classe-${c.id}" onclick="escolheClasse('${c.id}')">${c.nome}</div>`
+    ).join('');
 }
 
-function confirmarCriacao() {
-    const nome = document.getElementById('nome-jogador').value.trim();
-    if(!nome) { alert('Digite seu nome, herói!'); return; }
-    if(!selecionado.genero) { alert('Escolha seu gênero!'); return; }
-    if(!selecionado.raca) { alert('Escolha sua raça!'); return; }
-    if(!selecionado.classe) { alert('Escolha sua classe!'); return; }
+function escolheRaca(id) {
+    racaEscolhida = id;
+    document.querySelectorAll('#lista-racas .opcao').forEach(o => o.classList.remove('ativo'));
+    document.getElementById(`raca-${id}`).classList.add('ativo');
+}
+
+function escolheClasse(id) {
+    classeEscolhida = id;
+    document.querySelectorAll('#lista-classes .opcao').forEach(o => o.classList.remove('ativo'));
+    document.getElementById(`classe-${id}`).classList.add('ativo');
+}
+
+// CONFIRMAÇÃO
+function confirma() {
+    const nome = document.getElementById('nome').value.trim();
     
-    const jogador = {
-        nome,
-        genero: selecionado.genero,
-        raca: selecionado.raca,
-        classe: selecionado.classe
-    };
-    localStorage.setItem('malazar_jog', JSON.stringify(jogador));
+    if(!nome) return alert('Digite o nome!');
+    if(!genEscolhido) return alert('Escolha o gênero!');
+    if(!racaEscolhida) return alert('Escolha a raça!');
+    if(!classeEscolhida) return alert('Escolha a classe!');
     
-    alert(`Bem-vindo, ${nome}!\nSua jornada começa agora...`);
+    alert(`Bem-vindo, ${nome}! ✅\nGênero: ${genEscolhido}\nRaça: ${racaEscolhida}\nClasse: ${classeEscolhida}`);
     
-    // ✅ Quando tiver a próxima tela, troque a linha abaixo:
-    // trocarTela('tela-cidade');
-    voltarInicio(); // ← remova esta linha quando tiver a próxima tela!
+    // AQUI VOCÊ COLOCA A PRÓXIMA TELA DEPOIS
+    // trocaTela('tela-cidade');
+    vaiInicio();
 }
 </script>
 
