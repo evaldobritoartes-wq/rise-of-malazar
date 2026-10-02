@@ -9,6 +9,7 @@
     --ouro:#b8860b; --ouro-claro:#d4a017; --fundo:#f8f0dc;
     --tinta:#2c1810; --vida:#ef4444; --mana:#6366f1; --destaque:#4a7c59;
     --floresta:#1a2f1a; --perigo:#8b0000; --tesouro:#ffd700;
+    --taverna:#3d2914; --madeira:#6b4423; --lareira:#ff9500;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
 body{background:var(--fundo);color:var(--tinta);padding:1rem;max-width:540px;margin:0 auto;min-height:100vh;}
@@ -23,6 +24,7 @@ h1{color:var(--ouro);font-size:2rem;}
 .botao-voltar{background:linear-gradient(#7a5c3a,#5c442e);}
 .botao-perigo{background:linear-gradient(#8b0000,#5c0000);}
 .botao-tesouro{background:linear-gradient(#d4a017,#b8860b);}
+.botao-taverna{background:linear-gradient(#8b5a2b,#654321);}
 .botao-ponto{width:50px;height:50px;padding:0;font-size:1.3rem;margin:0.1rem;}
 .campo{width:100%;padding:0.8rem;margin:0.5rem 0;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
 .atributo{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 0;border-bottom:1px dashed #d4b896;}
@@ -36,12 +38,22 @@ h1{color:var(--ouro);font-size:2rem;}
 .mana{background:linear-gradient(90deg,#6366f1,#a5b4fc);}
 .xp{background:linear-gradient(90deg,#4ade80,#86efac);}
 .floresta{background:linear-gradient(135deg,#233523,#2c422c);color:#e0e0e0;border:3px solid #3a5f3a;}
+.taverna{background:linear-gradient(135deg,#4a3520,#3d2914);color:#f5e9d0;border:3px solid #8b5a2b;}
 .aviso-nivel{background:#fff3cd;border:2px solid #f59e0b;padding:0.8rem;border-radius:6px;text-align:center;margin:1rem 0;animation:pulse 1s infinite alternate;}
 @keyframes pulse {from{box-shadow:0 0 0 transparent;}to{box-shadow:0 0 10px #f59e0b50;}}
 .area-texto{background:rgba(0,0,0,0.1);padding:1rem;border-radius:6px;margin:1rem 0;line-height:1.6;}
 .pontos-disponiveis{text-align:center;padding:0.8rem;background:#e8f5e9;border-radius:6px;margin:1rem 0;border:2px solid #4caf50;font-size:1.2rem;font-weight:bold;}
 .salvo-ok{text-align:center;color:#4a7c59;font-size:0.85rem;margin-top:0.5rem;}
 .log{max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.05);padding:0.8rem;border-radius:4px;margin:0.5rem 0;font-size:0.9rem;}
+
+/* ===== ESTILOS DA TAVERNA ===== */
+.chat-area{height:250px;overflow-y:auto;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:6px;margin:0.5rem 0;}
+.chat-msg{margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px dashed rgba(255,255,255,0.15);}
+.chat-nome{font-weight:bold;color:#ffd700;}
+.chat-hora{font-size:0.75rem;color:#999;}
+.chat-texto{margin-top:0.2rem;}
+.curou-ok{background:#4ade8033;border:1px solid #4ade80;padding:0.6rem;border-radius:4px;text-align:center;margin:0.5rem 0;display:none;}
+.contador-online{text-align:right;font-size:0.85rem;color:#999;margin-bottom:0.5rem;}
 </style>
 </head>
 <body>
@@ -109,10 +121,42 @@ h1{color:var(--ouro);font-size:2rem;}
         <h3>📊 Status</h3>
         <div id="status-geral" style="background:rgba(255,255,255,0.5);padding:1rem;border-radius:6px;margin:1rem 0;"></div>
 
+        <button class="botao botao-taverna" onclick="entrarTaverna()">🏠 Taverna do Caminho</button>
         <button class="botao" id="btn-floresta" onclick="entrarFloresta()">🌑 Explorar Floresta Negra</button>
         <button class="botao" onclick="abrirDistribuicao()">📝 Distribuir Pontos</button>
         <button class="botao botao-voltar" onclick="sair()">🚪 Salvar e Sair</button>
         <p class="salvo-ok" id="salvo-mensagem" style="display:none;">✅ Salvo automaticamente</p>
+    </div>
+</div>
+
+<!-- ===== TELA TAVERNA ===== -->
+<div id="taverna" class="tela escondido">
+    <div class="pergaminho taverna">
+        <h2>🏠 Taverna do Caminho</h2>
+        <p class="subtitulo" style="color:#d4b896;">O fogo da lareira aquece o coração e o corpo...</p>
+        
+        <div id="curou-vida" class="curou-ok">❤️ Vida restaurada ao máximo!</div>
+        <div id="curou-mana" class="curou-ok">💧 Mana restaurada ao máximo!</div>
+        
+        <div style="display:flex;gap:0.5rem;margin:1rem 0;">
+            <button class="botao" style="flex:1;background:linear-gradient(#ef4444,#dc2626);" onclick="recuperarVida()">❤️ Descansar</button>
+            <button class="botao" style="flex:1;background:linear-gradient(#6366f1,#4f46e5);" onclick="recuperarMana()">💧 Meditar</button>
+        </div>
+        
+        <hr style="border:none;border-top:1px solid #6b4423;margin:1rem 0;">
+        
+        <h3>🍺 Conversa da Taverna</h3>
+        <p class="contador-online" id="contador-online">🟢 Jogadores: 1</p>
+        <div class="chat-area" id="caixa-chat">
+            <div style="color:#999;font-style:italic;">Bem-vindo à Taverna! Converse com outros aventureiros...</div>
+        </div>
+        
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+            <input type="text" id="mensagem-chat" class="campo" style="flex:1;margin:0;" placeholder="Sua mensagem..." maxlength="80">
+            <button class="botao" style="width:auto;padding:0.8rem 1rem;margin:0;" onclick="enviarMensagem()">➤</button>
+        </div>
+        
+        <button class="botao botao-voltar" style="margin-top:1rem;" onclick="sairTaverna()">🚪 Voltar à Cidade</button>
     </div>
 </div>
 
@@ -138,7 +182,9 @@ h1{color:var(--ouro);font-size:2rem;}
 </div>
 
 <script>
-const CHAVE_SALVO = 'malazar_heroi_v7';
+const CHAVE_SALVO = 'malazar_heroi_v8';
+const CHAVE_CHAT = 'malazar_chat_global';
+const LIMITE_MSG = 30; // Mantém só as últimas mensagens
 
 const REGRAS = {
     valorBase: 5,
@@ -182,6 +228,7 @@ let heroi = {
     atr:{for:5,des:5,agi:5,vit:5,int:5,esp:5}
 };
 
+// ===== SALVAMENTO =====
 function salvar() {
     localStorage.setItem(CHAVE_SALVO, JSON.stringify(heroi));
     const m = document.getElementById('salvo-mensagem');
@@ -224,6 +271,7 @@ function confirmarNome() {
 
 function sair() { salvar(); verificaRetomar(); trocaTela('inicio'); }
 
+// ===== DISTRIBUIÇÃO =====
 let distTemp = {};
 
 function abrirDistribuicao() {
@@ -245,7 +293,6 @@ function renderDistribuicao() {
     const c = document.getElementById('lista-atributos'); 
     c.innerHTML = '';
     
-    // ✅ CORREÇÃO GARANTIDA: Carrega os valores antes de exibir
     distTemp.for = heroi.atr.for;
     distTemp.des = heroi.atr.des;
     distTemp.agi = heroi.atr.agi;
@@ -359,6 +406,90 @@ function atualizarPrincipal() {
         : '🌑 Explorar Floresta Negra';
 }
 
+// ===== TAVERNA =====
+let intervaloChat;
+
+function entrarTaverna() {
+    trocaTela('taverna');
+    carregarChat();
+    intervaloChat = setInterval(carregarChat, 2000); // Atualiza a cada 2s
+}
+
+function sairTaverna() {
+    clearInterval(intervaloChat);
+    salvar();
+    atualizarPrincipal();
+    trocaTela('principal');
+}
+
+function recuperarVida() {
+    const st = calcularStatus();
+    heroi.vidaAtual = st.vidaMax;
+    salvar();
+    const aviso = document.getElementById('curou-vida');
+    aviso.style.display = 'block';
+    setTimeout(()=>aviso.style.display='none', 2500);
+    atualizarPrincipal();
+}
+
+function recuperarMana() {
+    const st = calcularStatus();
+    heroi.manaAtual = st.manaMax;
+    salvar();
+    const aviso = document.getElementById('curou-mana');
+    aviso.style.display = 'block';
+    setTimeout(()=>aviso.style.display='none', 2500);
+    atualizarPrincipal();
+}
+
+// ===== CHAT GLOBAL =====
+function carregarChat() {
+    const caixa = document.getElementById('caixa-chat');
+    const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
+    
+    caixa.innerHTML = mensagens.map(m => `
+        <div class="chat-msg">
+            <span class="chat-nome">${m.nome}</span>
+            <span class="chat-hora">${m.hora}</span>
+            <div class="chat-texto">${m.texto}</div>
+        </div>
+    `).join('');
+    
+    caixa.scrollTop = caixa.scrollHeight;
+    document.getElementById('contador-online').textContent = `🟢 Jogadores: ${Math.max(1, mensagens.length)}`;
+}
+
+function enviarMensagem() {
+    const campo = document.getElementById('mensagem-chat');
+    const texto = campo.value.trim();
+    if(!texto || !heroi.nome) return;
+    
+    const agora = new Date();
+    const hora = `${agora.getHours().toString().padStart(2,'0')}:${agora.getMinutes().toString().padStart(2,'0')}`;
+    
+    const mensagens = JSON.parse(localStorage.getItem(CHAVE_CHAT) || '[]');
+    mensagens.push({
+        nome: heroi.nome,
+        texto: texto,
+        hora: hora
+    });
+    
+    // Mantém só as últimas mensagens
+    if(mensagens.length > LIMITE_MSG) mensagens.shift();
+    
+    localStorage.setItem(CHAVE_CHAT, JSON.stringify(mensagens));
+    campo.value = '';
+    carregarChat();
+}
+
+// Envia ao apertar Enter
+document.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && document.getElementById('taverna').classList.contains('escondido') === false) {
+        enviarMensagem();
+    }
+});
+
+// ===== FLORESTA =====
 function entrarFloresta() {
     if(heroi.nivel > REGRAS.nivelMaxFloresta) return alert('Você já superou esta área!');
     trocaTela('floresta');
