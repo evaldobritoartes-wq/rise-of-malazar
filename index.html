@@ -1,798 +1,208 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Malazar — Crônicas de uma Era Esquecida ⚔️</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
-
-        :root {
-            --papel: #f4e4c1; --papel-escuro: #e6d09c; --ouro: #c8a951; --ouro-escuro: #9a7f38;
-            --tinta: #3a2f1f; --tinta-suave: #5c4a32; --borda: #8b7355; --sombra: rgba(58,47,31,0.35);
-            --perigo: #a84444; --sucesso: #4a9a67; --destaque: #5a6fa8;
-            --fundo: linear-gradient(135deg, #2c2418 0%, #1f1a12 50%, #2c2418 100%);
-        }
-
-        body { background: var(--fundo); min-height: 100vh; font-family: 'Playfair Display', serif; color: var(--tinta); overflow: hidden; }
-        h1,h2,h3 { font-family: 'Cinzel', serif; text-align: center; }
-        .escondido { display: none !important; }
-        .tela { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 1rem; overflow: hidden; }
-        .pergaminho { background: linear-gradient(to right, var(--papel-escuro), var(--papel) 10%, var(--papel) 90%, var(--papel-escuro)); border: 4px solid var(--borda); box-shadow: inset 0 0 40px var(--sombra), 0 0 30px rgba(0,0,0,0.4); padding: 1.2rem; max-width: 520px; width: 100%; height: calc(100vh - 2rem); display: flex; flex-direction: column; }
-        .divisor { height: 2px; background: linear-gradient(90deg, transparent, var(--ouro), transparent); margin: 0.5rem 0; }
-        .botao { font-family: 'Cinzel', serif; font-size: 1rem; padding: 0.8rem; margin: 0.3rem 0; background: linear-gradient(180deg, var(--ouro), var(--ouro-escuro)); border: 2px solid var(--borda); border-radius: 4px; color: #fff; cursor: pointer; transition: all 0.15s; width: 100%; min-height: 48px; }
-        .botao:active { transform: scale(0.97); }
-        .botao:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .botoes { display: flex; flex-direction: column; gap: 0.3rem; margin-top: auto; flex-shrink: 0; }
-        .opcao { border: 2px solid var(--borda); padding: 0.8rem; margin: 0.4rem 0; border-radius: 4px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.3); }
-        .opcao:hover, .opcao.selecionada { border-color: var(--ouro); background: rgba(200,169,81,0.25); }
-        .opcao-img { display: flex; align-items: center; gap: 0.8rem; }
-        .icone-grande { font-size: 2rem; line-height: 1; }
-        .info { font-size: 0.85rem; color: var(--tinta-suave); margin-top: 0.2rem; }
-        input, select { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 2px solid var(--borda); background: rgba(255,255,255,0.6); font-size: 1rem; border-radius: 4px; font-family: inherit; }
-        .grade-atributos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.8rem 0; }
-        .atributo { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.3); border-radius: 4px; }
-        .ctrl { display: flex; align-items: center; gap: 0.4rem; }
-        .ctrl button { width: 28px; height: 28px; padding: 0; font-weight: bold; border: none; border-radius: 50%; background: var(--borda); color: #fff; cursor: pointer; }
-        .painel-cidade { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
-        .painel-superior { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .painel-esq { flex: 1; background: rgba(255,255,255,0.3); padding: 0.6rem; border-radius: 4px; max-height: 180px; overflow-y: auto; }
-        .painel-dir { flex: 2; display: flex; flex-direction: column; gap: 0.5rem; }
-        .caixa-chat { flex: 1; background: rgba(255,255,255,0.4); border: 2px solid var(--borda); border-radius: 4px; padding: 0.6rem; overflow-y: auto; min-height: 200px; max-height: 300px; }
-        .msg { margin: 0.25rem 0; font-size: 0.9rem; line-height: 1.3; }
-        .msg-eu { color: var(--destaque); font-weight: bold; }
-        .horario { font-size: 0.75rem; color: #888; margin-right: 0.4rem; }
-        .barras { display: flex; gap: 0.8rem; margin: 0.5rem 0; flex-wrap: wrap; flex-shrink: 0; }
-        .bloco { flex: 1; min-width: 120px; }
-        .etiqueta { font-weight: bold; margin-bottom: 0.2rem; display: flex; justify-content: space-between; font-size: 0.85rem; }
-        .barra { height: 16px; background: var(--papel-escuro); border: 1px solid var(--borda); border-radius: 2px; overflow: hidden; }
-        .barra-int { height: 100%; transition: width 0.3s; }
-        .vida { background: linear-gradient(90deg, #3a7bd5, #6ab0f3); }
-        .mana { background: linear-gradient(90deg, #9b59b6, #d4a0f7); }
-        .log { background: rgba(255,255,255,0.4); border: 2px solid var(--borda); border-radius: 4px; padding: 0.6rem; margin: 0.5rem 0; flex: 1; overflow-y: auto; max-height: 180px; font-size: 0.9rem; line-height: 1.4; }
-        .ponto-online { display: inline-block; width: 10px; height: 10px; background: #4f4; border-radius: 50%; margin-right: 0.4rem; animation: pulsar 2s infinite; }
-        @keyframes pulsar { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .resumo { background: rgba(255,255,255,0.4); padding: 1rem; border-radius: 4px; margin: 0.8rem 0; flex: 1; overflow-y: auto; }
-        .linha { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px dashed var(--borda); font-size: 0.9rem; }
- .botoes-genero{display:flex;gap:0.5rem;justify-content:center;margin:0.5rem 0 1rem;flex-wrap:wrap}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALAZAR - Crônicas de uma Era Esquecida</title>
+<style>
+:root {
+    --tinta: #2c1810;
+    --tinta-suave: #5a4538;
+    --fundo: #f8f0dc;
+    --ouro: #b8860b;
+    --destaque: #8b0000;
+}
+* {margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;}
+body {background:var(--fundo);color:var(--tinta);line-height:1.6;}
+.tela {display:block;padding:1rem;max-width:500px;margin:0 auto;}
+.escondido {display:none !important;}
+.pergaminho {background:#fff9e8;border:3px solid var(--ouro);border-radius:8px;padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+h1 {text-align:center;color:var(--ouro);font-size:2.5rem;margin-bottom:0.5rem;}
+h2 {text-align:center;color:var(--tinta);margin-bottom:1.5rem;}
+.subtitulo {text-align:center;font-style:italic;color:var(--tinta-suave);margin-bottom:2rem;}
+.divisor {height:2px;background:linear-gradient(to right,transparent,var(--ouro),transparent);margin:1rem 0 2rem;}
+.botoes {display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
+.botao {padding:1rem 1.5rem;font-size:1.1rem;background:linear-gradient(to bottom,#d4a017,#b8860b);color:white;border:none;border-radius:6px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
+.botao:hover {transform:scale(1.03);box-shadow:0 4px 10px rgba(184,134,11,0.4);}
+.botoes-genero{display:flex;gap:0.5rem;justify-content:center;margin:0.5rem 0 1rem;flex-wrap:wrap}
 .botoes-genero button{flex:1;min-width:100px}
 .lista-opcoes{display:flex;flex-direction:column;gap:0.5rem;margin:0.5rem 0 1rem}
 .opcao{padding:0.8rem;border:2px solid transparent;border-radius:8px;background:rgba(139,90,43,0.1);cursor:pointer}
-.opcao.selecionada{border-color:var(--ouro);background:rgba(212,165,16,0.2)}
-
-    </style>
+.opcao.selecionada{border-color:var(--ouro);background:rgba(212,165,22,0.2)}
+.rotulo {font-weight:bold;margin:1rem 0 0.5rem;display:block;}
+.campo {width:100%;padding:0.8rem;border:1px solid #d4b896;border-radius:4px;font-size:1rem;background:#fffef5;}
+.aviso {margin-top:1.5rem;font-size:0.9rem;color:var(--tinta-suave);text-align:center;}
+</style>
 </head>
 <body>
 
-<!-- TELAS -->
+<!-- TELA INICIAL -->
 <div id="tela-inicio" class="tela">
-    <div class="pergaminho" style="text-align:center; justify-content:center;">
+    <div class="pergaminho">
         <h1>MALAZAR</h1>
-        <p style="font-style:italic; color:var(--tinta-suave); margin:0.5rem 0;">Crônicas de uma Era Esquecida</p>
+        <p class="subtitulo">Crônicas de uma Era Esquecida</p>
         <div class="divisor"></div>
-        <p style="margin:1rem 0;">As sombras despertaram. Cabe a ti deter o culto antes que Malazar desperte.</p>
+        <p style="text-align:center;margin-bottom:2rem;">
+            As sombras despertaram. Cabe a ti deter o culto antes que Malazar desperte.
+        </p>
         <div class="botoes">
             <button class="botao" onclick="iniciar()">⚔️ Iniciar Jornada</button>
             <button class="botao" onclick="telaHistoria()">📜 A História</button>
         </div>
     </div>
 </div>
+
+<!-- TELA DE CRIAÇÃO -->
 <div id="tela-criar" class="tela escondido">
     <div class="pergaminho">
-        <h2>Criar Seu Herói</h2>
+        <h2>Criar Herói</h2>
         <div class="divisor"></div>
-
-        <label>Nome do Herói:</label>
-        <input type="text" id="nome" placeholder="Digite o nome..." maxlength="20">
-
-        <h3>Gênero</h3>
+        
+        <label class="rotulo">Nome do Herói:</label>
+        <input type="text" id="nome-jogador" class="campo" placeholder="Digite seu nome..." maxlength="20">
+        
+        <label class="rotulo">Gênero:</label>
         <div class="botoes-genero">
-            <button data-gen="masc" onclick="selGen('masc')">♂ Masculino</button>
-            <button data-gen="fem" onclick="selGen('fem')">♀ Feminino</button>
-            <button data-gen="neut" onclick="selGen('neut')">⚙️ Neutro</button>
+            <button data-gen="masc">Masculino</button>
+            <button data-gen="fem">Feminino</button>
+            <button data-gen="neutro">Neutro</button>
         </div>
-
-        <h3>Raça</h3>
-        <div class="lista-opcoes" id="lista-racas"></div>
-
-        <h3>Classe</h3>
-        <div class="lista-opcoes" id="lista-classes"></div>
-
-        <div class="divisor"></div>
-        <p style="text-align:center; color:var(--texto-suave); font-size:0.9rem;">
-            Atributos iniciais: 5 em cada<br>
-            <small>DES | AGI | FOR | INT | CON | SOR</small>
-        </p>
-
+        
+        <label class="rotulo">Raça:</label>
+        <div id="lista-racas" class="lista-opcoes"></div>
+        
+        <label class="rotulo">Classe:</label>
+        <div id="lista-classes" class="lista-opcoes"></div>
+        
         <div class="botoes">
-            <button class="botao-secundario" onclick="voltarInicio()">← Voltar</button>
-            <button class="botao" onclick="confirmarHeroi()">✓ Confirmar e Entrar</button>
+            <button class="botao" onclick="confirmarCriacao()">✅ Confirmar</button>
+            <button class="botao" style="background:linear-gradient(to bottom,#7a5c3a,#5c442e)" onclick="voltarInicio()">↩️ Voltar</button>
         </div>
     </div>
 </div>
 
-<div id="tela-cidade" class="tela escondido">
+<!-- TELA DE HISTÓRIA -->
+<div id="tela-historia" class="tela escondido">
     <div class="pergaminho">
-        <h2 id="nome-cidade">🏰 Cidade de Malazar</h2>
-        <p style="text-align:center; font-style:italic; color:var(--tinta-suave);" id="sub-cidade">Bem-vindo de volta, Herói!</p>
+        <h2>A História</h2>
         <div class="divisor"></div>
-
-        <div class="barras">
-            <div class="bloco">
-                <div class="etiqueta"><span>❤️ Vida</span><span id="val-vida">--</span></div>
-                <div class="barra"><div id="bar-vida" class="barra-int vida"></div></div>
-            </div>
-            <div class="bloco">
-                <div class="etiqueta"><span>💧 Mana</span><span id="val-mana">--</span></div>
-                <div class="barra"><div id="bar-mana" class="barra-int mana"></div></div>
-            </div>
-        </div>
-        <p style="text-align:center; font-size:0.9rem;">
-            Nível <b id="nivel-display">1</b> | 
-            XP: <b id="xp-display">0</b>/<b id="xpprox-display">100</b> |
-            Ouro: <b id="ouro-display">0</b>
-        </p>
-        <p style="text-align:center; font-size:0.85rem; color:var(--sucesso);" id="pts-aviso"></p>
-
-        <div class="painel-cidade" id="menu-cidade">
-            <button class="botao" onclick="irMasmorra()">⚔️ Portão da Masmorra — Aventurar-se</button>
-            <button class="botao" onclick="abrirTaverna()">🍺 Taverna — Descansar e Conversar</button>
-            <button class="botao" onclick="abrirLoja()">🛒 Loja — Comprar Suprimentos</button>
-            <button class="botao" onclick="abrirFerreiro()">🔨 Ferreiro — Melhorar Atributos</button>
-            <button class="botao" onclick="abrirFicha()">📊 Ficha do Herói — Ver Status</button>
-        </div>
-
-        <div id="painel-taverna" class="escondido" style="display:flex; flex-direction:column; flex:1;">
-            <h3>🍺 A Canção do Herói — Taverna</h3>
-            <div class="painel-superior">
-                <div class="painel-esq">
-                    <p style="font-weight:bold; font-size:0.85rem;">🟢 Online</p>
-                    <div id="lista-online" style="font-size:0.8rem; margin-top:0.3rem;"></div>
-                </div>
-                <div class="painel-dir">
-                    <button class="botao" style="padding:0.4rem; font-size:0.9rem; margin:0;" onclick="descansarTaverna()">
-                        🛏️ Descansar — Vida/Mana ao Máx. (10 Ouro)
-                    </button>
-                </div>
-            </div>
-            <div class="caixa-chat" id="caixa-chat"></div>
-            <div style="display:flex; gap:0.4rem; margin-top:0.5rem;">
-                <input type="text" id="entrada-chat" placeholder="Fale com os heróis..." style="flex:1; margin:0;">
-                <button class="botao" style="width:auto; margin:0; padding:0.8rem 1rem;" onclick="enviarMsg()">✉️</button>
-            </div>
-            <button class="botao" style="margin-top:0.5rem;" onclick="fecharTaverna()">← Voltar à Cidade</button>
-        </div>
-
-        <div id="painel-ficha" class="escondido" style="flex:1; overflow-y:auto;">
-            <h3>📊 Ficha Completa</h3>
-            <button class="botao" onclick="iniciar()">⚔️ Iniciar Jornada</button>
-<button class="botao" onclick="alert('Em breve!')">📜 A História</button>
-
-        </div>
-                width: auto; margin: 0; padding: 0.8rem 1rem;" onclick="enviarMsg()">✉️</button>
-            </div>
-            <button class="botao" style="margin-top:0.5rem;" onclick="fecharTaverna()">← Voltar à Cidade</button>
-        </div>
-
-        <div id="painel-ficha" class="escondido" style="flex:1; overflow-y:auto;">
-            <h3>📊 Ficha Completa</h3>
-            <div class="divisor"></div>
-            <div id="conteudo-ficha"></div>
-            <button class="botao" onclick="fecharFicha()">← Voltar</button>
-        </div>
-
-        <div id="painel-ferreiro" class="escondido" style="flex:1; overflow-y:auto;">
-            <h3>🔨 Ferreiro — Melhorar Atributos</h3>
-            <div class="divisor"></div>
-            <p style="text-align:center; margin:0.5rem 0;">Custo: 50 Ouro por ponto | Disponíveis: <b id="pts-ferreiro">0</b></p>
-            <div class="grade-atributos" id="grade-ferreiro"></div>
-            <button class="botao" onclick="fecharFerreiro()">← Voltar</button>
-        </div>
-    </div>
-</div>
-
-<div id="tela-combate" class="tela escondido">
-    <div class="pergaminho">
-        <h2 id="nome-inimigo">Inimigo</h2>
-        <p class="subtitulo" id="status-turno">Seu turno</p>
-        <div class="divisor"></div>
-        <div class="barras">
-            <div class="bloco">
-                <div class="etiqueta"><span id="nm-jog">Herói</span><span id="v-jog">--</span></div>
-                <div class="barra"><div id="bar-jog" class="barra-int vida"></div></div>
-            </div>
-            <div class="bloco">
-                <div class="etiqueta"><span id="nm-inim">Inimigo</span><span id="v-inim">--</span></div>
-                <div class="barra"><div id="bar-inim" class="barra-int vida" style="background:linear-gradient(90deg, #8b2a2a, #d44);"></div></div>
-            </div>
-        </div>
-        <div class="log" id="log-cmb"></div>
-        <div class="botoes" id="acoes-cmb"></div>
-    </div>
-</div>
-
-<div id="tela-fim" class="tela escondido">
-    <div class="pergaminho" style="text-align:center; justify-content:center;">
-        <h2 id="tit-fim">Concluído</h2>
-        <div class="divisor"></div>
-        <div class="resumo" id="res-fim"></div>
+        <p style="margin-bottom:1rem;">Há milênios, Malazar — um senhor sombrio de poder imenso — foi selado por heróis lendários. Mas o selo enfraquece...</p>
+        <p style="margin-bottom:2rem;">Cultos espalhados pelo mundo buscam despertá-lo. Cabe a ti, escolhido, fortalecer o selo e deter a escuridão.</p>
         <div class="botoes">
-            <button class="botao" onclick="irCidade()">🏰 Voltar à Cidade</button>
+            <button class="botao" onclick="voltarInicio()">↩️ Voltar</button>
         </div>
     </div>
 </div>
 
 <script>
-// =============================================
-// DADOS DO JOGO — TUDO ALINHADO!
-// =============================================
+// DADOS DO JOGO
 const RACAS = [
-    { id:'draconato', nome:'🐉 Draconato', desc:'Sangue ancestral',
-      bonus:{des:0,agi:0,for:2,int:0,con:2,sor:0},
-      passiva:'Sangue de Chama — abaixo de 30% de vida, golpes causam dano extra de fogo (10% Vida Máx).' },
-    { id:'tiefling', nome:'🔥 Tiefling', desc:'Pacto das sombras',
-      bonus:{des:0,agi:0,for:0,int:2,con:0,sor:2},
-      passiva:'Pacto das Sombras — ao cair a 0, retorna com 25% de vida + 1 turno extra (1x/luta).' },
-    { id:'halfling', nome:'🍀 Halfling', desc:'Pequeno e sortudo',
-      bonus:{des:0,agi:2,for:0,int:0,con:0,sor:2},
-      passiva:'Mão do Destino — 1x por combate, ao falhar algo, rola novamente e escolhe o melhor.' },
-    { id:'elfo', nome:'🧝 Elfo', desc:'Herdeiro da luz',
-      bonus:{des:2,agi:2,for:0,int:0,con:0,sor:0},
-      passiva:'Primeiro Passo — ataca SEMPRE primeiro em todos os combates.' },
-    { id:'anao', nome:'🏔️ Anão', desc:'Forjado na rocha',
-      bonus:{des:0,agi:0,for:1,int:0,con:3,sor:0},
-      passiva:'Coração de Pedra — bloqueia o PRIMEIRO ataque recebido em cada luta.' },
-    { id:'humano', nome:'🧑 Humano', desc:'Vontade inquebrantável',
-      bonus:{des:1,agi:1,for:1,int:1,con:1,sor:1},
-      passiva:'Vontade de Ferro — abaixo de 50% de vida, +20% em TODOS os atributos.' }
+    {id:'humano',nome:'Humano',desc:'Versátil e adaptável.'},
+    {id:'elfo',nome:'Elfo',desc:'Agilidade e sabedoria.'},
+    {id:'anao',nome:'Anão',desc:'Força e resistência.'},
+    {id:'meio-sangue',nome:'Meio-Sangue',desc:'Dupla herança, força dupla.'}
 ];
-
 const CLASSES = [
-    { id:'guerreiro', nome:'⚔️ Guerreiro', base:{des:10,agi:9,for:17,int:8,con:15,sor:9},
-      hab:'Fúria — dano físico +50% neste golpe (1x/luta)' },
-    { id:'mago', nome:'🔮 Mago', base:{des:10,agi:10,for:8,int:18,con:10,sor:12},
-      hab:'Chama Arcana — dano mágico + cura 15 (2x/masmorra)', usos:2 },
-    { id:'paladino', nome:'🛡️ Paladino', base:{des:9,agi:9,for:14,int:10,con:16,sor:10},
-      hab:'Aura Sagrada — reduz dano recebido em 40% neste combate' },
-    { id:'patrulheiro', nome:'🏹 Patrulheiro', base:{des:16,agi:15,for:12,int:9,con:11,sor:12},
-      hab:'Precisão — acerto garantido + dano ×1.5 (1x/luta)' },
-    { id:'batedor', nome:'🥷 Batedor', base:{des:15,agi:17,for:11,int:10,con:10,sor:14},
-      hab:'Sombra — evasão +30% por 2 turnos' }
+    {id:'guerreiro',nome:'Guerreiro',desc:'Combate direto e resistência.'},
+    {id:'mago',nome:'Mago',desc:'Poderes arcanos e sabedoria.'},
+    {id:'ladino',nome:'Ladino',desc:'Agilidade e astúcia.'},
+    {id:'sacerdote',nome:'Sacerdote',desc:'Fé e proteção divina.'}
 ];
 
-const INIMIGOS = {
-    comuns: [
-        {nome:'🦇 Enxame de Morcegos',des:9,agi:11,for:10,int:5,con:11,sor:7,xp:50,ouro:8},
-        {nome:'💀 Esqueleto',des:8,agi:7,for:12,int:4,con:13,sor:6,xp:50,ouro:10},
-        {nome:'🐺 Lobo Sombrio',des:11,agi:12,for:13,int:3,con:10,sor:9,xp:50,ouro:12},
-        {nome:'🕯️ Cultista Iniciado',des:10,agi:9,for:9,int:11,con:8,sor:10,xp:50,ouro:15},
-        {nome:'🕷️ Aranha Escura',des:12,agi:13,for:8,int:2,con:7,sor:8,xp:40,ouro:9}
-    ],
-    chefe: {nome:'👹 Cultista de Malazar',des:14,agi:12,for:18,int:16,con:20,sor:15,xp:500,ouro:100}
-};
-
-let jogador = null;
+// ESTADO
 let selecionado = {raca:null,classe:null,genero:null};
-let ptsAlocados = {des:0,agi:0,for:0,int:0,con:0,sor:0};
-let ptsDisponiveis = 3;
-let progresso = {
-    nivel:1, xp:0, xpProx:100, sala:0, ouro:20, pocoes:2,
-    vidaAtual:null, manaAtual:null, ptsParaDistribuir:0,
-    masmorraConcluida:false
-};
-let inimigoAtual = null;
-let combate = {
-    turnoJog:true, habUsada:false, magiasUsadas:0, bloqueioAtivo:false,
-    passivaAtivada:{}, turnoExtra:false, log:[]
-};
-let mensagensChat = [];
-let ultimoEnvio = 0;
-let jogadoresOnline = [
-    {nome:'GuerreiroLuz',classe:'⚔️',nivel:42},
-    {nome:'LuaMística',classe:'🔮',nivel:38},
-    {nome:'FogoSagrado',classe:'🛡️',nivel:51},
-    {nome:'SombraRápida',classe:'🥷',nivel:29}
-];
 
+// FUNÇÕES PRINCIPAIS
 function trocarTela(id) {
-    document.querySelectorAll('.tela').forEach(t=>t.classList.add('escondido'));
+    document.querySelectorAll('.tela').forEach(t => t.classList.add('escondido'));
     document.getElementById(id).classList.remove('escondido');
 }
-function salvar() {
-    localStorage.setItem('malazar_jog',JSON.stringify(jogador));
-    localStorage.setItem('malazar_prog',JSON.stringify(progresso));
-}
-function carregar() {
-    const j = localStorage.getItem('malazar_jog');
-    const p = localStorage.getItem('malazar_prog');
-    if(j && p) { jogador=JSON.parse(j); progresso=JSON.parse(p); return true; }
-    return false;
-}
-function agoraHora() {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-function iniciar() {
-    localStorage.removeItem('jogador');
-    resetarSelecao();
-    montarCriacao();
-    trocarTela('tela-criar');
-}
 
-    }
-    resetarSelecao();
-    montarCriacao();
-    trocarTela('tela-criar');
-}
 function resetarSelecao() {
-    selecionado={raca:null,classe:null,genero:null};
-    ptsAlocados={des:0,agi:0,for:0,int:0,con:0,sor:0};
-    ptsDisponiveis=3;
-    localStorage.removeItem('jogador');
-
-}
-function montarCriacao() {
-    const racasDiv = document.getElementById('lista-racas');
-    racasDiv.innerHTML = RACAS.map(r=>`
-        <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
-            <strong>${r.nome}</strong><br>
-            <span style="font-size:0.85rem; color:var(--texto-suave);">${r.desc}</span>
-        </div>`).join('');
-
-    const classesDiv = document.getElementById('lista-classes');
-    classesDiv.innerHTML = CLASSES.map(c=>`
-        <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
-            <strong>${c.nome}</strong><br>
-            <span style="font-size:0.85rem; color:var(--texto-suave);">Habilidade: ${c.hab.split('—')[0]}</span>
-        </div>`).join('');
+    selecionado = {raca:null,classe:null,genero:null};
+    document.querySelectorAll('.opcao, [data-gen]').forEach(el => el.classList.remove('selecionada'));
+    document.getElementById('nome-jogador').value = '';
 }
 
-function montarGradePts() {
-    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
-    document.getElementById('grade-pts').innerHTML = Object.keys(nomes).map(ch=>`
-        <div class="atributo">
-            <span>${nomes[ch]}</span>
-            <div class="ctrl">
-                <button onclick="alterarPts('${ch}',-1)" ${ptsAlocados[ch]<=0?'disabled':''}>−</button>
-                <b>${ptsAlocados[ch]}</b>
-                <button onclick="alterarPts('${ch}',1)" ${ptsDisponiveis<=0?'disabled':''}>+</button>
-            </div>
-        </div>`).join('');
-
+function iniciar() {
+    localStorage.removeItem('malazar_jog');
+    localStorage.removeItem('malazar_prog');
+    resetarSelecao();
+    montarCriacao();
+    trocarTela('tela-criar');
 }
 
-function selGen(g) {
-    selecionado.genero = g;
-    document.querySelectorAll('[data-gen]').forEach(el=>el.classList.toggle('selecionada',el.dataset.gen===g));
+function telaHistoria() {
+    trocarTela('tela-historia');
 }
-function selRaca(id) {
-    selecionado.raca = id;
-    document.querySelectorAll('#lista-racas .opcao').forEach(el=>el.classList.toggle('selecionada',el.dataset.id===id));
-}
-function selClasse(id) {
-    selecionado.classe = id;
-    document.querySelectorAll('#lista-classes .opcao').forEach(el=>el.classList.toggle('selecionada',el.dataset.id===id));
-}
-function confirmarHeroi() {
-    const nome = document.getElementById('nome').value.trim();
-    if(!nome) return alert('Digite um nome para o herói!');
-    if(!selecionado.genero) return alert('Escolha o gênero!');
-    if(!selecionado.raca) return alert('Escolha a raça!');
-    if(!selecionado.classe) return alert('Escolha a classe!');
-    const atr = {};
-['des','agi','for','int','con','sor'].forEach(ch=>{
-    atr[ch] = 5 + raca.bonus[ch];
-});
 
-    const raca = RACAS.find(r=>r.id===selecionado.raca);
-    const classe = CLASSES.find(c=>c.id===selecionado.classe);
-
-    const atr = {};
-
-
-    jogador = {
-        nome, genero:selecionado.genero, raca, classe,
-        atr,
-
-    };
-    progresso = {
-        nivel:1, xp:0, xpProx:100, sala:0, ouro:20, pocoes:2,
-        vidaAtual:null, manaAtual:null, ptsParaDistribuir:0,
-        masmorraConcluida:false
-    };
-
-    salvar();
-    jogadoresOnline.unshift({nome,classe:jogador.classe.nome.split(' ')[0],nivel:1});
-    montarCidade();
-    trocarTela('tela-cidade');
-}
 function voltarInicio() {
     resetarSelecao();
     trocarTela('tela-inicio');
 }
-function telaHistoria() {
-    alert('Malazar foi selado há eras... mas seus cultistas espalham-se pelas masmorras. Você é a luz que deve deter a sombra antes que desperte.');
-}
-    function iniciar() {
-    resetarSelecao();
-    montarCriacao();
-    trocarTela('tela-criar');
+
+function selGen(g) {
+    selecionado.genero = g;
+    document.querySelectorAll('[data-gen]').forEach(el =>
+        el.classList.toggle('selecionada', el.dataset.gen === g)
+    );
 }
 
-// =============================================
-// CIDADE
-// =============================================
-function montarCidade() {
-    document.getElementById('nm-jogador').textContent = jogador.nome;
-    document.getElementById('nvl-jogador').textContent = progresso.nivel;
-    document.getElementById('barra-xp').style.width = `${(progresso.xp/progresso.xpProx)*100}%`;
-    document.getElementById('val-xp').textContent = `${progresso.xp}/${progresso.xpProx}`;
-    document.getElementById('ouro').textContent = progresso.ouro;
-    document.getElementById('pocoes').textContent = progresso.pocoes;
-    atualizarFicha();
-}
-function atualizarFicha() {
-    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
-    document.getElementById('conteudo-ficha').innerHTML = `
-        <p><b>Raça:</b> ${jogador.raca.nome}</p>
-        <p><b>Classe:</b> ${jogador.classe.nome}</p>
-        <p><b>Passiva:</b> ${jogador.raca.passiva}</p>
-        <div class="divisor"></div>
-        ${Object.keys(nomes).map(ch=>`<p>${nomes[ch]}: <b>${jogador.atr[ch]}</b></p>`).join('')}
-        <div class="divisor"></div>
-        <p style="color:var(--ouro);">💰 Ouro: ${progresso.ouro}</p>
-        <p style="color:var(--sucesso);">🧪 Poções: ${progresso.pocoes}</p>
-        <p style="color:var(--vida);">❤️ Vida Máx: ${calcularVidaMax()}</p>
-        <p style="color:var(--mana);">💧 Mana Máx: ${calcularManaMax()}</p>
-    `;
-}
-function abrirFicha() {
-    atualizarFicha();
-    document.getElementById('painel-ficha').classList.remove('escondido');
-}
-function fecharFicha() {
-    document.getElementById('painel-ficha').classList.add('escondido');
-}
-function abrirTaverna() {
-    document.getElementById('painel-taverna').classList.remove('escondido');
-    montarChat();
-}
-function fecharTaverna() {
-    document.getElementById('painel-taverna').classList.add('escondido');
-}
-function montarChat() {
-    const caixa = document.getElementById('caixa-chat');
-    caixa.innerHTML = `<div class="msg-sistema">🗣️ Taverna — conversa com outros heróis</div>`;
-    jogadoresOnline.forEach(j=>{
-        caixa.innerHTML += `<div class="msg-heroi"><b>${j.classe} ${j.nome}</b> — Nv ${j.nivel}</div>`;
-    });
-    mensagensChat.forEach(m=>{
-        caixa.innerHTML += `<div class="${m.eu?'msg-eu':'msg-heroi'}"><small>${m.hora}</small><br><b>${m.remetente}:</b> ${m.texto}</div>`;
-    });
-    caixa.scrollTop = caixa.scrollHeight;
-}
-function enviarMsg() {
-    const agora = Date.now();
-    if(agora - ultimoEnvio < 3000) return alert('Aguarde um pouquinho antes de enviar outra mensagem!');
-    const inp = document.getElementById('entrada-chat');
-    const texto = inp.value.trim();
-    if(!texto) return;
-    ultimoEnvio = agora;
-    mensagensChat.push({
-        remetente: jogador.nome,
-        texto,
-        hora: agoraHora(),
-        eu: true
-    });
-    inp.value = '';
-    montarChat();
-}
-function abrirFerreiro() {
-    document.getElementById('painel-ferreiro').classList.remove('escondido');
-    document.getElementById('pts-ferreiro').textContent = Math.floor(progresso.ouro / 50);
-    montarGradeFerreiro();
-}
-function montarGradeFerreiro() {
-    const nomes = {des:'⚡ Destreza',agi:'💨 Agilidade',for:'💪 Força',int:'🧠 Inteligência',con:'❤️ Constituição',sor:'🍀 Sorte'};
-    document.getElementById('grade-ferreiro').innerHTML = Object.keys(nomes).map(ch=>`
-        <div class="atributo">
-            <span>${nomes[ch]}: ${jogador.atr[ch]}</span>
-            <button onclick="melhorarAtributo('${ch}')" ${progresso.ouro<50 || jogador.atr[ch]>=200?'disabled':''}>
-                Melhorar (50💰)
-            </button>
-        </div>`).join('');
-}
-function melhorarAtributo(ch) {
-    if(progresso.ouro < 50 || jogador.atr[ch] >= 200) return;
-    progresso.ouro -= 50;
-    jogador.atr[ch] += 1;
-    salvar();
-    montarCidade();
-    abrirFerreiro();
-}
-function fecharFerreiro() {
-    document.getElementById('painel-ferreiro').classList.add('escondido');
-}
-function entrarMasmorra() {
-    progresso.sala = 0;
-    progresso.masmorraConcluida = false;
-    iniciarCombate();
-}
-function irCidade() {
-    trocarTela('tela-cidade');
-    montarCidade();
+function selRaca(id) {
+    selecionado.raca = id;
+    document.querySelectorAll('#lista-racas .opcao').forEach(el =>
+        el.classList.toggle('selecionada', el.dataset.id === id)
+    );
 }
 
-// =============================================
-// CÁLCULOS AUXILIARES
-// =============================================
-function calcularVidaMax() {
-    return 50 + jogador.atr.con * 5 + progresso.nivel * 10;
-}
-function calcularManaMax() {
-    return 30 + jogador.atr.int * 3 + progresso.nivel * 5;
-}
-function calcularDano(atacante, defensor, tipo='fisico') {
-    const base = atacante.for || atacante.atr.for;
-    const def = defensor.agilidade || defensor.atr.agi;
-    let dano = Math.floor(base * 0.8 + Math.random() * (base * 0.5));
-    if(tipo === 'magico') dano = Math.floor(atacante.int * 1.0 + Math.random() * (atacante.int * 0.4));
-    const reducao = Math.min(0.8, def / 30);
-    dano = Math.floor(dano * (1 - reducao));
-    return Math.max(1, dano);
-}
-function testarAcerto(atacante, defensor) {
-    const pre = atacante.des || atacante.atr.des;
-    const eva = defensor.agilidade || defensor.atr.agi;
-    const chance = 0.5 + (pre - eva) / 40;
-    return Math.random() < Math.max(0.1, Math.min(0.9, chance));
+function selClasse(id) {
+    selecionado.classe = id;
+    document.querySelectorAll('#lista-classes .opcao').forEach(el =>
+        el.classList.toggle('selecionada', el.dataset.id === id)
+    );
 }
 
-// =============================================
-// COMBATE
-// =============================================
-function iniciarCombate() {
-    trocarTela('tela-combate');
-    if(progresso.sala >= 4) {
-        inimigoAtual = {...INIMIGOS.chefe};
-    } else {
-        const lista = INIMIGOS.comuns;
-        inimigoAtual = {...lista[Math.floor(Math.random() * lista.length)]};
-    }
-    inimigoAtual.vidaMax = 30 + progresso.sala * 15 + (progresso.masmorraConcluida ? 30 : 0);
-    inimigoAtual.vidaAtual = inimigoAtual.vidaMax;
-
-    if(progresso.vidaAtual === null) {
-        progresso.vidaAtual = calcularVidaMax();
-        progresso.manaAtual = calcularManaMax();
-    }
-
-    combate = {
-        turnoJog: true,
-        habUsada: false,
-        magiasUsadas: 0,
-        bloqueioAtivo: false,
-        passivaAtivada: {},
-        turnoExtra: false,
-        log: []
-    };
-
-    if(jogador.raca.id === 'anao') combate.bloqueioAtivo = true;
-    if(jogador.raca.id === 'elfo') combate.turnoJog = true;
-
-    atualizarTelaCombate();
-    adicionarLog(`${inimigoAtual.nome} aparece!`);
-    if(jogador.raca.id === 'elfo') adicionarLog('🧝 Primeiro Passo — você ataca primeiro!');
-}
-function atualizarTelaCombate() {
-    document.getElementById('nome-inimigo').textContent = inimigoAtual.nome;
-    document.getElementById('status-turno').textContent = combate.turnoJog ? '⚔️ Seu turno' : '⏳ Turno do inimigo';
+function montarCriacao() {
+    const racasDiv = document.getElementById('lista-racas');
+    racasDiv.innerHTML = RACAS.map(r => `
+        <div class="opcao" data-id="${r.id}" onclick="selRaca('${r.id}')">
+            <strong>${r.nome}</strong> — ${r.desc}
+        </div>
+    `).join('');
     
-    const vidaMaxJog = calcularVidaMax();
-    const vidaPctJog = Math.max(0, (progresso.vidaAtual / vidaMaxJog) * 100);
-    document.getElementById('nm-jog').textContent = jogador.nome;
-    document.getElementById('v-jog').textContent = `${Math.ceil(progresso.vidaAtual)}/${vidaMaxJog}`;
-    document.getElementById('bar-jog').style.width = `${vidaPctJog}%`;
-
-    const vidaPctInim = Math.max(0, (inimigoAtual.vidaAtual / inimigoAtual.vidaMax) * 100);
-    document.getElementById('v-inim').textContent = `${Math.ceil(inimigoAtual.vidaAtual)}/${inimigoAtual.vidaMax}`;
-    document.getElementById('bar-inim').style.width = `${vidaPctInim}%`;
-
-    const acoes = document.getElementById('acoes-cmb');
-    if(combate.turnoJog && progresso.vidaAtual > 0) {
-        acoes.innerHTML = `
-            <button class="botao" onclick='golpear()'>⚔️ Golpear</button>
-            <button class="botao" onclick='usarHabilidade()' ${combate.habUsada?'disabled':''}>✨ ${jogador.classe.hab.split('—')[0].trim()}</button>
-            <button class="botao" onclick='usarPocao()' ${progresso.pocoes<=0?'disabled':''}>🧪 Poção (${progresso.pocoes})</button>
-            <button class="botao" onclick='tentarFugir()'>🏃 Fugir</button>
-        `;
-    } else {
-        acoes.innerHTML = `<p style="text-align:center;">Aguardando...</p>`;
-    }
-}
-function adicionarLog(texto) {
-    combate.log.push(texto);
-    const caixa = document.getElementById('log-cmb');
-    caixa.innerHTML = combate.log.map(l=>`<p>• ${l}</p>`).join('');
-    caixa.scrollTop = caixa.scrollHeight;
-}
-function golpear() {
-    if(!combate.turnoJog) return;
-    combate.turnoJog = false;
-    if(!testarAcerto(jogador, inimigoAtual)) {
-        adicionarLog('Seu golpe ERROU!');
-        setTimeout(turnoInimigo, 1000);
-        return;
-    }
-    let dano = calcularDano(jogador, inimigoAtual);
-    if(jogador.raca.id === 'draconato' && progresso.vidaAtual / calcularVidaMax() < 0.3) {
-        dano += Math.floor(0.1 * calcularVidaMax());
-        adicionarLog('🔥 Sangue de Chama ativa! Dano extra!');
-    }
-    inimigoAtual.vidaAtual -= dano;
-    adicionarLog(`Você golpeou causando ${dano} de dano!`);
-    verificarFimCombate() || setTimeout(turnoInimigo, 1000);
-}
-function usarHabilidade() {
-    if(combate.habUsada || !combate.turnoJog) return;
-    combate.habUsada = true;
-    combate.turnoJog = false;
-    const cls = jogador.classe.id;
-    let dano = 0;
-    switch(cls) {
-        case 'guerreiro':
-            dano = Math.floor(calcularDano(jogador, inimigoAtual) * 1.5);
-            inimigoAtual.vidaAtual -= dano;
-            adicionarLog(`⚔️ FÚRIA! Golpeou com ${dano} de dano!`);
-            break;
-        case 'mago':
-            dano = Math.floor(calcularDano(jogador, inimigoAtual, 'magico') * 1.3);
-            inimigoAtual.vidaAtual -= dano;
-            progresso.vidaAtual = Math.min(calcularVidaMax(), progresso.vidaAtual + 15);
-            adicionarLog(`🔮 CHAMA ARCANA! ${dano} de dano + cura 15!`);
-            break;
-        case 'paladino':
-            adicionarLog('🛡️ AURA SAGRADA! Dano recebido reduzido em 40%!');
-            break;
-        case 'patrulheiro':
-            dano = Math.floor(calcularDano(jogador, inimigoAtual) * 1.5);
-            inimigoAtual.vidaAtual -= dano;
-            adicionarLog(`🏹 PRECISÃO! Acerto garantido com ${dano} de dano!`);
-            break;
-        case 'batedor':
-            adicionarLog('🥷 SOMBRA! Evasão +30% por 2 turnos!');
-            break;
-    }
-    verificarFimCombate() || setTimeout(turnoInimigo, 1000);
-}
-function usarPocao() {
-    if(progresso.pocoes <= 0 || !combate.turnoJog) return;
-    progresso.pocoes--;
-    const cura = Math.floor(calcularVidaMax() * 0.35);
-    progresso.vidaAtual = Math.min(calcularVidaMax(), progresso.vidaAtual + cura);
-    adicionarLog(`🧪 Usou poção! Recuperou ${cura} de vida!`);
-    atualizarTelaCombate();
-}
-function tentarFugir() {
-    if(!combate.turnoJog) return;
-    if(Math.random() < 0.4) {
-        adicionarLog('🏃 Conseguiu fugir!');
-        setTimeout(irCidade, 1200);
-    } else {
-        adicionarLog('Não conseguiu fugir!');
-        combate.turnoJog = false;
-        setTimeout(turnoInimigo, 1000);
-    }
-}
-function turnoInimigo() {
-    atualizarTelaCombate();
-    if(inimigoAtual.vidaAtual <= 0) return;
-    if(combate.bloqueioAtivo) {
-        combate.bloqueioAtivo = false;
-        adicionarLog('🏔️ Coração de Pedra bloqueou o ataque!');
-        combate.turnoJog = true;
-        atualizarTelaCombate();
-        return;
-    }
-    if(!testarAcerto(inimigoAtual, jogador)) {
-        adicionarLog(`${inimigoAtual.nome} ERROU o golpe!`);
-        combate.turnoJog = true;
-        atualizarTelaCombate();
-        return;
-    }
-    let dano = calcularDano(inimigoAtual, jogador);
-    if(jogador.classe.id === 'paladino') dano = Math.floor(dano * 0.6);
-    if(jogador.classe.id === 'batedor' && Math.random() < 0.3) {
-        adicionarLog('🥷 Esquivou-se!');
-        combate.turnoJog = true;
-        atualizarTelaCombate();
-        return;
-    }
-    progresso.vidaAtual -= dano;
-    adicionarLog(`${inimigoAtual.nome} causou ${dano} de dano!`);
-    if(progresso.vidaAtual <= 0) {
-        progresso.vidaAtual = 0;
-        if(jogador.raca.id === 'tiefling' && !combate.passivaAtivada.tiefling) {
-            combate.passivaAtivada.tiefling = true;
-            progresso.vidaAtual = Math.floor(calcularVidaMax() * 0.25);
-            combate.turnoExtra = true;
-            adicionarLog('🔥 Pacto das Sombras — retornou à luta!');
-            combate.turnoJog = true;
-            atualizarTelaCombate();
-            return;
-        }
-        verificarFimCombate();
-        return;
-    }
-    combate.turnoJog = true;
-    atualizarTelaCombate();
-}
-function verificarFimCombate() {
-    if(inimigoAtual.vidaAtual <= 0) {
-        ganharCombate();
-        return true;
-    }
-    if(progresso.vidaAtual <= 0) {
-        perderCombate();
-        return true;
-    }
-    return false;
-}
-function ganharCombate() {
-    progresso.sala++;
-    progresso.xp += inimigoAtual.xp;
-    progresso.ouro += inimigoAtual.ouro;
-    let subiu = false;
-    while(progresso.xp >= progresso.xpProx) {
-        progresso.xp -= progresso.xpProx;
-        progresso.nivel++;
-        progresso.xpProx = Math.floor(progresso.xpProx * 1.4);
-        progresso.ptsParaDistribuir = (progresso.ptsParaDistribuir || 0) + 1;
-        subiu = true;
-    }
-    salvar();
-    if(progresso.sala >= 5) {
-        progresso.masmorraConcluida = true;
-        telaFim('vitória', `
-            <h3>🏆 MASMORRA CONCLUÍDA!</h3>
-            <p>Derrotou ${inimigoAtual.nome}!</p>
-            <p>XP: +${inimigoAtual.xp} | Ouro: +${inimigoAtual.ouro}</p>
-            ${subiu?'<p style="color:gold;">✨ Subiu de nível!</p>':''}
-        `);
-    } else {
-        telaFim('vitória', `
-            <p>Derrotou ${inimigoAtual.nome}!</p>
-            <p>XP: +${inimigoAtual.xp} | Ouro: +${inimigoAtual.ouro}</p>
-            ${subiu?'<p style="color:gold;">✨ Subiu de nível!</p>':''}
-            <p>Salas restantes: ${5 - progresso.sala}</p>
-            <button class="botao" onclick="continuarMasmorra()">⚔️ Continuar Masmorra</button>
-        `);
-    }
-}
-function continuarMasmorra() {
-    trocarTela('tela-combate');
-    iniciarCombate();
-}
-function perderCombate() {
-    salvar();
-    telaFim('derrota', `
-        <p>Você caiu em combate...</p>
-        <p>O culto ganha força, mas não desista!</p>
-        <p>Retorne à cidade e recupere forças.</p>
-    `);
-}
-function telaFim(tipo, conteudo) {
-    trocarTela('tela-fim');
-    document.getElementById('tit-fim').textContent = tipo==='vitória'?'🎉 Vitória!':'💀 Derrota';
-    document.getElementById('res-fim').innerHTML = conteudo;
+    const classesDiv = document.getElementById('lista-classes');
+    classesDiv.innerHTML = CLASSES.map(c => `
+        <div class="opcao" data-id="${c.id}" onclick="selClasse('${c.id}')">
+            <strong>${c.nome}</strong> — ${c.desc}
+        </div>
+    `).join('');
+    
+    // Vincula gênero
+    document.querySelectorAll('[data-gen]').forEach(btn => {
+        btn.onclick = () => selGen(btn.dataset.gen);
+    });
 }
 
+function confirmarCriacao() {
+    const nome = document.getElementById('nome-jogador').value.trim();
+    if(!nome) { alert('Digite seu nome, herói!'); return; }
+    if(!selecionado.genero) { alert('Escolha seu gênero!'); return; }
+    if(!selecionado.raca) { alert('Escolha sua raça!'); return; }
+    if(!selecionado.classe) { alert('Escolha sua classe!'); return; }
+    
+    const jogador = {
+        nome,
+        genero: selecionado.genero,
+        raca: selecionado.raca,
+        classe: selecionado.classe
+    };
+    localStorage.setItem('malazar_jog', JSON.stringify(jogador));
+    
+    alert(`Bem-vindo, ${nome}!\nSua jornada começa agora...`);
+    // Aqui você abre a tela do jogo principal
+    voltarInicio();
+}
 </script>
+
 </body>
 </html>
-
-              
-                    
-                    
