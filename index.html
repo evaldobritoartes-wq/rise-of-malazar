@@ -314,14 +314,13 @@ function agoraHora() {
     const d = new Date();
     return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-
 function iniciar() {
-    if(carregar()) {
-        if(confirm(`Retomar com ${jogador.nome} (Nv ${progresso.nivel})?`)) {
-            montarCidade();
-            trocarTela('tela-cidade');
-            return;
-        }
+    localStorage.removeItem('jogador');
+    resetarSelecao();
+    montarCriacao();
+    trocarTela('tela-criar');
+}
+
     }
     resetarSelecao();
     montarCriacao();
